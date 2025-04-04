@@ -1,12 +1,12 @@
-import React from 'react'
-import UserOtp from '../../../components/common/Otp'
+import React from "react";
+import UserOtp from "../../../components/auth/OtpInput";
 
 const Otp: React.FC = () => {
-    return (
-        <div>
-            <UserOtp />
-        </div>
-    )
-}
+  return (
+    <div>
+      <UserOtp />
+    </div>
+  );
+};
 
-export default Otp
+export default Otp;
