@@ -9,6 +9,8 @@ export interface InputFieldProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   showToggle?: boolean;
+  error?: string;
+  touched?: boolean;
 }
 
 export interface AuthLayoutProps {

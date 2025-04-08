@@ -2,16 +2,19 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserLogin } from "./pages/User/auth/UserLogin";
 import { UserRegister } from "./pages/User/auth/UserRegister";
 import { LandingPage } from "./pages/LandingPage";
-import Otp from "./pages/User/auth/Otp";
+import { UserOtp } from "./pages/User/auth/UserOtp";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 // import { UserPrivateRoute } from "./routes/user/UserPrivateRoute";
 import { UserPublicRoute } from "./routes/user/UserPublicRoute";
 import { TechnicianPublicRoute } from "./routes/technician/TechnicianPublicRoute";
 import { TechnicianLogin } from "./pages/Technician/auth/TechnicianLogin";
-import {TechnicianRegister} from "./pages/Technician/auth/TechnicianRegister";
+import { TechnicianRegister } from "./pages/Technician/auth/TechnicianRegister";
 import { AdminPublicRoute } from "./routes/admin/AdminPublicRoute";
 import { AdminLogin } from "./pages/Admin/auth/AdminLogin";
+import { TechnicianOtp } from "./pages/Technician/auth/TechnicianOtp";
+import { UserForgotPassword } from "./pages/User/auth/UserForgotPassword";
+import {TechnicianForgotPassword} from "./pages/Technician/auth/TechnicianForgotPassword";
 
 function App() {
   return (
@@ -36,7 +39,11 @@ function App() {
           <Route element={<UserPublicRoute />}>
             <Route path="/user/login" element={<UserLogin />} />
             <Route path="/user/register" element={<UserRegister />} />
-            <Route path="/otp" element={<Otp />} />
+            <Route path="/user/otp" element={<UserOtp />} />
+            <Route
+              path="/user/forgotpassword"
+              element={<UserForgotPassword />}
+            />
           </Route>
 
           {/* technician routes */}
@@ -46,6 +53,8 @@ function App() {
               path="/technician/register"
               element={<TechnicianRegister />}
             />
+            <Route path="/technician/otp" element={<TechnicianOtp />} />
+            <Route path="/technician/forgotpassword" element={<TechnicianForgotPassword />} />
           </Route>
 
           {/* admin routes */}

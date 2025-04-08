@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { login } from "../../services/auth.services";
-import { LoginProps } from "../../types/auth.types";
+import { LoginProps, UserLikeRoles } from "../../types/auth.types";
 import InputField from "../common/InputField";
 import Button from "../common/Button";
 import ForgotPasswordLink from "../common/ForgotPasswordLink";
 import AuthLayout from "../../layouts/AuthLayout";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 export const Login: React.FC<LoginProps> = ({ role }) => {
   const navigate = useNavigate();
@@ -30,16 +31,25 @@ export const Login: React.FC<LoginProps> = ({ role }) => {
 
     try {
       const response = await login(formData, role);
+      console.log("response from the user login component:", response);
 
-      toast.success("Login successful!");
-
-      // Navigate based on role
-      if (role === "ADMIN") {
-        navigate("/admin/dashboard");
-      } else if (role === "TECHNICIAN") {
-        navigate("/technician/dashboard");
-      } else {
-        navigate("/home");
+      if (response.success) {
+        const actualRole = response.role || "USER";
+        toast.success("Login successful!");
+      
+        Cookies.set(`${actualRole.toLowerCase()}_access_token`, response.accessToken);
+        Cookies.set(`${actualRole.toLowerCase()}_refresh_token`, response.refreshToken);
+        Cookies.set("role", response.role); 
+      
+        if (actualRole === "ADMIN") {
+          navigate("/admin/dashboard");
+        } else if (actualRole === "TECHNICIAN") {
+          navigate("/technician/portal"); 
+        } else {
+          navigate("/user/home");
+        }
+      }else {
+        toast.error(response.message || "Login failed");
       }
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Login failed.");
@@ -87,7 +97,9 @@ export const Login: React.FC<LoginProps> = ({ role }) => {
             showToggle
           />
 
-          <ForgotPasswordLink />
+          {role !== "ADMIN" && (
+            <ForgotPasswordLink role={role as UserLikeRoles} />
+          )}
 
           <Button type="submit" disabled={loading} className="w-full mt-4">
             {loading ? "Processing..." : "Login"}

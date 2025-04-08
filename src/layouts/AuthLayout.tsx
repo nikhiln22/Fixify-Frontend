@@ -2,10 +2,13 @@ import React from "react";
 import Lottie from "lottie-react";
 import { motion } from "framer-motion";
 import userAnimation from "../assets/welcome-animation.json";
+import technicianAnimation from "../assets/employee-animation.json";
+// import workerAnimation from "../assets/worker-animation.json";
 import { AuthLayoutProps } from "../types/component.types";
 
 const animationMap: Partial<Record<AuthLayoutProps["role"], unknown>> = {
   USER: userAnimation,
+  TECHNICIAN: technicianAnimation,
 };
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ role, children }) => {
@@ -13,7 +16,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ role, children }) => {
   return (
     <div className="min-h-screen flex bg-gray-200 overflow-hidden">
       <div className="hidden md:flex md:w-1/2 items-center justify-center p-8">
-      <motion.div
+        <motion.div
           initial={{ x: "-100%", opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ type: "tween", duration: 1.5, ease: "easeOut" }}

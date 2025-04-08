@@ -2,12 +2,30 @@ import { Iuser } from "../models/user";
 
 export type Role = "USER" | "ADMIN" | "TECHNICIAN";
 
+export type UserLikeRoles = Extract<Role, "USER" | "TECHNICIAN">;
+
 export interface LoginProps {
   role: Role;
 }
 
+export interface OtpProps {
+  role: UserLikeRoles;
+}
+
 export interface RegisterProps {
-  role: Extract<Role, "USER" | "TECHNICIAN">;
+  role: UserLikeRoles;
+}
+
+export interface ForgotPasswordProps {
+  role: UserLikeRoles;
+}
+
+export interface ForgotPasswordLinkProps {
+  role: UserLikeRoles;
+}
+
+export interface ResetPasswordProps {
+  role: UserLikeRoles;
 }
 
 export interface LoginFormData {
@@ -18,6 +36,8 @@ export interface LoginFormData {
 export interface LoginResponse {
   success: boolean;
   data: Iuser;
+  role: string;
+  message: string;
   accessToken: string;
   refreshToken: string;
 }
@@ -28,32 +48,20 @@ export interface OTPVerification {
   otp: string;
 }
 
-export interface OTPRequest {
-  email: string;
-}
-
-export interface OTPResponse {
-  success: boolean;
-  message: string;
-  user: Iuser;
-}
-
 export interface RegisterFormData {
   username: string;
   email: string;
   phone: string;
   password: string;
   confirmPassword: string;
-  yearsOfExperience?: string;
-  role?: string;
 }
 
 export interface RegisterResponse {
   success: boolean;
-  data?: Iuser;
+  userData?: Iuser;
   message: string;
-  access_token?: string;
-  refresh_token?: string;
+  access_token: string;
+  refresh_token: string;
   status: number;
 }
 

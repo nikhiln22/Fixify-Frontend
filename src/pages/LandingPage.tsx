@@ -10,7 +10,6 @@ export const LandingPage: React.FC = () => {
   const handleGetStarted = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  // Listen to scroll and set scroll state
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 100) {
@@ -26,7 +25,6 @@ export const LandingPage: React.FC = () => {
     };
   }, []);
 
-  // Framer animation variants
   const cardVariant = {
     hidden: { opacity: 0, y: 50, scale: 0.9 },
     visible: {
@@ -39,7 +37,6 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 text-gray-800">
-      {/* ================== Hero Section ================== */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-gray-300/70 to-gray-700/70"></div>
         <div
@@ -67,7 +64,6 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ================== Modal Section ================== */}
       <Modal isopen={isModalOpen} onclose={closeModal}>
         <div className="flex flex-col md:flex-row gap-6 p-6">
           {/* User Login Card */}
@@ -92,7 +88,6 @@ export const LandingPage: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Technician Login Card */}
           <motion.div
             variants={cardVariant}
             initial="hidden"
@@ -116,7 +111,6 @@ export const LandingPage: React.FC = () => {
         </div>
       </Modal>
 
-      {/* ================== Why Use Fixify Section ================== */}
       <section className="py-20 px-4 bg-white">
         <div className="container mx-auto">
           <div
