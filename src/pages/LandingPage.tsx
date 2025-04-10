@@ -53,7 +53,8 @@ export const LandingPage: React.FC = () => {
             Welcome to <span className="text-gray-300">Fixify</span>
           </h1>
           <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-8 text-white">
-            One platform to find the best service professionals for your everyday needs.
+            One platform to find the best service professionals for your
+            everyday needs.
           </p>
           <Button
             onClick={handleGetStarted}
@@ -78,7 +79,9 @@ export const LandingPage: React.FC = () => {
                 👤
               </div>
               <h3 className="text-2xl font-semibold mb-2">Login as User</h3>
-              <p className="text-gray-600 mb-4">Find and book services for your home</p>
+              <p className="text-gray-600 mb-4">
+                Find and book services for your home
+              </p>
               <Button
                 onClick={() => (window.location.href = "/user/login")}
                 className="w-full py-3 bg-gray-700 text-white hover:bg-gray-600"
@@ -98,8 +101,12 @@ export const LandingPage: React.FC = () => {
               <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 🛠️
               </div>
-              <h3 className="text-2xl font-semibold mb-2">Login as Technician</h3>
-              <p className="text-gray-600 mb-4">Offer your services and grow your business</p>
+              <h3 className="text-2xl font-semibold mb-2">
+                Login as Technician
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Offer your services and grow your business
+              </p>
               <Button
                 onClick={() => (window.location.href = "/technician/login")}
                 className="w-full py-3 bg-gray-700 text-white hover:bg-gray-600"
@@ -115,7 +122,9 @@ export const LandingPage: React.FC = () => {
         <div className="container mx-auto">
           <div
             className={`transition-all duration-1000 ${
-              isScrolled ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              isScrolled
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-10"
             }`}
           >
             <h2 className="text-4xl font-bold text-left mb-10 text-gray-800">
@@ -124,9 +133,10 @@ export const LandingPage: React.FC = () => {
 
             <div className="mb-10">
               <p className="text-xl text-gray-600 max-w-3xl">
-                At Fixify, we're committed to providing the best service experience.
-                Whether you need a quick fix or a major project, our platform connects you
-                with reliable professionals for all your service needs.
+                At Fixify, we're committed to providing the best service
+                experience. Whether you need a quick fix or a major project, our
+                platform connects you with reliable professionals for all your
+                service needs.
               </p>
             </div>
 

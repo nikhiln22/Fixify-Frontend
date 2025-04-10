@@ -5,9 +5,8 @@ import { verifyOtp, resendOtp } from "../../services/auth.services";
 import OTPInput from "../common/OtpInput";
 import Button from "../common/Button";
 import AuthLayout from "../../layouts/AuthLayout";
-import { toast } from "react-toastify";
+import { showToast } from "../../utils/toast";
 import { OtpProps } from "../../types/auth.types";
-import Cookies from "js-cookie";
 
 export const Otp: React.FC<OtpProps> = ({ role }) => {
   const navigate = useNavigate();
@@ -15,7 +14,7 @@ export const Otp: React.FC<OtpProps> = ({ role }) => {
 
   const tempUserId = location.state?.tempUserId || "";
   const email = location.state?.email || "";
-  const action = location.state?.action || "register";
+  const purpose = location.state?.action || "register";
 
   const [otp, setOtp] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -23,16 +22,13 @@ export const Otp: React.FC<OtpProps> = ({ role }) => {
   const [isOtpExpired, setIsOtpExpired] = useState<boolean>(false);
 
   useEffect(() => {
-
     const storedStartTime = localStorage.getItem("otpStartTime");
     const now = Date.now();
 
-    
     if (!storedStartTime || now - parseInt(storedStartTime) >= 60 * 1000) {
       localStorage.setItem("otpStartTime", now.toString());
     }
 
-    
     const interval = setInterval(() => {
       const currentTime = Date.now();
       const startTime = parseInt(
@@ -57,41 +53,53 @@ export const Otp: React.FC<OtpProps> = ({ role }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length !== 4) {
-      toast.error("Please enter the 4-digit OTP");
+      showToast({ message: "Please enter the 4-digit OTP", type: "error" });
       return;
     }
 
     try {
       setLoading(true);
-      const response = await verifyOtp({ tempUserId, otp, email }, role);
-      console.log(
-        "response from the verifyOtp function in otp Component:",
-        response
-      );
+      if (purpose === "forgot") {
+        const response = await verifyOtp(
+          { email, otp },
+          role,
+          "PASSWORD_RESET"
+        );
 
-      if (response.success) {
-        localStorage.removeItem("otpStartTime");
-
-        if (action === "forgot") {
-          navigate(`/${role}/resetpassword`, { state: { email: email } });
+        if (response.success) {
+          localStorage.removeItem("otpStartTime");
+          navigate(`/${role}/resetpassword`, {
+            state: {
+              email: email,
+            },
+          });
         } else {
-          Cookies.set(
-            `${role.toLowerCase()}_access_token`,
-            response.access_token
-          );
-          Cookies.set(
-            `${role.toLowerCase()}_refresh_token`,
-            response.refresh_token
-          );
-
-          toast.success(response.message);
-          navigate(`/${role.toLowerCase()}/home`);
+          showToast({
+            message: response.message || "Invalid OTP",
+            type: "error",
+          });
         }
       } else {
-        toast.error("Invalid OTP");
+        const response = await verifyOtp(
+          { tempUserId, otp, email },
+          role,
+          "REGISTRATION"
+        );
+
+        if (response.success) {
+          localStorage.removeItem("otpStartTime");
+          showToast({ message: response.message, type: "success" });
+          navigate(`/${role.toLowerCase()}/login`);
+        } else {
+          showToast({ message: "Invalid OTP", type: "error" });
+        }
       }
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Something went wrong!");
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      showToast({
+        message: error?.response?.data?.message || "Something went wrong!",
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -112,10 +120,17 @@ export const Otp: React.FC<OtpProps> = ({ role }) => {
         setTimer(60);
         setIsOtpExpired(false);
 
-        toast.success(result.message || "OTP Resent Successfully");
+        showToast({
+          message: result.message || "OTP Resent Successfully",
+          type: "success",
+        });
       }
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to resend OTP");
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      showToast({
+        message: error?.response?.data?.message || "Failed to resend OTP",
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }

@@ -8,12 +8,12 @@ import AuthLayout from "../../layouts/AuthLayout";
 import { resetPassword } from "../../services/auth.services";
 import { ResetPasswordProps } from "../../types/auth.types";
 
-const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
+export const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const query = new URLSearchParams(location.search);
 
-  const email = query.get("email") || "";
+  const email = location.state?.email || "";
+  console.log("email in the resetpassword component:",email);
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -21,6 +21,14 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!email) {
+      toast.error(
+        "Missing required information. Please try the password reset process again."
+      );
+      navigate(`/${role.toLowerCase()}/forgotpassword`);
+      return;
+    }
 
     if (password !== confirmPassword) {
       toast.error("Passwords do not match.");
@@ -31,7 +39,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
     try {
       const response = await resetPassword(email, password, role);
       toast.success(response.message || "Password reset successful!");
-      navigate(`/${role}/login`);
+      navigate(`/${role.toLowerCase()}/login`);
     } catch (error: any) {
       toast.error(
         error?.response?.data?.message || "Failed to reset password."
@@ -64,6 +72,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
             placeholder="Enter new password..."
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            showToggle
             required
           />
 
@@ -74,6 +83,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
             placeholder="Confirm new password..."
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            showToggle
             required
           />
 
@@ -98,5 +108,3 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
     </AuthLayout>
   );
 };
-
-export default ResetPassword;

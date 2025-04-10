@@ -8,5 +8,3 @@ export const UserRegister: React.FC = () => {
     </div>
   );
 };
-
-

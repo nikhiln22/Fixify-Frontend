@@ -19,8 +19,8 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ role }) => {
 
     try {
       const response = await forgotPassword(email, role);
-      toast.success(response.message || "OTP sent to your email.");
-      navigate(`/${role.toLowerCase()}/verifyotp`, {
+      toast.success(response.message || `OTP sent to ${email}.`);
+      navigate(`/${role.toLowerCase()}/otp`, {
         state: { email, action: "forgot" },
       });
     } catch (err: any) {

@@ -43,9 +43,10 @@ export interface LoginResponse {
 }
 
 export interface OTPVerification {
-  tempUserId: string;
+  tempUserId?: string;
   email?: string;
   otp: string;
+  purpose?:"REGISTRATION" | "Password_RESET"
 }
 
 export interface RegisterFormData {
@@ -70,4 +71,21 @@ export interface tempRegisterResponse {
   email: string;
   message: string;
   tempUserId: string;
+}
+
+export interface ResetPasswordData {
+  email: string;
+  newPassword: string;
+}
+
+export interface VerifyResetOtpResponse {
+  success: boolean;
+  message: string;
+  status: number;
+}
+
+export interface ResetPasswordResponse {
+  success: boolean;
+  message: string;
+  status: number;
 }

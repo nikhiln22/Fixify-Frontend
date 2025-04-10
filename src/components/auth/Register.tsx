@@ -22,7 +22,7 @@ export const Register: React.FC<RegisterProps> = ({ role }) => {
       .email("Invalid email address")
       .matches(
         /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-        "Please enter a valid email (e.g., user@example.com)"
+        "Please enter a valid email (e.g., user@example.com)",
       )
       .required("Email is required"),
     phone: Yup.string()
@@ -32,7 +32,7 @@ export const Register: React.FC<RegisterProps> = ({ role }) => {
       .min(8, "Password must be at least 8 characters")
       .matches(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/,
-        "Password must contain at least one uppercase, one lowercase, one number and one special character"
+        "Password must contain at least one uppercase, one lowercase, one number and one special character",
       )
       .required("Password is required"),
     confirmPassword: Yup.string()
@@ -62,7 +62,6 @@ export const Register: React.FC<RegisterProps> = ({ role }) => {
     onSubmit: async (values, { setSubmitting }) => {
       const dataToSend = {
         ...values,
-        role,
       };
 
       try {
@@ -74,7 +73,7 @@ export const Register: React.FC<RegisterProps> = ({ role }) => {
               tempUserId: response.tempUserId,
               email: response.email,
               role,
-              action: "register",
+              purpose: "register",
             },
           });
         }

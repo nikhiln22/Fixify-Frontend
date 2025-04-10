@@ -4,8 +4,11 @@ import { OTPInputProps } from "../../types/component.types";
 const OTPInput: React.FC<OTPInputProps> = ({ length, value, onchange }) => {
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const val = e.target.value.replace(/\D/, ""); 
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+  ) => {
+    const val = e.target.value.replace(/\D/, "");
     const otpArray = value.split("");
 
     if (val) {
@@ -20,7 +23,10 @@ const OTPInput: React.FC<OTPInputProps> = ({ length, value, onchange }) => {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number,
+  ) => {
     if (e.key === "Backspace" && !value[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }

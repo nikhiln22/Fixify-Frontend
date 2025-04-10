@@ -14,7 +14,9 @@ import { AdminPublicRoute } from "./routes/admin/AdminPublicRoute";
 import { AdminLogin } from "./pages/Admin/auth/AdminLogin";
 import { TechnicianOtp } from "./pages/Technician/auth/TechnicianOtp";
 import { UserForgotPassword } from "./pages/User/auth/UserForgotPassword";
-import {TechnicianForgotPassword} from "./pages/Technician/auth/TechnicianForgotPassword";
+import { TechnicianForgotPassword } from "./pages/Technician/auth/TechnicianForgotPassword";
+import { UserResetPassword } from "./pages/User/auth/UserResetPassword";
+import { TechnicianResetPassword } from "./pages/Technician/auth/TechnicianResetPassword";
 
 function App() {
   return (
@@ -44,6 +46,7 @@ function App() {
               path="/user/forgotpassword"
               element={<UserForgotPassword />}
             />
+            <Route path="/user/resetpassword" element={<UserResetPassword />} />
           </Route>
 
           {/* technician routes */}
@@ -54,7 +57,14 @@ function App() {
               element={<TechnicianRegister />}
             />
             <Route path="/technician/otp" element={<TechnicianOtp />} />
-            <Route path="/technician/forgotpassword" element={<TechnicianForgotPassword />} />
+            <Route
+              path="/technician/forgotpassword"
+              element={<TechnicianForgotPassword />}
+            />
+            <Route
+              path="/technician/resetpassword"
+              element={<TechnicianResetPassword />}
+            />
           </Route>
 
           {/* admin routes */}

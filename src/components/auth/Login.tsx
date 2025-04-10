@@ -36,19 +36,25 @@ export const Login: React.FC<LoginProps> = ({ role }) => {
       if (response.success) {
         const actualRole = response.role || "USER";
         toast.success("Login successful!");
-      
-        Cookies.set(`${actualRole.toLowerCase()}_access_token`, response.accessToken);
-        Cookies.set(`${actualRole.toLowerCase()}_refresh_token`, response.refreshToken);
-        Cookies.set("role", response.role); 
-      
+
+        Cookies.set(
+          `${actualRole.toLowerCase()}_access_token`,
+          response.accessToken,
+        );
+        Cookies.set(
+          `${actualRole.toLowerCase()}_refresh_token`,
+          response.refreshToken,
+        );
+        Cookies.set("role", response.role);
+
         if (actualRole === "ADMIN") {
           navigate("/admin/dashboard");
         } else if (actualRole === "TECHNICIAN") {
-          navigate("/technician/portal"); 
+          navigate("/technician/portal");
         } else {
           navigate("/user/home");
         }
-      }else {
+      } else {
         toast.error(response.message || "Login failed");
       }
     } catch (err: any) {
