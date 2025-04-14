@@ -32,7 +32,7 @@ export const Otp: React.FC<OtpProps> = ({ role }) => {
     const interval = setInterval(() => {
       const currentTime = Date.now();
       const startTime = parseInt(
-        localStorage.getItem("otpStartTime") || now.toString()
+        localStorage.getItem("otpStartTime") || now.toString(),
       );
       const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
       const remainingSeconds = Math.max(60 - elapsedSeconds, 0);
@@ -63,7 +63,7 @@ export const Otp: React.FC<OtpProps> = ({ role }) => {
         const response = await verifyOtp(
           { email, otp },
           role,
-          "PASSWORD_RESET"
+          "PASSWORD_RESET",
         );
 
         if (response.success) {
@@ -83,7 +83,7 @@ export const Otp: React.FC<OtpProps> = ({ role }) => {
         const response = await verifyOtp(
           { tempUserId, otp, email },
           role,
-          "REGISTRATION"
+          "REGISTRATION",
         );
 
         if (response.success) {

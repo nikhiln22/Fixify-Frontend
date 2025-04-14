@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../config/axios.config";
 import {
   LoginFormData,
   LoginResponse,
@@ -11,27 +11,25 @@ import {
   VerifyResetOtpResponse,
 } from "../types/auth.types";
 
-const API_URL = "http://localhost:3000";
-
 export const login = async (formData: LoginFormData, role: Role) => {
-  const response = await axios.post<LoginResponse>(
-    `${API_URL}/${role.toLowerCase()}/login`,
+  const response = await axiosInstance.post<LoginResponse>(
+    `/${role.toLowerCase()}/login`,
     {
-      ...formData,
-    }
+      formData,
+    },
   );
   return response.data;
 };
 
 export const register = async (
   formData: RegisterFormData,
-  role: UserLikeRoles
+  role: UserLikeRoles,
 ) => {
-  const response = await axios.post<tempRegisterResponse>(
-    `${API_URL}/${role.toLowerCase()}/register`,
+  const response = await axiosInstance.post<tempRegisterResponse>(
+    `/${role.toLowerCase()}/register`,
     {
-      ...formData,
-    }
+      formData,
+    },
   );
   return response.data;
 };
@@ -39,27 +37,26 @@ export const register = async (
 export const verifyOtp = async (
   data: OTPVerification,
   role: UserLikeRoles,
-  purpose: "REGISTRATION" | "PASSWORD_RESET" = "REGISTRATION"
+  purpose: "REGISTRATION" | "PASSWORD_RESET" = "REGISTRATION",
 ) => {
-  const response = await axios.post<RegisterResponse | VerifyResetOtpResponse>(
-    `${API_URL}/${role.toLowerCase()}/verifyotp`,
-    { ...data, purpose }
-  );
+  const response = await axiosInstance.post<
+    RegisterResponse | VerifyResetOtpResponse
+  >(`/${role.toLowerCase()}/verifyotp`, { ...data, purpose });
   return response.data;
 };
 
 export const resendOtp = async (email: string, role: UserLikeRoles) => {
-  const response = await axios.post(
-    `${API_URL}/${role.toLowerCase()}/resendotp`,
-    { email }
+  const response = await axiosInstance.post(
+    `/${role.toLowerCase()}/resendotp`,
+    { email },
   );
   return response.data;
 };
 
 export const forgotPassword = async (email: string, role: UserLikeRoles) => {
-  const response = await axios.post(
-    `${API_URL}/${role.toLowerCase()}/forgotpassword`,
-    { email }
+  const response = await axiosInstance.post(
+    `/${role.toLowerCase()}/forgotpassword`,
+    { email },
   );
   return response.data;
 };
@@ -67,11 +64,11 @@ export const forgotPassword = async (email: string, role: UserLikeRoles) => {
 export const resetPassword = async (
   email: string,
   password: string,
-  role: UserLikeRoles
+  role: UserLikeRoles,
 ): Promise<{ message: string }> => {
-  const response = await axios.post(
-    `${API_URL}/${role.toLowerCase()}/resetpassword`,
-    { email, password }
+  const response = await axiosInstance.post(
+    `/${role.toLowerCase()}/resetpassword`,
+    { email, password },
   );
   return response.data;
 };

@@ -36,12 +36,19 @@ export interface OTPInputProps {
   onchange: (otp: string) => void;
 }
 
+export interface Column<T> {
+  key: keyof T | "action";
+  label: string;
+  render?: (item: T) => React.ReactNode;
+}
+
 export interface TableWithPaginationProps<T> {
   data: T[];
-  columns: { key: keyof T; label: string }[];
+  columns: Column<T>[];
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  loading?: boolean;
 }
 
 export interface ToastMessageProps {

@@ -13,7 +13,7 @@ export const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
   const location = useLocation();
 
   const email = location.state?.email || "";
-  console.log("email in the resetpassword component:",email);
+  console.log("email in the resetpassword component:", email);
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -24,7 +24,7 @@ export const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
 
     if (!email) {
       toast.error(
-        "Missing required information. Please try the password reset process again."
+        "Missing required information. Please try the password reset process again.",
       );
       navigate(`/${role.toLowerCase()}/forgotpassword`);
       return;
@@ -42,7 +42,7 @@ export const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
       navigate(`/${role.toLowerCase()}/login`);
     } catch (error: any) {
       toast.error(
-        error?.response?.data?.message || "Failed to reset password."
+        error?.response?.data?.message || "Failed to reset password.",
       );
     } finally {
       setLoading(false);

@@ -31,28 +31,38 @@ export const Login: React.FC<LoginProps> = ({ role }) => {
 
     try {
       const response = await login(formData, role);
-      console.log("response from the user login component:", response);
+      console.log("response from the user login component:", response.data);
 
       if (response.success) {
-        const actualRole = response.role || "USER";
+        const serverRole = response.role || "USER";
+
+        console.log("serverRole in login component:", serverRole);
+
         toast.success("Login successful!");
 
         Cookies.set(
-          `${actualRole.toLowerCase()}_access_token`,
-          response.accessToken,
+          `${serverRole.toLowerCase()}_access_token`,
+          response.access_Token,
         );
         Cookies.set(
-          `${actualRole.toLowerCase()}_refresh_token`,
-          response.refreshToken,
+          `${serverRole.toLowerCase()}_refresh_token`,
+          response.refresh_Token,
         );
-        Cookies.set("role", response.role);
+        Cookies.set("role", serverRole);
 
-        if (actualRole === "ADMIN") {
-          navigate("/admin/dashboard");
-        } else if (actualRole === "TECHNICIAN") {
-          navigate("/technician/portal");
-        } else {
-          navigate("/user/home");
+        switch (serverRole.toUpperCase()) {
+          case "ADMIN":
+            navigate("/admin/dashboard");
+            break;
+          case "TECHNICIAN":
+            navigate("/technician/portal");
+            break;
+          case "USER":
+            navigate("/user/home");
+            break;
+          default:
+            navigate("/user/home");
+            break;
         }
       } else {
         toast.error(response.message || "Login failed");

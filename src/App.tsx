@@ -17,6 +17,8 @@ import { UserForgotPassword } from "./pages/User/auth/UserForgotPassword";
 import { TechnicianForgotPassword } from "./pages/Technician/auth/TechnicianForgotPassword";
 import { UserResetPassword } from "./pages/User/auth/UserResetPassword";
 import { TechnicianResetPassword } from "./pages/Technician/auth/TechnicianResetPassword";
+import AdminDashboard from "./pages/Admin/adminpages/AdminDashboard";
+import {JobDesignationListPage} from "./pages/Admin/adminpages/JobDesignationListPage";
 
 function App() {
   return (
@@ -70,6 +72,8 @@ function App() {
           {/* admin routes */}
           <Route element={<AdminPublicRoute />}>
             <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/jobdesignations" element={<JobDesignationListPage/>}/>
           </Route>
         </Routes>
       </BrowserRouter>

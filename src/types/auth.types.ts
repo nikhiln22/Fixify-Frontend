@@ -4,6 +4,10 @@ export type Role = "USER" | "ADMIN" | "TECHNICIAN";
 
 export type UserLikeRoles = Extract<Role, "USER" | "TECHNICIAN">;
 
+export interface GenericEntity {
+  [key: string]: any;
+}
+
 export interface LoginProps {
   role: Role;
 }
@@ -35,18 +39,19 @@ export interface LoginFormData {
 
 export interface LoginResponse {
   success: boolean;
-  data: Iuser;
+  data: GenericEntity;
   role: string;
   message: string;
-  accessToken: string;
-  refreshToken: string;
+  access_Token: string;
+  refresh_Token: string;
+  status?: number;
 }
 
 export interface OTPVerification {
   tempUserId?: string;
   email?: string;
   otp: string;
-  purpose?:"REGISTRATION" | "Password_RESET"
+  purpose?: "REGISTRATION" | "Password_RESET";
 }
 
 export interface RegisterFormData {
