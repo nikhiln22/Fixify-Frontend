@@ -8,11 +8,14 @@ export const showToast = ({
   duration = 3000,
 }: ToastMessageProps) => {
   toast(<ToastMessage message={message} type={type} />, {
-    type,
     autoClose: duration,
     hideProgressBar: true,
     pauseOnHover: true,
     draggable: true,
-    position: "top-right",
+    position: "top-center",
+    type: "default",
+    icon: false,
+    closeButton: false,
+    className: "custom-toast-container",
   });
 };

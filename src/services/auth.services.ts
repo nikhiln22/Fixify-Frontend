@@ -6,7 +6,7 @@ import {
   RegisterResponse,
   OTPVerification,
   Role,
-  tempRegisterResponse,
+  TempRegisterResponse,
   UserLikeRoles,
   VerifyResetOtpResponse,
 } from "../types/auth.types";
@@ -14,9 +14,7 @@ import {
 export const login = async (formData: LoginFormData, role: Role) => {
   const response = await axiosInstance.post<LoginResponse>(
     `/${role.toLowerCase()}/login`,
-    {
-      formData,
-    },
+    formData,
   );
   return response.data;
 };
@@ -25,10 +23,10 @@ export const register = async (
   formData: RegisterFormData,
   role: UserLikeRoles,
 ) => {
-  const response = await axiosInstance.post<tempRegisterResponse>(
+  const response = await axiosInstance.post<TempRegisterResponse>(
     `/${role.toLowerCase()}/register`,
     {
-      formData,
+      ...formData,
     },
   );
   return response.data;
@@ -39,9 +37,27 @@ export const verifyOtp = async (
   role: UserLikeRoles,
   purpose: "REGISTRATION" | "PASSWORD_RESET" = "REGISTRATION",
 ) => {
+
+  console.log(`veryfying the otp for ${role} with purpose ${purpose}`);
+
+  console.log("payload:",data);
+
+  let payload;
+  if (role.toLowerCase() === "technician") {
+    if (!('tempTechnicianId' in data) && purpose === "REGISTRATION") {
+      console.error("Missing tempTechnicianId for technician OTP verification");
+    }
+    payload = { ...data, purpose };
+  } else {
+    if (!('tempUserId' in data) && purpose === "REGISTRATION") {
+      console.error("Missing tempUserId for user OTP verification");
+    }
+    payload = { ...data, purpose };
+  }
+
   const response = await axiosInstance.post<
     RegisterResponse | VerifyResetOtpResponse
-  >(`/${role.toLowerCase()}/verifyotp`, { ...data, purpose });
+  >(`/${role.toLowerCase()}/verifyotp`, payload);
   return response.data;
 };
 

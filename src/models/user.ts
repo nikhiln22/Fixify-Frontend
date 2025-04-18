@@ -4,6 +4,7 @@ export interface Iuser {
   phone: number;
   status: string;
   image?: string;
+  role:string
   createdAt: Date;
   updatedAt: Date;
 }

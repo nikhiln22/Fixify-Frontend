@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.1",
     "@tailwindcss/vite": "^4.0.15",
     "axios": "^1.8.4",
     "formik": "^2.4.6",

@@ -28,6 +28,10 @@ export interface ModalProps {
   onclose: () => void;
   title?: string;
   children: React.ReactNode;
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm?: () => void;
+  confirmButtonColor?: "red" | "green" | "blue";
 }
 
 export interface OTPInputProps {
@@ -39,8 +43,9 @@ export interface OTPInputProps {
 export interface Column<T> {
   key: keyof T | "action";
   label: string;
-  render?: (item: T) => React.ReactNode;
+  render?: (item: T, index: number) => React.ReactNode;
 }
+
 
 export interface TableWithPaginationProps<T> {
   data: T[];
@@ -63,4 +68,8 @@ export interface ApprovalModalProps {
   onConfirm: () => void;
   title: string;
   message: string;
+}
+
+export interface AddDesignationFormProps {
+  onSuccess: () => void;
 }

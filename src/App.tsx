@@ -5,6 +5,7 @@ import { LandingPage } from "./pages/LandingPage";
 import { UserOtp } from "./pages/User/auth/UserOtp";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./assets/toast-overides.css";
 // import { UserPrivateRoute } from "./routes/user/UserPrivateRoute";
 import { UserPublicRoute } from "./routes/user/UserPublicRoute";
 import { TechnicianPublicRoute } from "./routes/technician/TechnicianPublicRoute";
@@ -18,22 +19,23 @@ import { TechnicianForgotPassword } from "./pages/Technician/auth/TechnicianForg
 import { UserResetPassword } from "./pages/User/auth/UserResetPassword";
 import { TechnicianResetPassword } from "./pages/Technician/auth/TechnicianResetPassword";
 import AdminDashboard from "./pages/Admin/adminpages/AdminDashboard";
-import {JobDesignationListPage} from "./pages/Admin/adminpages/JobDesignationListPage";
+import JobDesignationListPage from "./pages/Admin/adminpages/JobDesignationListPage";
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <ToastContainer
-          position="top-right"
+          position="top-center"
           autoClose={5000}
-          hideProgressBar={false}
+          hideProgressBar={true}
           newestOnTop={false}
           closeOnClick
           rtl={false}
           pauseOnFocusLoss
           draggable
           pauseOnHover
+          closeButton={false}
           theme="light"
         />
         <Routes>
@@ -73,7 +75,10 @@ function App() {
           <Route element={<AdminPublicRoute />}>
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/jobdesignations" element={<JobDesignationListPage/>}/>
+            <Route
+              path="/admin/jobdesignations"
+              element={<JobDesignationListPage />}
+            />
           </Route>
         </Routes>
       </BrowserRouter>

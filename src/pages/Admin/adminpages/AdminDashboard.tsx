@@ -33,10 +33,8 @@ const AdminDashboard: React.FC = () => {
     <AdminLayout>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-2">Dashboard</h1>
-        {/* <p className="text-gray-500">Welcome to your admin dashboard</p> */}
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <StatsCard
           title="Total Users"

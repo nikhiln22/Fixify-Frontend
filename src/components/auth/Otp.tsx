@@ -1,22 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { useFormik } from "formik";
 import { verifyOtp, resendOtp } from "../../services/auth.services";
 import OTPInput from "../common/OtpInput";
 import Button from "../common/Button";
 import AuthLayout from "../../layouts/AuthLayout";
 import { showToast } from "../../utils/toast";
 import { OtpProps } from "../../types/auth.types";
+import { otpValidationSchema } from "../../utils/validations/authvalidationschema"; 
 
 export const Otp: React.FC<OtpProps> = ({ role }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const tempUserId = location.state?.tempUserId || "";
   const email = location.state?.email || "";
+  const tempUserId = location.state?.tempUserId || "";
+  const tempTechnicianId = location.state?.tempTechnicianId || "";
   const purpose = location.state?.action || "register";
+  
+  const otpPurpose = purpose === "forgot" ? "PASSWORD_RESET" : "REGISTRATION";
 
-  const [otp, setOtp] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState<number>(60);
   const [isOtpExpired, setIsOtpExpired] = useState<boolean>(false);
@@ -50,69 +53,81 @@ export const Otp: React.FC<OtpProps> = ({ role }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otp.length !== 4) {
-      showToast({ message: "Please enter the 4-digit OTP", type: "error" });
-      return;
-    }
-
-    try {
-      setLoading(true);
-      if (purpose === "forgot") {
-        const response = await verifyOtp(
-          { email, otp },
-          role,
-          "PASSWORD_RESET",
-        );
+  const formik = useFormik({
+    initialValues: {
+      otp: "",
+    },
+    validationSchema: otpValidationSchema,
+    onSubmit: async (values, { setSubmitting, setErrors }) => {
+      try {
+        setLoading(true);
+        
+        let payload;
+        
+        if (otpPurpose === "PASSWORD_RESET") {
+          payload = { email, otp: values.otp };
+        } else {
+          if (role.toLowerCase() === "technician") {
+            payload = { tempTechnicianId, otp: values.otp, email };
+          } else {
+            payload = { tempUserId, otp: values.otp, email };
+          }
+        }
+        
+        console.log(`Sending ${otpPurpose} OTP verification for ${role}:`, payload);
+        
+        const response = await verifyOtp(payload, role, otpPurpose);
 
         if (response.success) {
           localStorage.removeItem("otpStartTime");
-          navigate(`/${role}/resetpassword`, {
-            state: {
-              email: email,
-            },
-          });
+          
+          if (otpPurpose === "PASSWORD_RESET") {
+            showToast({ 
+              message: response.message || "OTP verified successfully", 
+              type: "success" 
+            });
+            navigate(`/${role.toLowerCase()}/resetpassword`, {
+              state: { email }
+            });
+          } else {
+            showToast({ 
+              message: response.message || "Registration successful!", 
+              type: "success" 
+            });
+            navigate(`/${role.toLowerCase()}/login`);
+          }
         } else {
-          showToast({
-            message: response.message || "Invalid OTP",
-            type: "error",
+          showToast({ 
+            message: response.message || "Invalid OTP", 
+            type: "error" 
           });
+          setErrors({ otp: "Invalid OTP" });
         }
-      } else {
-        const response = await verifyOtp(
-          { tempUserId, otp, email },
-          role,
-          "REGISTRATION",
-        );
-
-        if (response.success) {
-          localStorage.removeItem("otpStartTime");
-          showToast({ message: response.message, type: "success" });
-          navigate(`/${role.toLowerCase()}/login`);
-        } else {
-          showToast({ message: "Invalid OTP", type: "error" });
-        }
+      } catch (err) {
+        const error = err as { response?: { data?: { message?: string } } };
+        const errorMessage = error?.response?.data?.message || "Something went wrong!";
+        
+        showToast({
+          message: errorMessage,
+          type: "error",
+        });
+        setErrors({ otp: errorMessage });
+        console.error("OTP verification error:", err);
+      } finally {
+        setLoading(false);
+        setSubmitting(false);
       }
-    } catch (err) {
-      const error = err as { response?: { data?: { message?: string } } };
-      showToast({
-        message: error?.response?.data?.message || "Something went wrong!",
-        type: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  });
 
   const handleResend = async () => {
     try {
-      setLoading(true);
+      setLoading(true); 
       const result = await resendOtp(email, role);
-      console.log("response from resend at resend otp function:", result);
-
+      
       if (result.success) {
-        setOtp("");
+        // Reset OTP input
+        formik.setFieldValue('otp', '');
 
         const newStartTime = Date.now();
         localStorage.setItem("otpStartTime", newStartTime.toString());
@@ -132,18 +147,15 @@ export const Otp: React.FC<OtpProps> = ({ role }) => {
         type: "error",
       });
     } finally {
-      setLoading(false);
+      setLoading(false); 
     }
   };
 
   return (
     <AuthLayout role={role}>
-      <motion.form
-        onSubmit={handleSubmit}
-        className="w-full md:w-[28rem] mx-auto space-y-6 p-8"
-        initial={{ x: "100%", opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ type: "tween", duration: 1.5, ease: "easeOut" }}
+      <form
+        onSubmit={formik.handleSubmit}
+        className="w-full space-y-6 p-8"
       >
         <div className="text-center">
           <h4 className="text-3xl font-bold text-black capitalize">
@@ -154,11 +166,20 @@ export const Otp: React.FC<OtpProps> = ({ role }) => {
           </p>
         </div>
 
-        <OTPInput length={4} value={otp} onchange={setOtp} />
+        <div className="space-y-2">
+          <OTPInput 
+            length={4} 
+            value={formik.values.otp} 
+            onchange={(otp) => formik.setFieldValue('otp', otp)} 
+          />
+          {formik.errors.otp && formik.touched.otp && (
+            <p className="text-red-500 text-xs text-center mt-1">{formik.errors.otp}</p>
+          )}
+        </div>
 
         <Button
           type="submit"
-          disabled={loading || isOtpExpired}
+          disabled={loading || isOtpExpired || formik.isSubmitting}
           className="w-full mt-4"
         >
           {loading ? "Verifying..." : "Verify OTP"}
@@ -179,7 +200,7 @@ export const Otp: React.FC<OtpProps> = ({ role }) => {
             Resend OTP in {timer}s
           </p>
         )}
-      </motion.form>
+      </form>
     </AuthLayout>
   );
 };

@@ -1,43 +1,47 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { toast } from "react-toastify";
 import InputField from "../common/InputField";
 import Button from "../common/Button";
 import AuthLayout from "../../layouts/AuthLayout";
 import { forgotPassword } from "../../services/auth.services";
 import { ForgotPasswordProps } from "../../types/auth.types";
+import { showToast } from "../../utils/toast";
+import { useFormik } from "formik";
+import { forgotPasswordValidationSchema } from "../../utils/validations/authvalidationschema"; 
 
 export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ role }) => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const response = await forgotPassword(email, role);
-      toast.success(response.message || `OTP sent to ${email}.`);
-      navigate(`/${role.toLowerCase()}/otp`, {
-        state: { email, action: "forgot" },
-      });
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to send OTP.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+    },
+    validationSchema: forgotPasswordValidationSchema,
+    onSubmit: async (values, { setSubmitting }) => {
+      setSubmitting(true);
+      try {
+        const response = await forgotPassword(values.email, role);
+        showToast({
+          message: response.message || `OTP sent to ${values.email}.`,
+          type: "success",
+        });
+        navigate(`/${role.toLowerCase()}/otp`, {
+          state: { email: values.email, action: "forgot" },
+        });
+      } catch (err: any) {
+        showToast({
+          message: err?.response?.data?.message || "Failed to send OTP.",
+          type: "error",
+        });
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
 
   return (
     <AuthLayout role={role}>
-      <motion.div
-        initial={{ x: "100%", opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ type: "tween", duration: 1.5, ease: "easeOut" }}
-        className="w-full md:w-[28rem] space-y-8"
-      >
+      <div className="w-full md:w-[28rem] space-y-8">
         <div className="text-center">
           <h4 className="text-3xl font-bold text-black capitalize">
             {role[0].toUpperCase() + role.slice(1).toLowerCase()} Forgot
@@ -47,22 +51,21 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ role }) => {
             Enter your email to receive an OTP
           </p>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6 p-8 rounded-lg">
+        <form onSubmit={formik.handleSubmit} className="space-y-6 p-8 rounded-lg">
           <InputField
             label="Email"
             name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formik.values.email}
+            onChange={formik.handleChange}
             type="email"
             placeholder="Enter your email..."
             required
+            error={formik.errors.email}
+            touched={formik.touched.email}
           />
-
-          <Button type="submit" disabled={loading} className="w-full mt-4">
-            {loading ? "Sending OTP..." : "Submit"}
+          <Button type="submit" disabled={formik.isSubmitting} className="w-full mt-4">
+            {formik.isSubmitting ? "Sending OTP..." : "Submit"}
           </Button>
-
           <div className="text-center mt-4">
             <p className="text-base text-gray-700">
               Back to{" "}
@@ -76,7 +79,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ role }) => {
             </p>
           </div>
         </form>
-      </motion.div>
+      </div>
     </AuthLayout>
   );
 };
