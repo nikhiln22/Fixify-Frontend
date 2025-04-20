@@ -1,35 +1,89 @@
-
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Register from './pages/User/auth/Register';
-import Login from './pages/User/auth/Login'
-import Otp from './pages/User/auth/Otp';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { UserLogin } from "./pages/User/auth/UserLogin";
+import { UserRegister } from "./pages/User/auth/UserRegister";
+import { LandingPage } from "./pages/LandingPage";
+import { UserOtp } from "./pages/User/auth/UserOtp";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./assets/toast-overides.css";
+// import { UserPrivateRoute } from "./routes/user/UserPrivateRoute";
+import { UserPublicRoute } from "./routes/user/UserPublicRoute";
+import { TechnicianPublicRoute } from "./routes/technician/TechnicianPublicRoute";
+import { TechnicianLogin } from "./pages/Technician/auth/TechnicianLogin";
+import { TechnicianRegister } from "./pages/Technician/auth/TechnicianRegister";
+import { AdminPublicRoute } from "./routes/admin/AdminPublicRoute";
+import { AdminLogin } from "./pages/Admin/auth/AdminLogin";
+import { TechnicianOtp } from "./pages/Technician/auth/TechnicianOtp";
+import { UserForgotPassword } from "./pages/User/auth/UserForgotPassword";
+import { TechnicianForgotPassword } from "./pages/Technician/auth/TechnicianForgotPassword";
+import { UserResetPassword } from "./pages/User/auth/UserResetPassword";
+import { TechnicianResetPassword } from "./pages/Technician/auth/TechnicianResetPassword";
+import AdminDashboard from "./pages/Admin/adminpages/AdminDashboard";
+import JobDesignationListPage from "./pages/Admin/adminpages/JobDesignationListPage";
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <ToastContainer
-          position="top-right"
+          position="top-center"
           autoClose={5000}
-          hideProgressBar={false}
+          hideProgressBar={true}
           newestOnTop={false}
           closeOnClick
           rtl={false}
           pauseOnFocusLoss
           draggable
           pauseOnHover
+          closeButton={false}
           theme="light"
         />
         <Routes>
-          <Route path='/' element={<Login />} />
-          <Route path='/register' element={<Register />} />
-          <Route path='/otp' element={<Otp />} />
+          <Route path="/" element={<LandingPage />} />
+
+          {/* user routes */}
+          <Route element={<UserPublicRoute />}>
+            <Route path="/user/login" element={<UserLogin />} />
+            <Route path="/user/register" element={<UserRegister />} />
+            <Route path="/user/otp" element={<UserOtp />} />
+            <Route
+              path="/user/forgotpassword"
+              element={<UserForgotPassword />}
+            />
+            <Route path="/user/resetpassword" element={<UserResetPassword />} />
+          </Route>
+
+          {/* technician routes */}
+          <Route element={<TechnicianPublicRoute />}>
+            <Route path="/technician/login" element={<TechnicianLogin />} />
+            <Route
+              path="/technician/register"
+              element={<TechnicianRegister />}
+            />
+            <Route path="/technician/otp" element={<TechnicianOtp />} />
+            <Route
+              path="/technician/forgotpassword"
+              element={<TechnicianForgotPassword />}
+            />
+            <Route
+              path="/technician/resetpassword"
+              element={<TechnicianResetPassword />}
+            />
+          </Route>
+
+          {/* admin routes */}
+          <Route element={<AdminPublicRoute />}>
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route
+              path="/admin/jobdesignations"
+              element={<JobDesignationListPage />}
+            />
+          </Route>
         </Routes>
       </BrowserRouter>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
