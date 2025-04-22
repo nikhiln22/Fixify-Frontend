@@ -1,9 +1,13 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import cookie from "js-cookie";
+import { getAccessToken } from "../../utils/authUtils";
 
 export const UserPublicRoute: React.FC = () => {
-  const userAccessToken = cookie.get("user_access_token");
-  console.log("userAccessToken:", userAccessToken);
-  return userAccessToken ? <Navigate to="/user/home" /> : <Outlet />;
+  const token = getAccessToken("user");
+
+  if (token) {
+    return <Navigate to="/user/home" />;
+  }
+  
+  return <Outlet />;
 };

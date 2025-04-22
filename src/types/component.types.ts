@@ -3,6 +3,9 @@ import React, { ButtonHTMLAttributes } from "react";
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   className?: string;
+  variant?: 'primary' | 'outline';
+  isLoading?: boolean;
+  onClick?: () => void;
 }
 
 export interface InputFieldProps
@@ -14,7 +17,7 @@ export interface InputFieldProps
 }
 
 export interface AuthLayoutProps {
-  role: "USER" | "ADMIN" | "TECHNICIAN";
+   role: "USER" | "ADMIN" | "TECHNICIAN";
   children: React.ReactNode;
 }
 
@@ -32,6 +35,7 @@ export interface ModalProps {
   cancelText?: string;
   onConfirm?: () => void;
   confirmButtonColor?: "red" | "green" | "blue";
+  fullContent?:Boolean;
 }
 
 export interface OTPInputProps {
@@ -72,4 +76,37 @@ export interface ApprovalModalProps {
 
 export interface AddDesignationFormProps {
   onSuccess: () => void;
+}
+
+export interface QualificationFormProps {
+  onSubmit: (formData: any) => void;
+  onCancel: () => void;
+}
+
+export interface VerificationBannerProps {
+  isVerified: boolean;
+  isSubmitted?: boolean;
+  onStartVerification: () => void;
+}
+
+export interface SelectFieldProps {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLSelectElement>) => void;
+  options: Array<{ value: string; label: string }>;
+  placeholder?: string;
+  required?: boolean;
+  disabled?: boolean;
+  error?: string;
+  touched?: boolean;
+  icon?: React.ReactNode;
+  className?: string;
+}
+
+export interface VerificationBannerProps {
+  isVerified: boolean;
+  isSubmitted?: boolean;
+  onStartVerification: () => void;
 }

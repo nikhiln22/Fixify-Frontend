@@ -4,4 +4,6 @@ export interface Iadmin {
   image?: string;
   createdAt: Date;
   updatedAt: Date;
+  access_token:string;
+  refresh_token:string;
 }

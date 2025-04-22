@@ -1,13 +1,13 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import cookie from "js-cookie";
+import { getAccessToken } from "../../utils/authUtils";
 
 export const TechnicianPublicRoute: React.FC = () => {
-  const technicianAccessToken = cookie.get("technicianAccessToken");
-  console.log("technicianAccessToken:", technicianAccessToken);
-  return technicianAccessToken ? (
-    <Navigate to="/technician/dashboard" />
-  ) : (
-    <Outlet />
-  );
+  const token = getAccessToken("technician");
+
+  if (token) {
+    return <Navigate to="/technician/portal" />;
+  }
+
+  return <Outlet />;
 };

@@ -12,4 +12,6 @@ export interface Itechnician {
   role:string
   createdAt: Date;
   updatedAt: Date;
+  access_token:string;
+  refresh_token:string;
 }
