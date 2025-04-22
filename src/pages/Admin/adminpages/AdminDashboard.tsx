@@ -28,7 +28,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
   );
 };
 
-const AdminDashboard: React.FC = () => {
+export const AdminDashboard: React.FC = () => {
   return (
     <AdminLayout>
       <div className="mb-6">
@@ -58,5 +58,3 @@ const AdminDashboard: React.FC = () => {
     </AdminLayout>
   );
 };
-
-export default AdminDashboard;

@@ -43,8 +43,6 @@ export interface LoginResponse {
   success: boolean;
   data: Iadmin | Iuser | Itechnician;
   message: string;
-  access_Token: string;
-  refresh_Token: string;
   status?: number;
 }
 
@@ -72,7 +70,6 @@ export interface RegisterFormData {
   confirmPassword: string;
 }
 
-// User registration response
 export interface UserRegisterResponse {
   success: boolean;
   userData?: Iuser;
@@ -82,7 +79,7 @@ export interface UserRegisterResponse {
   status: number;
 }
 
-// Technician registration response
+
 export interface TechnicianRegisterResponse {
   success: boolean;
   technicianData?: Itechnician;
@@ -92,27 +89,27 @@ export interface TechnicianRegisterResponse {
   status: number;
 }
 
-// Combined registration response type
+
 export type RegisterResponse = UserRegisterResponse | TechnicianRegisterResponse;
 
-// Base temporary registration response with common fields
+
 export interface BaseTempRegisterResponse {
   success: boolean;
   email: string;
   message: string;
 }
 
-// User-specific temporary registration response
+
 export interface UserTempRegisterResponse extends BaseTempRegisterResponse {
   tempUserId: string;
 }
 
-// Technician-specific temporary registration response
+
 export interface TechnicianTempRegisterResponse extends BaseTempRegisterResponse {
   tempTechnicianId: string;
 }
 
-// Dynamic temporary registration response based on role
+
 export type TempRegisterResponse = UserTempRegisterResponse | TechnicianTempRegisterResponse;
 
 
@@ -133,7 +130,7 @@ export interface ResetPasswordResponse {
   status: number;
 }
 
-// Helper type guard functions to determine which type of response/payload we're dealing with
+
 export function isUserTempRegisterResponse(response: TempRegisterResponse): response is UserTempRegisterResponse {
   return 'tempUserId' in response;
 }

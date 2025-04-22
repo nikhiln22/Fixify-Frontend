@@ -15,11 +15,11 @@ const OTPInput: React.FC<OTPInputProps> = ({ length, value, onchange }) => {
       otpArray[index] = val;
       onchange(otpArray.join(""));
       if (index < length - 1) {
-        inputRefs.current[index + 1]?.focus(); // Move to next input
+        inputRefs.current[index + 1]?.focus();
       }
     } else {
       otpArray[index] = "";
-      onchange(otpArray.join("")); // Remove the value in Formik state
+      onchange(otpArray.join(""));
     }
   };
 
@@ -28,7 +28,7 @@ const OTPInput: React.FC<OTPInputProps> = ({ length, value, onchange }) => {
     index: number
   ) => {
     if (e.key === "Backspace" && !value[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus(); // Move focus to previous input
+      inputRefs.current[index - 1]?.focus();
     }
   };
 
@@ -43,9 +43,9 @@ const OTPInput: React.FC<OTPInputProps> = ({ length, value, onchange }) => {
           type="text"
           inputMode="numeric"
           maxLength={1}
-          value={value[index] || ""} // Controlled value from Formik
-          onChange={(e) => handleChange(e, index)} // Update Formik value
-          onKeyDown={(e) => handleKeyDown(e, index)} // Handle backspace to focus previous input
+          value={value[index] || ""}
+          onChange={(e) => handleChange(e, index)} 
+          onKeyDown={(e) => handleKeyDown(e, index)} 
           className="w-12 h-12 text-center text-xl border border-gray-400 rounded focus:outline-none focus:ring-2 focus:ring-black"
         />
       ))}

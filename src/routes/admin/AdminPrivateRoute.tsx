@@ -1,9 +1,14 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import cookie from "js-cookie";
+import { getAccessToken } from "../../utils/authUtils";
 
 export const AdminPrivateRoute: React.FC = () => {
-  const adminAccessToken = cookie.get("adminAccessToken");
-  console.log("adminAccessToken:", adminAccessToken);
-  return adminAccessToken ? <Outlet /> : <Navigate to="/admin/dashboard" />;
+  const token = getAccessToken("admin");
+
+  if (token) {
+    return <Outlet />;
+  }
+
+  return <Navigate to="/admin/login" />;
 };
+

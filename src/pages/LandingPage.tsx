@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Button from "../components/common/Button";
-import Modal from "../components/common/Modal";
+import { X } from "lucide-react";
 
 export const LandingPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,6 +35,18 @@ export const LandingPage: React.FC = () => {
     },
   };
 
+  const backdropVariant = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { duration: 0.3 }
+    },
+    exit: { 
+      opacity: 0,
+      transition: { duration: 0.3 }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 text-gray-800">
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -65,58 +77,119 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      <Modal isopen={isModalOpen} onclose={closeModal}>
-        <div className="flex flex-col md:flex-row gap-6 p-6">
-          {/* User Login Card */}
-          <motion.div
-            variants={cardVariant}
-            initial="hidden"
-            animate="visible"
-            className="flex-1 bg-white p-6 rounded-xl shadow-xl"
-          >
-            <div className="text-center mb-6">
-              <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                👤
-              </div>
-              <h3 className="text-2xl font-semibold mb-2">Login as User</h3>
-              <p className="text-gray-600 mb-4">
-                Find and book services for your home
-              </p>
-              <Button
-                onClick={() => (window.location.href = "/user/login")}
-                className="w-full py-3 bg-gray-700 text-white hover:bg-gray-600"
-              >
-                Login as User
-              </Button>
-            </div>
-          </motion.div>
+      <AnimatePresence>
+        {isModalOpen && (
+          <>
+            <motion.div 
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+              variants={backdropVariant}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              onClick={closeModal}
+            />
+            
+            <motion.div 
+              className="fixed inset-0 z-50 flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="relative flex flex-col md:flex-row gap-8 px-4">
+                <button 
+                  onClick={closeModal}
+                  className="absolute -top-8 -right-8 p-2 z-10 transition-transform hover:scale-110"
+                  aria-label="Close modal"
+                >
+                  <X size={32} className="text-black" strokeWidth={2.5} />
+                </button>
+                
+                <motion.div
+                  variants={cardVariant}
+                  initial="hidden"
+                  animate="visible"
+                  exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                  className="relative overflow-hidden"
+                  style={{ 
+                    width: '440px', 
+                    borderRadius: '16px',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1), 0 10px 30px rgba(0, 0, 0, 0.2)',
+                    background: 'linear-gradient(to top, #9ca3af, #e5e7eb)'
+                  }}
+                >
+                  <div className="p-14 text-center">
+                    <div className="flex justify-center items-center w-40 h-40 bg-gray-200 rounded-full mx-auto mb-10" 
+                      style={{ boxShadow: '0 15px 30px -10px rgba(0, 0, 0, 0.25), 0 10px 20px -5px rgba(0, 0, 0, 0.1)' }}>
+                      <span className="text-gray-900 text-6xl">&#x1F464;</span>
+                    </div>
+                    
+                    <h3 className="text-3xl font-bold mb-4 text-gray-800">Login as User</h3>
+                    <p className="text-xl text-gray-600 mb-10">
+                      Find and book services for your home
+                    </p>
+                    
+                    <Button
+                      onClick={() => (window.location.href = "/user/login")}
+                      className="w-full py-6 bg-black hover:bg-gray-800 text-xl font-semibold rounded-xl text-white"
+                      style={{ 
+                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2)' 
+                      }}
+                    >
+                      Login as User
+                    </Button>
+                    
+                    <p className="mt-8 text-gray-600">
+                      Not registered? <a href="/user/register" className="text-gray-800 hover:underline font-medium">Create an account</a>
+                    </p>
+                  </div>
+                </motion.div>
 
-          <motion.div
-            variants={cardVariant}
-            initial="hidden"
-            animate="visible"
-            className="flex-1 bg-white p-6 rounded-xl shadow-xl"
-          >
-            <div className="text-center mb-6">
-              <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                🛠️
+                <motion.div
+                  variants={cardVariant}
+                  initial="hidden"
+                  animate="visible"
+                  exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                  className="relative overflow-hidden"
+                  style={{ 
+                    width: '440px', 
+                    borderRadius: '16px',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1), 0 10px 30px rgba(0, 0, 0, 0.2)',
+                    background: 'linear-gradient(to top, #9ca3af, #e5e7eb)'
+                  }}
+                >
+                  <div className="p-14 text-center">
+                    <div className="flex justify-center items-center w-40 h-40 bg-gray-200 rounded-full mx-auto mb-10" 
+                      style={{ boxShadow: '0 15px 30px -10px rgba(0, 0, 0, 0.25), 0 10px 20px -5px rgba(0, 0, 0, 0.1)' }}>
+                      <span className="text-gray-900 text-6xl">&#x1F6E0;</span>
+                    </div>
+                    
+                    <h3 className="text-3xl font-bold mb-4 text-gray-800">
+                      Login as Technician
+                    </h3>
+                    <p className="text-xl text-gray-600 mb-10">
+                      Offer your services and grow your business
+                    </p>
+                    
+                    <Button
+                      onClick={() => (window.location.href = "/technician/login")}
+                      className="w-full py-6 bg-black hover:bg-gray-800 text-xl font-semibold rounded-xl text-white"
+                      style={{ 
+                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2)' 
+                      }}
+                    >
+                      Login as Technician
+                    </Button>
+                    
+                    <p className="mt-8 text-gray-600">
+                      Not registered? <a href="/technician/register" className="text-gray-800 hover:underline font-medium">Join as a technician</a>
+                    </p>
+                  </div>
+                </motion.div>
               </div>
-              <h3 className="text-2xl font-semibold mb-2">
-                Login as Technician
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Offer your services and grow your business
-              </p>
-              <Button
-                onClick={() => (window.location.href = "/technician/login")}
-                className="w-full py-3 bg-gray-700 text-white hover:bg-gray-600"
-              >
-                Login as Technician
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </Modal>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       <section className="py-20 px-4 bg-white">
         <div className="container mx-auto">

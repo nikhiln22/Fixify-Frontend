@@ -24,7 +24,9 @@ export const Login: React.FC<LoginProps> = ({ role }) => {
       setSubmitting(true);
       try {
         const response = await login(values, role);
-        console.log("response from the user login component:", response.data);
+        console.log("response from the login component:", response.data);
+        console.log("access token in login component:",response.data.access_token);
+        console.log("refresh token in login component:",response.data.refresh_token);
         if (response.success) {
           const serverRole = response.data.role || "USER";
           console.log("serverRole in login component:", serverRole);
@@ -36,13 +38,12 @@ export const Login: React.FC<LoginProps> = ({ role }) => {
           
           Cookies.set(
             `${serverRole.toLowerCase()}_access_token`,
-            response.access_Token
+            response.data.access_token
           );
           Cookies.set(
             `${serverRole.toLowerCase()}_refresh_token`,
-            response.refresh_Token
+            response.data.refresh_token
           );
-          Cookies.set("role", serverRole);
           
           switch (serverRole.toUpperCase()) {
             case "ADMIN":
