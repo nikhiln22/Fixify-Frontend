@@ -3,7 +3,7 @@ import TechnicianLayout from "../../../layouts/TechnicianLayout";
 
 const TechnicianProfile: React.FC = () => {
   return (
-    <TechnicianLayout isVerified={true}>
+    <TechnicianLayout>
       <div>
         welcome to my profile page
       </div>

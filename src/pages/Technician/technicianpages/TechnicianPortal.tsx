@@ -95,7 +95,7 @@ export const TechnicianPortal: React.FC = () => {
   };
 
   return (
-    <TechnicianLayout isVerified={false}>
+    <TechnicianLayout>
       <div className="flex flex-col items-center p-4 mt-8">
         <h1 className="text-3xl font-bold text-center mb-12">
           Welcome to Technician Portal

@@ -10,12 +10,13 @@ import {
 } from "lucide-react";
 import useLogout from "../../hooks/useLogout";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
-interface TechnicianNavbarProps {
-  isVerified?: boolean;
-}
-
-export const TechnicianNavbar: React.FC<TechnicianNavbarProps> = ({ isVerified = false }) => {
+export const TechnicianNavbar: React.FC = () => {
+  const isVerified = useSelector(
+    (state: RootState) => state.technician.technicianData?.is_verified || false
+  );
   const navigate = useNavigate();
   const logout = useLogout();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -50,9 +51,9 @@ export const TechnicianNavbar: React.FC<TechnicianNavbarProps> = ({ isVerified =
   }, []);
 
   // Style for disabled nav links
-  const disabledStyle = !isVerified ? 
-    "text-gray-400 cursor-not-allowed" : 
-    "text-gray-700 hover:text-black";
+  const disabledStyle = !isVerified
+    ? "text-gray-400 cursor-not-allowed"
+    : "text-gray-700 hover:text-black";
 
   const handleNavigation = (path: string, allowUnverified: boolean = false) => {
     if (isVerified || allowUnverified) {
@@ -70,25 +71,25 @@ export const TechnicianNavbar: React.FC<TechnicianNavbarProps> = ({ isVerified =
         <nav className="hidden md:flex items-center justify-center flex-1">
           <div className="flex justify-center">
             <button
-              onClick={() => handleNavigation('/technician/dashboard')}
+              onClick={() => handleNavigation("/technician/dashboard")}
               className={`${disabledStyle} text-base font-medium mx-8`}
             >
               Dashboard
             </button>
             <button
-              onClick={() => handleNavigation('/technician/tasks')}
+              onClick={() => handleNavigation("/technician/tasks")}
               className={`${disabledStyle} text-base font-medium mx-8`}
             >
               Tasks
             </button>
             <button
-              onClick={() => handleNavigation('/technician/requests')}
+              onClick={() => handleNavigation("/technician/requests")}
               className={`${disabledStyle} text-base font-medium mx-8`}
             >
               Requests
             </button>
             <button
-              onClick={() => handleNavigation('/technician/history')}
+              onClick={() => handleNavigation("/technician/history")}
               className={`${disabledStyle} text-base font-medium mx-8`}
             >
               History
@@ -99,11 +100,15 @@ export const TechnicianNavbar: React.FC<TechnicianNavbarProps> = ({ isVerified =
         <div className="flex items-center">
           <div className="relative mr-10" ref={notificationsRef}>
             <button
-              onClick={() => isVerified && setIsNotificationsOpen(!isNotificationsOpen)}
-              className={`w-10 h-10 rounded-full ${isVerified ? 'bg-gray-200' : 'bg-gray-300'} flex items-center justify-center focus:outline-none relative ${!isVerified ? 'cursor-not-allowed' : ''}`}
+              onClick={() =>
+                isVerified && setIsNotificationsOpen(!isNotificationsOpen)
+              }
+              className={`w-10 h-10 rounded-full ${isVerified ? "bg-gray-200" : "bg-gray-300"} flex items-center justify-center focus:outline-none relative ${!isVerified ? "cursor-not-allowed" : ""}`}
               disabled={!isVerified}
             >
-              <Bell className={`h-6 w-6 ${isVerified ? 'text-gray-600' : 'text-gray-400'}`} />
+              <Bell
+                className={`h-6 w-6 ${isVerified ? "text-gray-600" : "text-gray-400"}`}
+              />
               {isVerified && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   3
@@ -120,7 +125,9 @@ export const TechnicianNavbar: React.FC<TechnicianNavbarProps> = ({ isVerified =
                 </div>
                 <div className="max-h-60 overflow-y-auto">
                   <button
-                    onClick={() => handleNavigation('/technician/notifications/1')}
+                    onClick={() =>
+                      handleNavigation("/technician/notifications/1")
+                    }
                     className="w-full text-left block px-4 py-3 hover:bg-gray-50 border-b border-gray-100"
                   >
                     <div className="flex">
@@ -142,7 +149,9 @@ export const TechnicianNavbar: React.FC<TechnicianNavbarProps> = ({ isVerified =
                     </div>
                   </button>
                   <button
-                    onClick={() => handleNavigation('/technician/notifications/2')}
+                    onClick={() =>
+                      handleNavigation("/technician/notifications/2")
+                    }
                     className="w-full text-left block px-4 py-3 hover:bg-gray-50 border-b border-gray-100"
                   >
                     <div className="flex">
@@ -163,8 +172,10 @@ export const TechnicianNavbar: React.FC<TechnicianNavbarProps> = ({ isVerified =
                       </div>
                     </div>
                   </button>
-                  <button 
-                    onClick={() => handleNavigation('/technician/notifications/3')}
+                  <button
+                    onClick={() =>
+                      handleNavigation("/technician/notifications/3")
+                    }
                     className="w-full text-left block px-4 py-3 hover:bg-gray-50"
                   >
                     <div className="flex">
@@ -186,7 +197,9 @@ export const TechnicianNavbar: React.FC<TechnicianNavbarProps> = ({ isVerified =
                 </div>
                 <div className="block px-4 py-2 text-center border-t border-gray-100">
                   <button
-                    onClick={() => handleNavigation('/technician/notifications')}
+                    onClick={() =>
+                      handleNavigation("/technician/notifications")
+                    }
                     className="text-sm font-medium text-blue-600 hover:text-blue-700"
                   >
                     View all notifications
@@ -207,7 +220,7 @@ export const TechnicianNavbar: React.FC<TechnicianNavbarProps> = ({ isVerified =
             {isUserDropdownOpen && (
               <div className="absolute -right-0 top-14 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
                 <button
-                  onClick={() => handleNavigation('/technician/profile', true)}
+                  onClick={() => handleNavigation("/technician/profile", true)}
                   className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   My Profile
@@ -246,14 +259,14 @@ export const TechnicianNavbar: React.FC<TechnicianNavbarProps> = ({ isVerified =
               </button>
             </div>
             <button
-              onClick={() => handleNavigation('/technician/dashboard')}
-              className={`w-full text-left block px-3 py-2 rounded-md text-base font-medium ${isVerified ? 'text-gray-700 hover:text-black hover:bg-gray-50' : 'text-gray-400 cursor-not-allowed'}`}
+              onClick={() => handleNavigation("/technician/dashboard")}
+              className={`w-full text-left block px-3 py-2 rounded-md text-base font-medium ${isVerified ? "text-gray-700 hover:text-black hover:bg-gray-50" : "text-gray-400 cursor-not-allowed"}`}
             >
               Dashboard
             </button>
             <button
-              onClick={() => handleNavigation('/technician/tasks')}
-              className={`w-full text-left block px-3 py-2 rounded-md text-base font-medium ${isVerified ? 'text-gray-700 hover:text-black hover:bg-gray-50' : 'text-gray-400 cursor-not-allowed'}`}
+              onClick={() => handleNavigation("/technician/tasks")}
+              className={`w-full text-left block px-3 py-2 rounded-md text-base font-medium ${isVerified ? "text-gray-700 hover:text-black hover:bg-gray-50" : "text-gray-400 cursor-not-allowed"}`}
             >
               Tasks
             </button>
