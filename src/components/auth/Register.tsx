@@ -1,20 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  RegisterProps, 
-  isUserTempRegisterResponse,
-  isTechnicianTempRegisterResponse
-} from "../../types/auth.types";
+import { RegisterProps } from "../../types/auth.types";
 import AuthLayout from "../../layouts/AuthLayout";
 import InputField from "../../components/common/InputField";
 import Button from "../../components/common/Button";
-import { register } from "../../services/auth.services";
 import { useFormik } from "formik";
-import { showToast } from "../../utils/toast";
 import { registerValidationSchema } from "../../utils/validations/authvalidationschema";
 
-
-export const Register: React.FC<RegisterProps> = ({ role }) => {
+export const Register: React.FC<RegisterProps> = ({ role, onSubmit }) => {
   const navigate = useNavigate();
 
   const formik = useFormik({
@@ -25,53 +18,11 @@ export const Register: React.FC<RegisterProps> = ({ role }) => {
       password: "",
       confirmPassword: "",
     },
-    validationSchema:registerValidationSchema,
+    validationSchema: registerValidationSchema,
     onSubmit: async (values, { setSubmitting }) => {
-      const dataToSend = {
-        ...values,
-      };
-
       try {
-        const response = await register(dataToSend, role);
-        if (response.success) {
-          showToast({
-            message: `OTP has been sent to ${values.email}`,
-            type: "success",
-          });
-          
-          let stateData;
-          
-          if (isTechnicianTempRegisterResponse(response)) {
-            stateData = {
-              email: response.email,
-              action: "register",
-              role: role,
-              tempTechnicianId: response.tempTechnicianId
-            };
-          } else if (isUserTempRegisterResponse(response)) {
-            stateData = {
-              email: response.email,
-              action: "register",
-              role: role,
-              tempUserId: response.tempUserId
-            };
-          } else {
-            console.error("Unexpected response format:", response);
-            showToast({
-              message: "Unexpected response from server",
-              type: "error",
-            });
-            return;
-          }
-          
-          navigate(`/${role.toLowerCase()}/otp`, { state: stateData });
-        }
-      } catch (error: any) {
-
-        showToast({
-          message: error?.response?.data?.message || "Registration failed",
-          type: "error",
-        });
+        await onSubmit(values);
+      } catch (error) {
         console.error("Registration error:", error);
       } finally {
         setSubmitting(false);
@@ -92,10 +43,7 @@ export const Register: React.FC<RegisterProps> = ({ role }) => {
         </p>
       </div>
 
-      <form
-        onSubmit={formik.handleSubmit}
-        className="space-y-6 p-8 rounded-lg"
-      >
+      <form onSubmit={formik.handleSubmit} className="space-y-6 p-8 rounded-lg">
         <InputField
           name="username"
           label="Username"
@@ -140,7 +88,6 @@ export const Register: React.FC<RegisterProps> = ({ role }) => {
           error={formik.errors.password}
           touched={formik.touched.password}
           onBlur={formik.handleBlur}
-          required
           showToggle
         />
 
@@ -160,10 +107,15 @@ export const Register: React.FC<RegisterProps> = ({ role }) => {
 
         <Button
           type="submit"
+          disabled={
+            formik.isSubmitting ||
+            !Object.values(formik.values).every((value) => value) ||
+            Object.keys(formik.errors).length > 0
+          }
+          isLoading={formik.isSubmitting}
           className="w-full mt-4"
-          disabled={formik.isSubmitting}
         >
-          {formik.isSubmitting ? "Processing..." : "Sign Up"}
+          Sign Up
         </Button>
 
         <div className="text-center mt-4">

@@ -1,21 +1,15 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React from "react";
 import { useFormik } from "formik";
 import InputField from "../common/InputField";
 import Button from "../common/Button";
 import AuthLayout from "../../layouts/AuthLayout";
-import { resetPassword } from "../../services/auth.services";
 import { ResetPasswordProps } from "../../types/auth.types";
-import { showToast } from "../../utils/toast";
-import { resetPasswordValidationSchema } from "../../utils/validations/authvalidationschema"; 
+import { resetPasswordValidationSchema } from "../../utils/validations/authvalidationschema";
 
-export const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const email = location.state?.email || "";
-  console.log("email in the resetpassword component:", email);
-  const [loading, setLoading] = useState(false);
-
+export const ResetPassword: React.FC<ResetPasswordProps> = ({
+  role,
+  onSubmit,
+}) => {
   const formik = useFormik({
     initialValues: {
       password: "",
@@ -23,30 +17,10 @@ export const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
     },
     validationSchema: resetPasswordValidationSchema,
     onSubmit: async (values, { setSubmitting }) => {
-      if (!email) {
-        showToast({
-          message: "Missing required information. Please try the password reset process again.",
-          type: "error",
-        });
-        navigate(`/${role.toLowerCase()}/forgotpassword`);
-        return;
-      }
-
-      setLoading(true);
+      setSubmitting(true);
       try {
-        const response = await resetPassword(email, values.password, role);
-        showToast({
-          message: response.message || "Password reset successful!",
-          type: "success",
-        });
-        navigate(`/${role.toLowerCase()}/login`);
-      } catch (error: any) {
-        showToast({
-          message: error?.response?.data?.message || "Failed to reset password.",
-          type: "error",
-        });
+        await onSubmit(values.password);
       } finally {
-        setLoading(false);
         setSubmitting(false);
       }
     },
@@ -61,8 +35,10 @@ export const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
           </h4>
           <p className="mt-2 text-base text-gray-700">Set your new password</p>
         </div>
-        
-        <form onSubmit={formik.handleSubmit} className="space-y-6 p-8 rounded-lg">
+        <form
+          onSubmit={formik.handleSubmit}
+          className="space-y-6 p-8 rounded-lg"
+        >
           <InputField
             label="New Password"
             name="password"
@@ -74,9 +50,7 @@ export const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
             error={formik.errors.password}
             touched={formik.touched.password}
             showToggle
-            required
           />
-          
           <InputField
             label="Confirm Password"
             name="confirmPassword"
@@ -88,29 +62,19 @@ export const ResetPassword: React.FC<ResetPasswordProps> = ({ role }) => {
             error={formik.errors.confirmPassword}
             touched={formik.touched.confirmPassword}
             showToggle
-            required
           />
-
-          <Button 
-            type="submit" 
-            disabled={loading || formik.isSubmitting} 
+          <Button
+            type="submit"
+            disabled={
+              formik.isSubmitting ||
+              !Object.values(formik.values).every((value) => value) ||
+              Object.keys(formik.errors).length > 0
+            }
+            isLoading={formik.isSubmitting}
             className="w-full mt-4"
           >
-            {loading ? "Resetting..." : "Reset Password"}
+            Reset Password
           </Button>
-          
-          <div className="text-center mt-4">
-            <p className="text-base text-gray-700">
-              Back to{" "}
-              <button
-                type="button"
-                onClick={() => navigate(`/${role.toLowerCase()}/login`)}
-                className="font-medium text-black hover:text-gray-700"
-              >
-                Login
-              </button>
-            </p>
-          </div>
         </form>
       </div>
     </AuthLayout>

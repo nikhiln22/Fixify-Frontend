@@ -1,11 +1,22 @@
 import axiosInstance from "../config/axios.config";
 import cookies from "js-cookie";
+import { Itechnician } from "../models/technician";
 
 interface JobDesignationResponse {
   message: string;
   success: boolean;
   designation: string[];
   status: number;
+}
+
+interface submitTechnicianQualificationResponse {
+  message: string;
+  success: boolean;
+  status: number;
+  technician: Pick<
+    Itechnician,
+    "yearsOfExperience" | "Designation" | "About" | "image" | "certificates"
+  >;
 }
 
 export const getJobDesignations = async (): Promise<string[]> => {
@@ -17,17 +28,8 @@ export const getJobDesignations = async (): Promise<string[]> => {
 
 export const submitTechnicianQualification = async (
   formdata: FormData
-): Promise<void> => {
-  console.log("entering into the form submitting to the backend");
+): Promise<submitTechnicianQualificationResponse> => {
   const token = cookies.get("technician_access_token");
-  console.log("token:", token);
-
-  if (token) {
-    const decoded = JSON.parse(atob(token.split(".")[1]));
-    const isExpired = decoded.exp * 1000 < Date.now();
-    console.log("Token expired?", isExpired);
-  }
-
   const response = await axiosInstance.patch(
     "/technician/qualifications",
     formdata,
@@ -39,4 +41,18 @@ export const submitTechnicianQualification = async (
     }
   );
   return response.data;
+};
+
+export const getTechnicianProfile = async () => {
+  const token = cookies.get("technician_access_token");
+  try {
+    const response = await axiosInstance.get("/technician/profile", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching the technician profile:", error);
+  }
 };

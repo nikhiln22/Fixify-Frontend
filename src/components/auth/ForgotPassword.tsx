@@ -1,17 +1,15 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import InputField from "../common/InputField";
 import Button from "../common/Button";
 import AuthLayout from "../../layouts/AuthLayout";
-import { forgotPassword } from "../../services/auth.services";
 import { ForgotPasswordProps } from "../../types/auth.types";
-import { showToast } from "../../utils/toast";
 import { useFormik } from "formik";
-import { forgotPasswordValidationSchema } from "../../utils/validations/authvalidationschema"; 
+import { forgotPasswordValidationSchema } from "../../utils/validations/authvalidationschema";
 
-export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ role }) => {
-  const navigate = useNavigate();
-
+export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
+  role,
+  onSubmit,
+}) => {
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -20,19 +18,8 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ role }) => {
     onSubmit: async (values, { setSubmitting }) => {
       setSubmitting(true);
       try {
-        const response = await forgotPassword(values.email, role);
-        showToast({
-          message: response.message || `OTP sent to ${values.email}.`,
-          type: "success",
-        });
-        navigate(`/${role.toLowerCase()}/otp`, {
-          state: { email: values.email, action: "forgot" },
-        });
-      } catch (err: any) {
-        showToast({
-          message: err?.response?.data?.message || "Failed to send OTP.",
-          type: "error",
-        });
+        await onSubmit(values.email);
+      } catch (err) {
       } finally {
         setSubmitting(false);
       }
@@ -51,7 +38,10 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ role }) => {
             Enter your email to receive an OTP
           </p>
         </div>
-        <form onSubmit={formik.handleSubmit} className="space-y-6 p-8 rounded-lg">
+        <form
+          onSubmit={formik.handleSubmit}
+          className="space-y-6 p-8 rounded-lg"
+        >
           <InputField
             label="Email"
             name="email"
@@ -59,25 +49,22 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ role }) => {
             onChange={formik.handleChange}
             type="email"
             placeholder="Enter your email..."
-            required
             error={formik.errors.email}
             touched={formik.touched.email}
+            onBlur={formik.handleBlur}
           />
-          <Button type="submit" disabled={formik.isSubmitting} className="w-full mt-4">
-            {formik.isSubmitting ? "Sending OTP..." : "Submit"}
+          <Button
+            type="submit"
+            disabled={
+              formik.isSubmitting ||
+              !Object.values(formik.values).every((value) => value) ||
+              Object.keys(formik.errors).length > 0
+            }
+            isLoading={formik.isSubmitting}
+            className="w-full mt-4"
+          >
+            submit
           </Button>
-          <div className="text-center mt-4">
-            <p className="text-base text-gray-700">
-              Back to{" "}
-              <button
-                type="button"
-                onClick={() => navigate(`/${role.toLowerCase()}/login`)}
-                className="font-medium text-black hover:text-gray-700"
-              >
-                Login
-              </button>
-            </p>
-          </div>
         </form>
       </div>
     </AuthLayout>

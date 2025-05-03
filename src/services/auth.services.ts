@@ -1,4 +1,6 @@
 import axiosInstance from "../config/axios.config";
+import Cookies from "js-cookie";
+import { envConfig } from "../config/env.config";
 import {
   LoginFormData,
   LoginResponse,
@@ -11,80 +13,136 @@ import {
   VerifyResetOtpResponse,
 } from "../types/auth.types";
 
-export const login = async (formData: LoginFormData, role: Role) => {
+const getAuthUrl = (role: UserLikeRoles | Role, endpoint: string) =>
+  `/${role.toLowerCase()}/${endpoint}`;
+
+const refreshToken = async (role: Role) => {
+  try {
+    const response = await axiosInstance.post(
+      `${envConfig.apiUrl}/refreshtoken`,
+      { role: role.toLowerCase() },
+      { withCredentials: true }
+    );
+
+    if (response.data.success) {
+      const newAccessToken = response.data.access_token;
+
+      Cookies.set(`${role.toLowerCase()}_access_token`, newAccessToken);
+      return newAccessToken;
+    } else {
+      throw new Error("Failed to refresh token");
+    }
+  } catch (error) {
+    console.error("Error refreshing access token:", error);
+    throw error;
+  }
+};
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response && error.response.status === 401) {
+      const role = error.config.headers["role"] || "USER";
+
+      try {
+        const newAccessToken = await refreshToken(role);
+
+        error.config.headers["Authorization"] = `Bearer ${newAccessToken}`;
+        return axiosInstance(error.config);
+      } catch (refreshError) {
+        console.error("Could not refresh token, logging out...");
+        Cookies.remove(`${role.toLowerCase()}_access_token`);
+        window.location.href = "/login";
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+const login = async (formData: LoginFormData, role: Role) => {
   const response = await axiosInstance.post<LoginResponse>(
-    `/${role.toLowerCase()}/login`,
+    getAuthUrl(role, "login"),
     formData,
+    { withCredentials: true }
   );
   return response.data;
 };
 
-export const register = async (
-  formData: RegisterFormData,
-  role: UserLikeRoles,
-) => {
+const register = async (formData: RegisterFormData, role: UserLikeRoles) => {
   const response = await axiosInstance.post<TempRegisterResponse>(
-    `/${role.toLowerCase()}/register`,
-    {
-      ...formData,
-    },
+    getAuthUrl(role, "register"),
+    formData
   );
   return response.data;
 };
 
-export const verifyOtp = async (
+const verifyOtp = async (
   data: OTPVerification,
   role: UserLikeRoles,
-  purpose: "REGISTRATION" | "PASSWORD_RESET" = "REGISTRATION",
+  purpose: "REGISTRATION" | "PASSWORD_RESET" = "REGISTRATION"
 ) => {
-
-  console.log(`veryfying the otp for ${role} with purpose ${purpose}`);
-
-  console.log("payload:",data);
-
   let payload;
   if (role.toLowerCase() === "technician") {
-    if (!('tempTechnicianId' in data) && purpose === "REGISTRATION") {
-      console.error("Missing tempTechnicianId for technician OTP verification");
-    }
     payload = { ...data, purpose };
   } else {
-    if (!('tempUserId' in data) && purpose === "REGISTRATION") {
-      console.error("Missing tempUserId for user OTP verification");
-    }
     payload = { ...data, purpose };
   }
 
   const response = await axiosInstance.post<
     RegisterResponse | VerifyResetOtpResponse
-  >(`/${role.toLowerCase()}/verifyotp`, payload);
+  >(getAuthUrl(role, "verifyotp"), payload);
+
   return response.data;
 };
 
-export const resendOtp = async (email: string, role: UserLikeRoles) => {
+const resendOtp = async (email: string, role: UserLikeRoles) => {
+  const response = await axiosInstance.post(getAuthUrl(role, "resendotp"), {
+    email,
+  });
+  return response.data;
+};
+
+const forgotPassword = async (email: string, role: UserLikeRoles) => {
   const response = await axiosInstance.post(
-    `/${role.toLowerCase()}/resendotp`,
-    { email },
+    getAuthUrl(role, "forgotpassword"),
+    { email }
   );
   return response.data;
 };
 
-export const forgotPassword = async (email: string, role: UserLikeRoles) => {
-  const response = await axiosInstance.post(
-    `/${role.toLowerCase()}/forgotpassword`,
-    { email },
-  );
-  return response.data;
-};
-
-export const resetPassword = async (
+const resetPassword = async (
   email: string,
   password: string,
-  role: UserLikeRoles,
+  role: UserLikeRoles
 ): Promise<{ message: string }> => {
-  const response = await axiosInstance.post(
-    `/${role.toLowerCase()}/resetpassword`,
-    { email, password },
-  );
+  const response = await axiosInstance.post(getAuthUrl(role, "resetpassword"), {
+    email,
+    password,
+  });
   return response.data;
 };
+
+const logOut = async (role: Role) => {
+  const accessToken = Cookies.get(`${role.toLowerCase()}_access_token`);
+
+  const response = await axiosInstance.get(getAuthUrl(role, "logout"), {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return response.data;
+};
+
+const authService = {
+  login,
+  register,
+  verifyOtp,
+  resendOtp,
+  forgotPassword,
+  resetPassword,
+  logOut,
+};
+
+export default authService;

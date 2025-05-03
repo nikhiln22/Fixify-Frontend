@@ -1,10 +1,66 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { Login } from "../../../components/auth/Login";
+import authService from "../../../services/auth.services"; 
+import { showToast } from "../../../utils/toast";
+import Cookies from "js-cookie";
+import { setUserData } from "../../../redux/slices/userSlice";
+import { Iuser } from "../../../models/user";
+import { LoginFormData } from "../../../types/auth.types";
 
 export const UserLogin: React.FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLoginSubmit = async (values: LoginFormData) => {
+    try {
+      const response = await authService.login(values, "USER");
+      console.log("response from the user login page:", response);
+
+      if (response.success) {
+        const serverRole = response.data.role || "USER";
+
+        showToast({
+          message: "Login successful!",
+          type: "success",
+        });
+
+        Cookies.set(
+          `${serverRole.toLowerCase()}_access_token`,
+          response.data.access_token
+        );
+
+        if ("user" in response.data) {
+          const userData = response.data.user as Iuser;
+          console.log("username:", userData.username);
+          const userInfo = {
+            username: userData.username,
+            email: userData.email,
+            phone: userData.phone,
+          };
+          console.log("before dispatching the user details to the state");
+          dispatch(setUserData(userInfo));
+        }
+
+        navigate("/user/home");
+      } else {
+        showToast({
+          message: response.message || "Login failed",
+          type: "error",
+        });
+      }
+    } catch (err: any) {
+      showToast({
+        message: err?.response?.data?.message || "Login failed.",
+        type: "error",
+      });
+    }
+  };
+
   return (
     <div>
-      <Login role="USER" />
+      <Login role="USER" onsubmit={handleLoginSubmit} />
     </div>
   );
 };

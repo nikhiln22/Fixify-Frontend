@@ -5,5 +5,4 @@ export interface Iadmin {
   createdAt: Date;
   updatedAt: Date;
   access_token:string;
-  refresh_token:string;
 }
