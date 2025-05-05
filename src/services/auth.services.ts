@@ -42,7 +42,16 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response && error.response.status === 401) {
-      const role = error.config.headers["role"] || "USER";
+      const urlpath = error.config.url || "";
+      let role: Role;
+
+      if (urlpath.includes("/technician/")) {
+        role = "TECHNICIAN";
+      } else if (urlpath.includes("/admin/")) {
+        role = "ADMIN";
+      } else {
+        role = "USER";
+      }
 
       try {
         const newAccessToken = await refreshToken(role);
@@ -52,7 +61,7 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         console.error("Could not refresh token, logging out...");
         Cookies.remove(`${role.toLowerCase()}_access_token`);
-        window.location.href = "/login";
+        window.location.href = `/${role}/login`;
       }
     }
 

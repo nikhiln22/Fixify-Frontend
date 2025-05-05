@@ -23,6 +23,8 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
       about: "",
       certificates: [] as File[],
       profilePhoto: null as File | null,
+      location: "", // New field for where the user lives
+      preferredWorkLocations: "", // New field for preferred work locations
     },
     validationSchema: professionQualificationSchema,
     onSubmit: async (values) => {
@@ -92,7 +94,7 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
 
       <form onSubmit={formik.handleSubmit}>
         <div className="flex flex-wrap -mx-4">
-          {/* Left section with designation and experience */}
+          {/* Left section with designation, experience, location and preferred work locations */}
           <div className="w-1/2 px-4">
             <div className="mb-6">
               <div className="flex items-center mb-1">
@@ -123,7 +125,7 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
                     : undefined
                 }
                 touched={formik.touched.designation}
-                className="w-full max-w-md"
+                className="w-full max-w-md h-10" // Added fixed height
               />
             </div>
 
@@ -148,63 +150,117 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
                     : undefined
                 }
                 touched={formik.touched.experience}
-                className="w-full max-w-md [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-full max-w-md h-10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" // Added fixed height
+              />
+            </div>
+
+            {/* Where do you live */}
+            <div className="mb-6">
+              <div className="flex items-center mb-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Where do you live
+                </span>
+              </div>
+              <SelectField
+                label=""
+                name="location"
+                value={formik.values.location}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                options={[]}  // This will be populated from your backend
+                placeholder="Select your city"
+                required={true}
+                error={
+                  formik.touched.location && formik.errors.location
+                    ? formik.errors.location
+                    : undefined
+                }
+                touched={formik.touched.location}
+                className="w-full max-w-md h-10" // Added fixed height
+              />
+            </div>
+
+            {/* Moved Preferred Work Locations to the left column */}
+            <div className="mb-6">
+              <div className="flex items-center mb-1">
+                <span className="text-sm font-medium text-gray-700">
+                  Preferred Work Locations
+                </span>
+              </div>
+              <InputField
+                label=""
+                name="preferredWorkLocations"
+                type="text"
+                value={formik.values.preferredWorkLocations}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="e.g. Bangalore, Mumbai, Remote"
+                required={true}
+                error={
+                  formik.touched.preferredWorkLocations && formik.errors.preferredWorkLocations
+                    ? formik.errors.preferredWorkLocations
+                    : undefined
+                }
+                touched={formik.touched.preferredWorkLocations}
+                className="w-full max-w-md h-10" // Added fixed height
               />
             </div>
           </div>
 
           {/* Right column for profile photo */}
-          <div className="w-1/2 px-4 flex justify-end">
-            <div className="w-40">
-              <div className="flex items-center mb-1">
-                <span className="text-sm font-medium text-gray-700">
-                  Profile Photo
-                </span>
-              </div>
-              <div className="mt-1">
-                {formik.values.profilePhoto ? (
-                  <div className="relative">
-                    <img
-                      src={URL.createObjectURL(formik.values.profilePhoto)}
-                      alt="Profile preview"
-                      className="h-40 w-40 object-cover rounded border border-gray-300"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeFile("profilePhoto")}
-                      className="absolute top-0 right-0 bg-red-500 text-white h-6 w-6 flex items-center justify-center"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ) : (
-                  <div className="h-40 w-40 border border-gray-300 rounded flex items-center justify-center bg-gray-50">
-                    <label
-                      htmlFor="profilePhoto"
-                      className="cursor-pointer text-center w-full h-full flex flex-col items-center justify-center"
-                    >
-                      <Upload className="mx-auto h-10 w-10 text-gray-400" />
-                      <span className="text-sm text-gray-500 mt-2">
-                        Add photo
-                      </span>
-                      <input
-                        id="profilePhoto"
-                        name="profilePhoto"
-                        type="file"
-                        className="sr-only"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        onBlur={formik.handleBlur}
+          <div className="w-1/2 px-4">
+            <div className="flex justify-end">
+              <div className="w-40">
+                <div className="flex items-center mb-1">
+                  <span className="text-sm font-medium text-gray-700">
+                    Profile Photo
+                  </span>
+                </div>
+                <div className="mt-1">
+                  {formik.values.profilePhoto ? (
+                    <div className="relative">
+                      <img
+                        src={URL.createObjectURL(formik.values.profilePhoto)}
+                        alt="Profile preview"
+                        className="h-40 w-40 object-cover rounded border border-gray-300"
                       />
-                    </label>
-                  </div>
+                      <button
+                        type="button"
+                        onClick={() => removeFile("profilePhoto")}
+                        className="absolute top-0 right-0 bg-red-500 text-white h-6 w-6 flex items-center justify-center"
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="h-40 w-40 border border-gray-300 rounded flex items-center justify-center bg-gray-50">
+                      <label
+                        htmlFor="profilePhoto"
+                        className="cursor-pointer text-center w-full h-full flex flex-col items-center justify-center"
+                      >
+                        <Upload className="mx-auto h-10 w-10 text-gray-400" />
+                        <span className="text-sm text-gray-500 mt-2">
+                          Add photo
+                        </span>
+                        <input
+                          id="profilePhoto"
+                          name="profilePhoto"
+                          type="file"
+                          className="sr-only"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          onBlur={formik.handleBlur}
+                        />
+                      </label>
+                    </div>
+                  )}
+                </div>
+                {formik.touched.profilePhoto && formik.errors.profilePhoto && (
+                  <p className="text-sm text-red-600">
+                    {formik.errors.profilePhoto}
+                  </p>
                 )}
               </div>
-              {formik.touched.profilePhoto && formik.errors.profilePhoto && (
-                <p className="text-sm text-red-600">
-                  {formik.errors.profilePhoto}
-                </p>
-              )}
             </div>
           </div>
         </div>
