@@ -1,4 +1,6 @@
+
 export interface Itechnician {
+  _id: string;
   username: string;
   email: string;
   phone: number;
@@ -9,6 +11,8 @@ export interface Itechnician {
   About?: string;
   image?: string;
   certificates?: string[];
+  city?: string;              
+  preferredWorkLocation?: string;  
   role: string;
   createdAt: Date;
   updatedAt: Date;

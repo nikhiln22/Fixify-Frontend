@@ -28,7 +28,7 @@ const technicianSlice = createSlice({
     },
     updateTechnicianData: (
       state,
-      action: PayloadAction<Partial<TechnicianReduxData>>
+      action: PayloadAction<Partial<TechnicianReduxData>>,
     ) => {
       if (state.technicianData) {
         state.technicianData = {

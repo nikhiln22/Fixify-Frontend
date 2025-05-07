@@ -7,58 +7,63 @@ import { OtpPurpose, OTPVerification } from "../../../types/auth.types";
 
 export const UserOtp: React.FC = () => {
   const navigate = useNavigate();
-  
-  const handleVerifyOtp = async (values: { otp: string }, email: string, purpose: OtpPurpose, tempId?: string) => {
-    try {
 
+  const handleVerifyOtp = async (
+    values: { otp: string },
+    email: string,
+    purpose: OtpPurpose,
+    tempId?: string,
+  ) => {
+    try {
       let data: OTPVerification;
-      
+
       if (purpose === "PASSWORD_RESET") {
-        data = { 
-          email, 
+        data = {
+          email,
           otp: values.otp,
-          purpose
+          purpose,
         };
       } else {
-        data = { 
-          tempUserId: tempId, 
-          otp: values.otp, 
+        data = {
+          tempUserId: tempId,
+          otp: values.otp,
           email,
-          purpose
+          purpose,
         };
       }
-      
+
       const response = await authService.verifyOtp(data, "USER", purpose);
 
       if (response.success) {
         localStorage.removeItem("otpStartTime");
-        
+
         if (purpose === "PASSWORD_RESET") {
           showToast({
             message: response.message || "OTP verified successfully",
-            type: "success"
+            type: "success",
           });
           navigate(`/user/resetpassword`, {
-            state: { email }
+            state: { email },
           });
         } else {
           showToast({
             message: response.message || "Registration successful!",
-            type: "success"
+            type: "success",
           });
           navigate(`/user/login`);
         }
       } else {
         showToast({
           message: response.message || "Invalid OTP",
-          type: "error"
+          type: "error",
         });
         throw new Error("Invalid OTP");
       }
     } catch (err) {
       const error = err as { response?: { data?: { message?: string } } };
-      const errorMessage = error?.response?.data?.message || "Something went wrong!";
-      
+      const errorMessage =
+        error?.response?.data?.message || "Something went wrong!";
+
       showToast({
         message: errorMessage,
         type: "error",
@@ -70,7 +75,7 @@ export const UserOtp: React.FC = () => {
   const handleResendOtp = async (email: string) => {
     try {
       const result = await authService.resendOtp(email, "USER");
-      
+
       if (result.success) {
         showToast({
           message: result.message || "OTP Resent Successfully",
@@ -81,8 +86,9 @@ export const UserOtp: React.FC = () => {
       }
     } catch (err) {
       const error = err as { response?: { data?: { message?: string } } };
-      const errorMessage = error?.response?.data?.message || "Failed to resend OTP";
-      
+      const errorMessage =
+        error?.response?.data?.message || "Failed to resend OTP";
+
       showToast({
         message: errorMessage,
         type: "error",

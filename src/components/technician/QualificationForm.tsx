@@ -4,17 +4,25 @@ import { useFormik } from "formik";
 import InputField from "../../components/common/InputField";
 import SelectField from "../../components/common/SelectField";
 import Button from "../../components/common/Button";
-import { getJobDesignations } from "../../services/technician.services";
+import {
+  getJobDesignations,
+  getCityLocations,
+  getLocationsByCity,
+} from "../../services/technician.services";
 import { QualificationFormProps } from "../../types/component.types";
 import { professionQualificationSchema } from "../../utils/validations/formvalidationSchema";
 import { showToast } from "../../utils/toast";
+import { Location } from "../../types/technicians.types";
 
 export const QualificationForm: React.FC<QualificationFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
   const [designations, setDesignations] = useState<string[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingLocations, setIsLoadingLocations] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -23,12 +31,13 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
       about: "",
       certificates: [] as File[],
       profilePhoto: null as File | null,
-      location: "", // New field for where the user lives
-      preferredWorkLocations: "", // New field for preferred work locations
+      city: "",
+      preferredWorkLocation: "",
     },
     validationSchema: professionQualificationSchema,
     onSubmit: async (values) => {
       try {
+        console.log("values:", values);
         await onSubmit(values);
       } catch (error) {
         console.error("Error submitting form:", error);
@@ -44,12 +53,17 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
     const fetchDesignations = async () => {
       setIsLoading(true);
       try {
-        const designationNames = await getJobDesignations();
+        const [designationNames, cityNames] = await Promise.all([
+          getJobDesignations(),
+          getCityLocations(),
+        ]);
         console.log(
           "job designations from the qualification component:",
           designationNames
         );
+        console.log("city locations:", cityNames);
         setDesignations(designationNames);
+        setCities(cityNames);
       } catch (err) {
         console.error("Error fetching designations:", err);
         showToast({
@@ -63,6 +77,34 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
 
     fetchDesignations();
   }, []);
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      if (!formik.values.city) {
+        setLocations([]);
+        formik.setFieldValue("preferredWorkLocation", "");
+        return;
+      }
+
+      setIsLoadingLocations(true);
+      try {
+        const locationData = await getLocationsByCity(formik.values.city);
+        console.log("locations for selected city:", locationData);
+        setLocations(locationData);
+      } catch (err) {
+        console.error("Error fetching locations:", err);
+        showToast({
+          message: "Failed to load locations. Please try again later.",
+          type: "error",
+        });
+        setLocations([]);
+      } finally {
+        setIsLoadingLocations(false);
+      }
+    };
+
+    fetchLocations();
+  }, [formik.values.city]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, files } = e.target;
@@ -94,7 +136,6 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
 
       <form onSubmit={formik.handleSubmit}>
         <div className="flex flex-wrap -mx-4">
-          {/* Left section with designation, experience, location and preferred work locations */}
           <div className="w-1/2 px-4">
             <div className="mb-6">
               <div className="flex items-center mb-1">
@@ -125,7 +166,7 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
                     : undefined
                 }
                 touched={formik.touched.designation}
-                className="w-full max-w-md h-10" // Added fixed height
+                className="w-full max-w-md h-10"
               />
             </div>
 
@@ -150,11 +191,10 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
                     : undefined
                 }
                 touched={formik.touched.experience}
-                className="w-full max-w-md h-10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" // Added fixed height
+                className="w-full max-w-md h-10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
             </div>
 
-            {/* Where do you live */}
             <div className="mb-6">
               <div className="flex items-center mb-1">
                 <span className="text-sm font-medium text-gray-700">
@@ -163,51 +203,82 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
               </div>
               <SelectField
                 label=""
-                name="location"
-                value={formik.values.location}
+                name="city"
+                value={formik.values.city}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                options={[]}  // This will be populated from your backend
+                options={
+                  isLoading
+                    ? [{ value: "", label: "Loading cities..." }]
+                    : cities.map((cityName) => ({
+                        value: cityName,
+                        label: cityName,
+                      }))
+                }
                 placeholder="Select your city"
                 required={true}
                 error={
-                  formik.touched.location && formik.errors.location
-                    ? formik.errors.location
+                  formik.touched.city && formik.errors.city
+                    ? formik.errors.city
                     : undefined
                 }
-                touched={formik.touched.location}
-                className="w-full max-w-md h-10" // Added fixed height
+                touched={formik.touched.city}
+                className="w-full max-w-md h-10"
               />
             </div>
 
-            {/* Moved Preferred Work Locations to the left column */}
             <div className="mb-6">
               <div className="flex items-center mb-1">
                 <span className="text-sm font-medium text-gray-700">
-                  Preferred Work Locations
+                  Preferred Work Location
                 </span>
               </div>
-              <InputField
+              <SelectField
                 label=""
-                name="preferredWorkLocations"
-                type="text"
-                value={formik.values.preferredWorkLocations}
+                name="preferredWorkLocation"
+                value={formik.values.preferredWorkLocation}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                placeholder="e.g. Bangalore, Mumbai, Remote"
+                options={
+                  isLoadingLocations
+                    ? [{ value: "", label: "Loading locations..." }]
+                    : locations.map((location) => ({
+                        value: location.locationName,
+                        label: `${location.locationName},${location.pincode},${location.cityName}`,
+                      }))
+                }
+                placeholder={
+                  formik.values.city
+                    ? `Select preferred location in ${formik.values.city}`
+                    : "Please select a city first"
+                }
                 required={true}
+                disabled={!formik.values.city || isLoadingLocations}
                 error={
-                  formik.touched.preferredWorkLocations && formik.errors.preferredWorkLocations
-                    ? formik.errors.preferredWorkLocations
+                  formik.touched.preferredWorkLocation &&
+                  formik.errors.preferredWorkLocation
+                    ? formik.errors.preferredWorkLocation
                     : undefined
                 }
-                touched={formik.touched.preferredWorkLocations}
-                className="w-full max-w-md h-10" // Added fixed height
+                touched={formik.touched.preferredWorkLocation}
+                className="w-full max-w-md h-10"
               />
+              {isLoadingLocations && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Loading locations...
+                </p>
+              )}
+              {!isLoadingLocations &&
+                locations.length === 0 &&
+                formik.values.city && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    No locations found for this city
+                  </p>
+                )}
             </div>
           </div>
 
-          {/* Right column for profile photo */}
+
           <div className="w-1/2 px-4">
             <div className="flex justify-end">
               <div className="w-40">
@@ -264,13 +335,10 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
             </div>
           </div>
         </div>
-        
-        {/* About You section - full width */}
+
         <div className="w-full px-4 mb-6">
           <div className="flex items-center mb-1">
-            <span className="text-sm font-medium text-gray-700">
-              About You
-            </span>
+            <span className="text-sm font-medium text-gray-700">About You</span>
           </div>
           <textarea
             name="about"
@@ -286,13 +354,10 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
             required
           />
           {formik.touched.about && formik.errors.about && (
-            <p className="mt-1 text-sm text-red-600">
-              {formik.errors.about}
-            </p>
+            <p className="mt-1 text-sm text-red-600">{formik.errors.about}</p>
           )}
         </div>
 
-        {/* Professional Certificates section - full width */}
         <div className="w-full px-4 mt-2">
           <div className="mb-6">
             <div className="flex items-center mb-1">

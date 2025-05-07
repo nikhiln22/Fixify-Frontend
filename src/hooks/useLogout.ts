@@ -4,7 +4,7 @@ import authService from "../services/auth.services";
 import { Role } from "../types/auth.types";
 import { showToast } from "../utils/toast";
 import { PURGE } from "redux-persist";
-import { useDispatch} from "react-redux";
+import { useDispatch } from "react-redux";
 
 const useLogout = () => {
   const navigate = useNavigate();

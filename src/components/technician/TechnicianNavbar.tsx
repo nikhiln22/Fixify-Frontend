@@ -15,7 +15,7 @@ import { RootState } from "../../redux/store";
 
 export const TechnicianNavbar: React.FC = () => {
   const isVerified = useSelector(
-    (state: RootState) => state.technician.technicianData?.is_verified || false
+    (state: RootState) => state.technician.technicianData?.is_verified || false,
   );
   const navigate = useNavigate();
   const logout = useLogout();

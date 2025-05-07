@@ -15,7 +15,7 @@ export const UserRegister: React.FC = () => {
     try {
       const response = (await authService.register(
         values,
-        "USER"
+        "USER",
       )) as UserTempRegisterResponse;
 
       if (response.success) {

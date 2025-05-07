@@ -6,9 +6,9 @@ import { LandingPage } from "./pages/LandingPage";
 import { UserRoutes } from "./routes/user/UserRoutes";
 import { TechnicianRoutes } from "./routes/technician/TechnicianRoutes";
 import { AdminRoutes } from "./routes/admin/AdminRoutes";
-import { store, persistor } from "./redux/store";  
+import { store, persistor } from "./redux/store";
 import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";  
+import { PersistGate } from "redux-persist/integration/react";
 
 function App() {
   return (
@@ -28,7 +28,7 @@ function App() {
             closeButton={false}
             theme="light"
           />
-          
+
           <Routes>
             <Route path="/" element={<LandingPage />} />
           </Routes>

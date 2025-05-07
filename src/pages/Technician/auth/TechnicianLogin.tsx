@@ -28,7 +28,7 @@ export const TechnicianLogin: React.FC = () => {
 
         Cookies.set(
           `${serverRole.toLowerCase()}_access_token`,
-          response.data.access_token
+          response.data.access_token,
         );
 
         if ("technician" in response.data) {

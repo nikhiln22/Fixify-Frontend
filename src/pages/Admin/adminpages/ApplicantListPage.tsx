@@ -1,29 +1,29 @@
 import AdminLayout from "../../../layouts/AdminLayout";
-import useUsers from "../../../hooks/useUsers";
-import { getUsersColumns } from "../../../constants/tablecolumns/getUsersColumn";
+import useApplicants from "../../../hooks/useApplicants";
+import { getApplicantsColumns } from "../../../constants/tablecolumns/ApplicantsColumn";
 import TableWithPagination from "../../../components/common/TableWithPagination";
 
-function UserListPage() {
+function ApplicantListPage() {
   const {
-    users,
+    applicants,
     currentPage,
     totalPages,
     setCurrentPage,
-    handleStatusToggle,
+    handleViewDetails,
     loading,
     error,
-  } = useUsers();
-
-  const columns = getUsersColumns(handleStatusToggle);
-
+  } = useApplicants();
+  
+  const columns = getApplicantsColumns(handleViewDetails);
+  
   return (
     <AdminLayout>
       <div className="p-4 flex justify-between items-center">
-        <h1 className="text-xl font-semibold mb-4 text-center">User List</h1>
+        <h1 className="text-2xl font-semibold mb-4 text-center">Applicants</h1>
       </div>
       {error && <p className="text-red-500 mb-2">{error}</p>}
       <TableWithPagination
-        data={users}
+        data={applicants}
         columns={columns}
         currentPage={currentPage}
         totalPages={totalPages}
@@ -34,4 +34,4 @@ function UserListPage() {
   );
 }
 
-export default UserListPage;
+export default ApplicantListPage;

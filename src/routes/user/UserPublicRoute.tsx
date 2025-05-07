@@ -8,6 +8,6 @@ export const UserPublicRoute: React.FC = () => {
   if (token) {
     return <Navigate to="/user/home" />;
   }
-  
+
   return <Outlet />;
 };

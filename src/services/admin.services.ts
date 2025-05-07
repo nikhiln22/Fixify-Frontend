@@ -1,5 +1,6 @@
 import axiosInstance from "../config/axios.config";
 import { Idesignation } from "../models/designation";
+import { Itechnician } from "../models/technician";
 import { Iuser } from "../models/user";
 
 export const getAllDesignations = async (
@@ -59,9 +60,7 @@ export const getAllUsers = async (
   currentPage: number;
 }> => {
   try {
-    const response = await axiosInstance.get(
-      `/admin/userslist?page=${page}`
-    );
+    const response = await axiosInstance.get(`/admin/userslist?page=${page}`);
     console.log("response:", response);
     return {
       data: response.data.users || [],
@@ -85,5 +84,32 @@ export const toggleUserStatus = async (userId: string) => {
   } catch (error) {
     console.log("error toggling user status:", error);
     throw error;
+  }
+};
+
+export const getAllApplicants = async (
+  page: number
+): Promise<{
+  data: Itechnician[];
+  totalPages: number;
+  currentPage: number;
+}> => {
+  try {
+    const response = await axiosInstance.get(
+      `/admin/applicantslist?page=${page}`
+    );
+    console.log("response:", response);
+    return {
+      data: response.data.applicants || [],
+      totalPages: response.data.totalPages || 1,
+      currentPage: response.data.currentPage || page,
+    };
+  } catch (error) {
+    console.error("error fetching the applicants:", error);
+    return {
+      data: [],
+      totalPages: 0,
+      currentPage: page,
+    };
   }
 };

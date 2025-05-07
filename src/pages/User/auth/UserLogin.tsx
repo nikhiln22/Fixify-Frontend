@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Login } from "../../../components/auth/Login";
-import authService from "../../../services/auth.services"; 
+import authService from "../../../services/auth.services";
 import { showToast } from "../../../utils/toast";
 import Cookies from "js-cookie";
 import { setUserData } from "../../../redux/slices/userSlice";
@@ -28,7 +28,7 @@ export const UserLogin: React.FC = () => {
 
         Cookies.set(
           `${serverRole.toLowerCase()}_access_token`,
-          response.data.access_token
+          response.data.access_token,
         );
 
         if ("user" in response.data) {

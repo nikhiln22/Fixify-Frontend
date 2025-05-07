@@ -14,11 +14,11 @@ export const UserForgotPassword: React.FC = () => {
         message: response.message || `OTP sent to ${email}.`,
         type: "success",
       });
-      
+
       navigate(`/user/otp`, {
         state: { email: email, action: "forgot" },
       });
-      
+
       return response;
     } catch (err: any) {
       showToast({
@@ -31,10 +31,7 @@ export const UserForgotPassword: React.FC = () => {
 
   return (
     <div>
-      <ForgotPassword 
-        role="USER" 
-        onSubmit={handleForgotPassword}
-      />
+      <ForgotPassword role="USER" onSubmit={handleForgotPassword} />
     </div>
   );
 };

@@ -11,4 +11,3 @@ export const AdminPrivateRoute: React.FC = () => {
 
   return <Navigate to="/admin/login" />;
 };
-

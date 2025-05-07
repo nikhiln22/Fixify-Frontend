@@ -12,7 +12,7 @@ export const TechnicianOtp: React.FC = () => {
     values: { otp: string },
     email: string,
     purpose: OtpPurpose,
-    tempId?: string
+    tempId?: string,
   ) => {
     try {
       let data: OTPVerification;

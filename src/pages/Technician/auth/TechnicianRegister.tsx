@@ -15,7 +15,7 @@ export const TechnicianRegister: React.FC = () => {
     try {
       const response = (await authService.register(
         values,
-        "TECHNICIAN"
+        "TECHNICIAN",
       )) as TechnicianTempRegisterResponse;
 
       if (response.success) {

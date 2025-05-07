@@ -1,4 +1,5 @@
 import axiosInstance from "../config/axios.config";
+import axios from "axios";
 import Cookies from "js-cookie";
 import { envConfig } from "../config/env.config";
 import {
@@ -16,23 +17,116 @@ import {
 const getAuthUrl = (role: UserLikeRoles | Role, endpoint: string) =>
   `/${role.toLowerCase()}/${endpoint}`;
 
+// const refreshToken = async (role: Role) => {
+//   try {
+//     console.log("started initiating the new access token");
+//     const response = await axiosInstance.post(
+//       `${envConfig.apiUrl}/refreshtoken`,
+//       { role: role.toLowerCase() },
+//       { withCredentials: true }
+//     );
+//     console.log("response.data:", response.data);
+//     if (response.data.success) {
+//       const newAccessToken = response.data.access_token;
+
+//       Cookies.set(`${role.toLowerCase()}_access_token`, newAccessToken, {
+//         path: "/",
+//       });
+
+//       axiosInstance.defaults.headers.common["Authorization"] =
+//         `Bearer ${newAccessToken}`;
+
+//       console.log("Current headers:", axiosInstance.defaults.headers.common);
+
+//       return newAccessToken;
+//     } else {
+//       throw new Error("Failed to refresh token");
+//     }
+//   } catch (error) {
+//     console.error("Error refreshing access token:", error);
+//     throw error;
+//   }
+// };
+
+// axiosInstance.interceptors.response.use(
+//   (response) => response,
+//   async (error) => {
+//     if (error.response && error.response.status === 401) {
+//       const urlpath = error.config.url || "";
+//       let role: Role;
+
+//       if (urlpath.includes("/technician/")) {
+//         role = "TECHNICIAN";
+//       } else if (urlpath.includes("/admin/")) {
+//         role = "ADMIN";
+//       } else {
+//         role = "USER";
+//       }
+
+//       try {
+//         const newAccessToken = await refreshToken(role);
+//         console.log("newAccessToken:", newAccessToken);
+//         error.config.headers["Authorization"] = `Bearer ${newAccessToken}`;
+//         return axiosInstance(error.config);
+//       } catch (refreshError) {
+//         console.error("Could not refresh token, logging out...");
+//         Cookies.remove(`${role.toLowerCase()}_access_token`);
+//         window.location.href = `/${role.toLowerCase()}/login`;
+//       }
+//     }
+
+//     return Promise.reject(error);
+//   }
+// );
+
+
+let isRefreshing = false;
+let pendingRequests: ((token: string | null) => void)[] = [];
+
 const refreshToken = async (role: Role) => {
   try {
-    const response = await axiosInstance.post(
+    if (isRefreshing) {
+      console.log("Token refresh already in progress");
+      return new Promise((resolve) => {
+        pendingRequests.push(resolve);
+      });
+    }
+
+    isRefreshing = true;
+    console.log("Started initiating the new access token");
+
+    const response = await axios.post(
       `${envConfig.apiUrl}/refreshtoken`,
       { role: role.toLowerCase() },
       { withCredentials: true }
     );
 
+    console.log("Response data:", response.data);
+
     if (response.data.success) {
       const newAccessToken = response.data.access_token;
 
-      Cookies.set(`${role.toLowerCase()}_access_token`, newAccessToken);
+      Cookies.set(`${role.toLowerCase()}_access_token`, newAccessToken, {
+        path: "/",
+      });
+      axiosInstance.defaults.headers.common["Authorization"] =
+        `Bearer ${newAccessToken}`;
+
+      pendingRequests.forEach((resolve) => resolve(newAccessToken));
+      pendingRequests = [];
+
+      isRefreshing = false;
       return newAccessToken;
     } else {
+      pendingRequests.forEach((resolve) => resolve(null));
+      pendingRequests = [];
+      isRefreshing = false;
       throw new Error("Failed to refresh token");
     }
   } catch (error) {
+    pendingRequests.forEach((resolve) => resolve(null));
+    pendingRequests = [];
+    isRefreshing = false;
     console.error("Error refreshing access token:", error);
     throw error;
   }
@@ -41,9 +135,13 @@ const refreshToken = async (role: Role) => {
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response && error.response.status === 401) {
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !error.config.url.includes("/refreshtoken")
+    ) {
       const urlpath = error.config.url || "";
-      let role: Role;
+      let role:Role;
 
       if (urlpath.includes("/technician/")) {
         role = "TECHNICIAN";
@@ -56,12 +154,22 @@ axiosInstance.interceptors.response.use(
       try {
         const newAccessToken = await refreshToken(role);
 
-        error.config.headers["Authorization"] = `Bearer ${newAccessToken}`;
-        return axiosInstance(error.config);
+        if (newAccessToken) {
+          const newConfig = { ...error.config };
+          if (!newConfig.headers) {
+            newConfig.headers = {};
+          }
+          newConfig.headers["Authorization"] = `Bearer ${newAccessToken}`;
+
+          return axios(newConfig);
+        } else {
+          throw new Error("Could not get a new token");
+        }
       } catch (refreshError) {
         console.error("Could not refresh token, logging out...");
         Cookies.remove(`${role.toLowerCase()}_access_token`);
-        window.location.href = `/${role}/login`;
+        window.location.href = `/${role.toLowerCase()}/login`;
+        return Promise.reject(refreshError);
       }
     }
 

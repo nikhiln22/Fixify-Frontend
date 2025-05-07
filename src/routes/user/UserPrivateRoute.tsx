@@ -8,6 +8,6 @@ export const UserPrivateRoute: React.FC = () => {
   if (token) {
     return <Outlet />;
   }
-  
+
   return <Navigate to="/user/login" />;
 };

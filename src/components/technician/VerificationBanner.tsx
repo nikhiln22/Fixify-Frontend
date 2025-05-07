@@ -1,5 +1,11 @@
 import React from "react";
-import { AlertTriangle, CheckCircle, FileEdit, ArrowRight, Clock } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle,
+  FileEdit,
+  ArrowRight,
+  Clock,
+} from "lucide-react";
 import { VerificationBannerProps } from "../../types/component.types";
 import Button from "../../components/common/Button";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +22,7 @@ export const VerificationBanner: React.FC<VerificationBannerProps> = ({
   }
 
   const handleNavigateToProfile = () => {
-    navigate('/technician/profile');
+    navigate("/technician/profile");
   };
 
   if (isSubmitted) {
@@ -43,7 +49,8 @@ export const VerificationBanner: React.FC<VerificationBannerProps> = ({
                 <div className="flex items-center gap-3">
                   <Clock className="h-5 w-5 text-green-600" />
                   <p className="text-sm text-gray-700">
-                    Our team will review your information and update your account status within 1-2 business days.
+                    Our team will review your information and update your
+                    account status within 1-2 business days.
                   </p>
                 </div>
               </div>
@@ -51,7 +58,7 @@ export const VerificationBanner: React.FC<VerificationBannerProps> = ({
                 <FileEdit className="h-4 w-4 text-gray-500" />
                 <p className="text-sm text-gray-600">
                   Need to make changes? Visit your{" "}
-                  <button 
+                  <button
                     onClick={handleNavigateToProfile}
                     className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium underline-offset-2 hover:underline transition-colors"
                   >
@@ -98,7 +105,9 @@ export const VerificationBanner: React.FC<VerificationBannerProps> = ({
           </div>
           <div className="mt-4 bg-white/70 rounded-lg p-4 border border-gray-200">
             <p className="text-sm text-gray-700">
-              Submit your professional qualifications to get verified and access all features of the platform. The verification process usually takes 1-2 business days.
+              Submit your professional qualifications to get verified and access
+              all features of the platform. The verification process usually
+              takes 1-2 business days.
             </p>
           </div>
         </div>

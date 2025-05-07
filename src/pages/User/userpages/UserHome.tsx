@@ -107,14 +107,20 @@ export const UserHome: React.FC = () => {
                     />
                   </div>
                   <div className="p-5">
-                    <h3 className="font-medium text-gray-800">{service.title}</h3>
+                    <h3 className="font-medium text-gray-800">
+                      {service.title}
+                    </h3>
                     <div className="flex items-center mt-2">
                       <span className="text-yellow-500 mr-1">★</span>
                       <span className="text-sm font-medium">
                         {index === 0 ? "4.79" : index === 1 ? "4.81" : "4.80"}
                       </span>
                       <span className="text-sm text-gray-500 ml-1">
-                        {index === 0 ? "(103K)" : index === 1 ? "(3K)" : "(31K)"}
+                        {index === 0
+                          ? "(103K)"
+                          : index === 1
+                            ? "(3K)"
+                            : "(31K)"}
                       </span>
                     </div>
                     <p className="font-medium text-gray-900 mt-1">
@@ -124,13 +130,13 @@ export const UserHome: React.FC = () => {
                 </div>
               ))}
             </div>
-            
+
             <div className="absolute inset-y-0 left-0 flex items-center -ml-3">
               <button className="p-2 rounded-full bg-white shadow-md hover:bg-gray-100 focus:outline-none">
                 <ChevronLeft className="h-5 w-5" />
               </button>
             </div>
-            
+
             <div className="absolute inset-y-0 right-0 flex items-center -mr-3">
               <button className="p-2 rounded-full bg-white shadow-md hover:bg-gray-100 focus:outline-none">
                 <ChevronRight className="h-5 w-5" />

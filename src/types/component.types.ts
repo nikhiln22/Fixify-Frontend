@@ -3,7 +3,7 @@ import React, { ButtonHTMLAttributes } from "react";
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   className?: string;
-  variant?: 'primary' | 'outline';
+  variant?: "primary" | "outline";
   isLoading?: boolean;
   onClick?: () => void;
 }
@@ -17,7 +17,7 @@ export interface InputFieldProps
 }
 
 export interface AuthLayoutProps {
-   role: "USER" | "ADMIN" | "TECHNICIAN";
+  role: "USER" | "ADMIN" | "TECHNICIAN";
   children: React.ReactNode;
 }
 
@@ -35,7 +35,7 @@ export interface ModalProps {
   cancelText?: string;
   onConfirm?: () => void;
   confirmButtonColor?: "red" | "green" | "blue";
-  fullContent?:Boolean;
+  fullContent?: boolean;
 }
 
 export interface OTPInputProps {
@@ -49,7 +49,6 @@ export interface Column<T> {
   label: string;
   render?: (item: T, index: number) => React.ReactNode;
 }
-
 
 export interface TableWithPaginationProps<T> {
   data: T[];

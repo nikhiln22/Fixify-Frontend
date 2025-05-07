@@ -10,7 +10,7 @@ export const registerValidationSchema = Yup.object().shape({
     .email("Invalid email address")
     .matches(
       /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-      "Please enter a valid email (e.g., user@example.com)"
+      "Please enter a valid email (e.g., user@example.com)",
     )
     .required("Email is required"),
 
@@ -22,7 +22,7 @@ export const registerValidationSchema = Yup.object().shape({
     .min(8, "Password must be at least 8 characters")
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/,
-      "Password must contain uppercase, lowercase, number and special character"
+      "Password must contain uppercase, lowercase, number and special character",
     )
     .required("Password is required"),
 
@@ -36,7 +36,7 @@ export const loginValidationSchema = Yup.object().shape({
     .email("Invalid email address")
     .matches(
       /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-      "Please enter a valid email (e.g., user@example.com)"
+      "Please enter a valid email (e.g., user@example.com)",
     )
     .required("Email is required"),
   password: Yup.string()
@@ -49,7 +49,7 @@ export const forgotPasswordValidationSchema = Yup.object().shape({
     .email("Invalid email address")
     .matches(
       /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-      "Please enter a valid email (e.g., user@example.com)"
+      "Please enter a valid email (e.g., user@example.com)",
     )
     .required("Email is required"),
 });
@@ -66,7 +66,7 @@ export const resetPasswordValidationSchema = Yup.object().shape({
     .min(8, "Password must be at least 8 characters")
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
     )
     .required("Password is required"),
   confirmPassword: Yup.string()

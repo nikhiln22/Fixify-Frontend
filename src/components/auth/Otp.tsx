@@ -33,7 +33,7 @@ export const Otp: React.FC<OtpProps> = ({ role, onVerifyOtp, onResendOtp }) => {
     const interval = setInterval(() => {
       const currentTime = Date.now();
       const startTime = parseInt(
-        localStorage.getItem("otpStartTime") || now.toString()
+        localStorage.getItem("otpStartTime") || now.toString(),
       );
       const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
       const remainingSeconds = Math.max(60 - elapsedSeconds, 0);

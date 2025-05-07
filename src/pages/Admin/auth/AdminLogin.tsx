@@ -24,7 +24,7 @@ export const AdminLogin: React.FC = () => {
 
         Cookies.set(
           `${serverRole.toLowerCase()}_access_token`,
-          response.data.access_token
+          response.data.access_token,
         );
 
         navigate("/admin/dashboard");

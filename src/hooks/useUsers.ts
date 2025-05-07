@@ -12,16 +12,16 @@ const useUsers = () => {
     error,
     refetch,
   } = usePaginatedList<Iuser>(getAllUsers);
-  
+
   const handleStatusToggle = async (userId: string) => {
     try {
-      await toggleUserStatus(userId); 
+      await toggleUserStatus(userId);
       await refetch();
     } catch (error) {
       console.error("Failed to toggle user status:", error);
     }
   };
-  
+
   return {
     users,
     currentPage,
