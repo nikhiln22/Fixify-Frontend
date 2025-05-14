@@ -5,8 +5,9 @@ import {
   Users,
   UserCog,
   FileText,
-  UserCircle,
   Briefcase,
+  Grid3x3,
+  Wrench    
 } from "lucide-react";
 
 const AdminSidebar: React.FC = () => {
@@ -89,9 +90,9 @@ const AdminSidebar: React.FC = () => {
               <span>Job Designations</span>
             </NavLink>
           </li>
-          <li className="mt-6 pt-6 border-t border-gray-200">
+          <li>
             <NavLink
-              to="/admin/profile"
+              to="/admin/categories"
               className={({ isActive }) =>
                 `flex items-center gap-3 py-3 px-4 rounded transition-colors ${
                   isActive
@@ -100,8 +101,23 @@ const AdminSidebar: React.FC = () => {
                 }`
               }
             >
-              <UserCircle size={20} />
-              <span>Profile</span>
+              <Grid3x3 size={20} />
+              <span>Categories</span>
+            </NavLink>
+          </li>
+             <li>
+            <NavLink
+              to="/admin/services"
+              className={({ isActive }) =>
+                `flex items-center gap-3 py-3 px-4 rounded transition-colors ${
+                  isActive
+                    ? "bg-white text-gray-800 shadow-sm font-medium"
+                    : "text-gray-700 hover:bg-white hover:shadow-sm"
+                }`
+              }
+            >
+              <Wrench size={20} />
+              <span>Services</span>
             </NavLink>
           </li>
         </ul>

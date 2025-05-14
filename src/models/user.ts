@@ -9,5 +9,4 @@ export interface Iuser {
   createdAt: Date;
   updatedAt: Date;
   access_token: string;
-  refresh_token: string;
 }

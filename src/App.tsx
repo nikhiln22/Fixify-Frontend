@@ -6,35 +6,42 @@ import { LandingPage } from "./pages/LandingPage";
 import { UserRoutes } from "./routes/user/UserRoutes";
 import { TechnicianRoutes } from "./routes/technician/TechnicianRoutes";
 import { AdminRoutes } from "./routes/admin/AdminRoutes";
+import { store, persistor } from "./redux/store";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import { BlockedUserGuard } from "./components/common/BlockedUserGuard";
 
 function App() {
   return (
-    <>
-      <BrowserRouter>
-        <ToastContainer
-          position="top-center"
-          autoClose={5000}
-          hideProgressBar={true}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          closeButton={false}
-          theme="light"
-        />
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          </Routes> 
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <BrowserRouter>
+        <BlockedUserGuard>
+          <ToastContainer
+            position="top-center"
+            autoClose={5000}
+            hideProgressBar={true}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            closeButton={false}
+            theme="light"
+          />
+
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+          </Routes>
 
           <UserRoutes />
-
           <TechnicianRoutes />
-
           <AdminRoutes />
-      </BrowserRouter>
-    </>
+          </BlockedUserGuard>
+        </BrowserRouter>
+      </PersistGate>
+    </Provider>
   );
 }
 

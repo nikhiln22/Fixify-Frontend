@@ -15,6 +15,7 @@ const InputField: React.FC<InputFieldProps> = ({
   error,
   touched,
   onBlur,
+  disabled,
 }) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -47,6 +48,7 @@ const InputField: React.FC<InputFieldProps> = ({
             type="button"
             onClick={toggleVisibility}
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-900"
+            disabled={disabled}
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>

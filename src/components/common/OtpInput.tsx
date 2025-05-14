@@ -6,7 +6,7 @@ const OTPInput: React.FC<OTPInputProps> = ({ length, value, onchange }) => {
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    index: number
+    index: number,
   ) => {
     const val = e.target.value.replace(/\D/, "");
     const otpArray = value.split("");
@@ -25,7 +25,7 @@ const OTPInput: React.FC<OTPInputProps> = ({ length, value, onchange }) => {
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
-    index: number
+    index: number,
   ) => {
     if (e.key === "Backspace" && !value[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
@@ -33,7 +33,7 @@ const OTPInput: React.FC<OTPInputProps> = ({ length, value, onchange }) => {
   };
 
   return (
-    <div className="flex justify-center gap-2">
+    <div className="flex justify-center gap-10">
       {Array.from({ length }).map((_, index) => (
         <input
           key={index}
@@ -44,8 +44,8 @@ const OTPInput: React.FC<OTPInputProps> = ({ length, value, onchange }) => {
           inputMode="numeric"
           maxLength={1}
           value={value[index] || ""}
-          onChange={(e) => handleChange(e, index)} 
-          onKeyDown={(e) => handleKeyDown(e, index)} 
+          onChange={(e) => handleChange(e, index)}
+          onKeyDown={(e) => handleKeyDown(e, index)}
           className="w-12 h-12 text-center text-xl border border-gray-400 rounded focus:outline-none focus:ring-2 focus:ring-black"
         />
       ))}

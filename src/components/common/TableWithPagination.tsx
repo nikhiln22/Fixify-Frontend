@@ -25,9 +25,7 @@ const TableWithPagination = <T extends object>({
                     key={String(col.key)}
                     className={`px-6 py-3 text-center border-b border-r border-gray-200 text-white font-medium tracking-wider uppercase text-base ${
                       index === 0 ? "rounded-tl-xl" : ""
-                    } ${
-                      index === columns.length - 1 ? "rounded-tr-xl" : ""
-                    }`}
+                    } ${index === columns.length - 1 ? "rounded-tr-xl" : ""}`}
                     style={{ width: `${100 / columns.length}%` }}
                   >
                     {col.label}
@@ -43,8 +41,19 @@ const TableWithPagination = <T extends object>({
                     className="text-center py-8 text-gray-500 bg-gray-50"
                   >
                     <div className="flex flex-col items-center justify-center">
-                      <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 2a10 10 0 110 20 10 10 0 010-20z"></path>
+                      <svg
+                        className="w-12 h-12 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 2a10 10 0 110 20 10 10 0 010-20z"
+                        ></path>
                       </svg>
                       <p className="mt-2 text-gray-600">No data found.</p>
                     </div>
@@ -52,8 +61,8 @@ const TableWithPagination = <T extends object>({
                 </tr>
               ) : (
                 data.map((row, rowIndex) => (
-                  <tr 
-                    key={rowIndex} 
+                  <tr
+                    key={rowIndex}
                     className="hover:bg-gray-100 transition-colors duration-150 ease-in-out"
                   >
                     {columns.map((col) => (
@@ -62,7 +71,10 @@ const TableWithPagination = <T extends object>({
                         className="px-6 py-4 border-b border-r border-gray-200 text-base text-gray-700"
                       >
                         {col.render
-                          ? col.render(row, (currentPage - 1) * data.length + rowIndex)
+                          ? col.render(
+                              row,
+                              (currentPage - 1) * data.length + rowIndex,
+                            )
                           : String(row[col.key as keyof T])}
                       </td>
                     ))}
@@ -94,7 +106,7 @@ const TableWithPagination = <T extends object>({
                     >
                       {page}
                     </button>
-                  )
+                  ),
                 )}
               </div>
               <button

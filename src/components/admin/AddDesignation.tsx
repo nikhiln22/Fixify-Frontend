@@ -1,4 +1,4 @@
-import { Formik, Form} from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import InputField from "../common/InputField";
 import Button from "../common/Button";
@@ -6,10 +6,9 @@ import { addJobDesignation } from "../../services/admin.services";
 import { showToast } from "../../utils/toast";
 import { AddDesignationFormProps } from "../../types/component.types";
 
-const AddDesignationForm: React.FC<AddDesignationFormProps & { onRefresh?: () => void }> = ({
-  onSuccess,
-  onRefresh
-}) => {
+const AddDesignationForm: React.FC<
+  AddDesignationFormProps & { onRefresh?: () => void }
+> = ({ onSuccess, onRefresh }) => {
   const validationSchema = Yup.object().shape({
     designation: Yup.string()
       .trim()
@@ -18,20 +17,23 @@ const AddDesignationForm: React.FC<AddDesignationFormProps & { onRefresh?: () =>
       .max(50, "Designation must not exceed 50 characters")
       .matches(
         /^[a-zA-Z0-9\s-]+$/,
-        "Designation can only contain letters, numbers, spaces, and hyphens"
-      )
+        "Designation can only contain letters, numbers, spaces, and hyphens",
+      ),
   });
 
-  const handleSubmit = async (values: { designation: string }, { setSubmitting, resetForm }: any) => {
+  const handleSubmit = async (
+    values: { designation: string },
+    { setSubmitting, resetForm }: any,
+  ) => {
     try {
       const response = await addJobDesignation(values.designation);
       console.log("Response from addDesignationForm component:", response);
       showToast({ message: "Designation added successfully", type: "success" });
-      
+
       if (onRefresh) {
         onRefresh();
       }
-      
+
       onSuccess();
       resetForm();
     } catch (error) {
@@ -48,7 +50,14 @@ const AddDesignationForm: React.FC<AddDesignationFormProps & { onRefresh?: () =>
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
+        {({
+          values,
+          errors,
+          touched,
+          handleChange,
+          handleBlur,
+          isSubmitting,
+        }) => (
           <Form>
             <div className="mb-6">
               <InputField
@@ -59,11 +68,15 @@ const AddDesignationForm: React.FC<AddDesignationFormProps & { onRefresh?: () =>
                 onBlur={handleBlur}
                 placeholder="Enter designation name"
                 className={`w-full py-2 ${
-                  errors.designation && touched.designation ? "border-red-500" : ""
+                  errors.designation && touched.designation
+                    ? "border-red-500"
+                    : ""
                 }`}
               />
               {errors.designation && touched.designation && (
-                <div className="text-red-500 text-sm mt-1">{errors.designation}</div>
+                <div className="text-red-500 text-sm mt-1">
+                  {errors.designation}
+                </div>
               )}
             </div>
 

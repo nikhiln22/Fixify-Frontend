@@ -1,19 +1,15 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../services/auth.services";
 import { LoginProps, UserLikeRoles } from "../../types/auth.types";
 import InputField from "../common/InputField";
 import Button from "../common/Button";
 import ForgotPasswordLink from "../common/ForgotPasswordLink";
 import AuthLayout from "../../layouts/AuthLayout";
-import Cookies from "js-cookie";
-import { showToast } from "../../utils/toast";
 import { useFormik } from "formik";
 import { loginValidationSchema } from "../../utils/validations/authvalidationschema";
 
-export const Login: React.FC<LoginProps> = ({ role }) => {
+export const Login: React.FC<LoginProps> = ({ role, onsubmit }) => {
   const navigate = useNavigate();
-
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -21,70 +17,22 @@ export const Login: React.FC<LoginProps> = ({ role }) => {
     },
     validationSchema: loginValidationSchema,
     onSubmit: async (values, { setSubmitting }) => {
-      setSubmitting(true);
       try {
-        const response = await login(values, role);
-        console.log("response from the login component:", response.data);
-        console.log("access token in login component:",response.data.access_token);
-        console.log("refresh token in login component:",response.data.refresh_token);
-        if (response.success) {
-          const serverRole = response.data.role || "USER";
-          console.log("serverRole in login component:", serverRole);
-          
-          showToast({
-            message: "Login successful!",
-            type: "success",
-          });
-          
-          Cookies.set(
-            `${serverRole.toLowerCase()}_access_token`,
-            response.data.access_token
-          );
-          Cookies.set(
-            `${serverRole.toLowerCase()}_refresh_token`,
-            response.data.refresh_token
-          );
-          
-          switch (serverRole.toUpperCase()) {
-            case "ADMIN":
-              navigate("/admin/dashboard");
-              break;
-            case "TECHNICIAN":
-              navigate("/technician/portal");
-              break;
-            case "USER":
-              navigate("/user/home");
-              break;
-            default:
-              navigate("/user/home");
-              break;
-          }
-        } else {
-          showToast({
-            message: response.message || "Login failed",
-            type: "error",
-          });
-        }
-      } catch (err: any) {
-        showToast({
-          message: err?.response?.data?.message || "Login failed.",
-          type: "error",
-        });
+        await onsubmit(values);
+      } catch (error) {
+        console.error("Form submission error:", error);
       } finally {
         setSubmitting(false);
       }
     },
   });
-
   return (
     <AuthLayout role={role || "USER"}>
       <div className="text-center">
         <h4 className="text-3xl font-bold text-black capitalize">
           {role[0].toUpperCase() + role.slice(1).toLowerCase()} Login
         </h4>
-        <p className="mt-2 text-base text-gray-700">
-          Please login to continue
-        </p>
+        <p className="mt-2 text-base text-gray-700">Please login to continue</p>
       </div>
       <form onSubmit={formik.handleSubmit} className="space-y-6 p-8 rounded-lg">
         <InputField
@@ -94,18 +42,18 @@ export const Login: React.FC<LoginProps> = ({ role }) => {
           onChange={formik.handleChange}
           type="email"
           placeholder="Enter your email..."
-          required
           error={formik.errors.email}
           touched={formik.touched.email}
+          onBlur={formik.handleBlur}
         />
         <InputField
           label="Password"
           name="password"
           value={formik.values.password}
           onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           type="password"
           placeholder="Enter your password..."
-          required
           error={formik.errors.password}
           touched={formik.touched.password}
           showToggle
@@ -113,8 +61,17 @@ export const Login: React.FC<LoginProps> = ({ role }) => {
         {role !== "ADMIN" && (
           <ForgotPasswordLink role={role as UserLikeRoles} />
         )}
-        <Button type="submit" disabled={formik.isSubmitting} className="w-full mt-4">
-          {formik.isSubmitting ? "Processing..." : "Login"}
+        <Button
+          type="submit"
+          disabled={
+            formik.isSubmitting ||
+            !Object.values(formik.values).every((value) => value) ||
+            Object.keys(formik.errors).length > 0
+          }
+          isLoading={formik.isSubmitting}
+          className="w-full mt-4"
+        >
+          Login
         </Button>
         {role !== "ADMIN" && (
           <div className="text-center mt-4">

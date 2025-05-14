@@ -3,8 +3,8 @@ import { Itechnician } from "../models/technician";
 import { Iadmin } from "../models/admin";
 
 export type Role = "USER" | "ADMIN" | "TECHNICIAN";
-
 export type UserLikeRoles = Extract<Role, "USER" | "TECHNICIAN">;
+export type OtpPurpose = "REGISTRATION" | "PASSWORD_RESET";
 
 export interface GenericEntity {
   [key: string]: any;
@@ -12,18 +12,28 @@ export interface GenericEntity {
 
 export interface LoginProps {
   role: Role;
+  onsubmit: (values: LoginFormData) => Promise<void>;
 }
 
 export interface OtpProps {
   role: UserLikeRoles;
+  onVerifyOtp: (
+    values: { otp: string },
+    email: string,
+    purpose: OtpPurpose,
+    tempId?: string,
+  ) => Promise<void>;
+  onResendOtp: (email: string) => Promise<void>;
 }
 
 export interface RegisterProps {
   role: UserLikeRoles;
+  onSubmit: (values: RegisterFormData) => Promise<void>;
 }
 
 export interface ForgotPasswordProps {
   role: UserLikeRoles;
+  onSubmit: (email: string) => Promise<void>;
 }
 
 export interface ForgotPasswordLinkProps {
@@ -32,6 +42,7 @@ export interface ForgotPasswordLinkProps {
 
 export interface ResetPasswordProps {
   role: UserLikeRoles;
+  onSubmit: (password: string) => Promise<void>;
 }
 
 export interface LoginFormData {
@@ -49,7 +60,7 @@ export interface LoginResponse {
 export interface BaseOTPVerification {
   email?: string;
   otp: string;
-  purpose?: "REGISTRATION" | "PASSWORD_RESET";
+  purpose?: OtpPurpose;
 }
 
 export interface UserOTPVerification extends BaseOTPVerification {
@@ -79,7 +90,6 @@ export interface UserRegisterResponse {
   status: number;
 }
 
-
 export interface TechnicianRegisterResponse {
   success: boolean;
   technicianData?: Itechnician;
@@ -89,9 +99,9 @@ export interface TechnicianRegisterResponse {
   status: number;
 }
 
-
-export type RegisterResponse = UserRegisterResponse | TechnicianRegisterResponse;
-
+export type RegisterResponse =
+  | UserRegisterResponse
+  | TechnicianRegisterResponse;
 
 export interface BaseTempRegisterResponse {
   success: boolean;
@@ -99,19 +109,18 @@ export interface BaseTempRegisterResponse {
   message: string;
 }
 
-
 export interface UserTempRegisterResponse extends BaseTempRegisterResponse {
   tempUserId: string;
 }
 
-
-export interface TechnicianTempRegisterResponse extends BaseTempRegisterResponse {
+export interface TechnicianTempRegisterResponse
+  extends BaseTempRegisterResponse {
   tempTechnicianId: string;
 }
 
-
-export type TempRegisterResponse = UserTempRegisterResponse | TechnicianTempRegisterResponse;
-
+export type TempRegisterResponse =
+  | UserTempRegisterResponse
+  | TechnicianTempRegisterResponse;
 
 export interface ResetPasswordData {
   email: string;
@@ -130,19 +139,14 @@ export interface ResetPasswordResponse {
   status: number;
 }
 
-
-export function isUserTempRegisterResponse(response: TempRegisterResponse): response is UserTempRegisterResponse {
-  return 'tempUserId' in response;
+export function isUserOTPVerification(
+  payload: OTPVerification,
+): payload is UserOTPVerification {
+  return "tempUserId" in payload;
 }
 
-export function isTechnicianTempRegisterResponse(response: TempRegisterResponse): response is TechnicianTempRegisterResponse {
-  return 'tempTechnicianId' in response;
-}
-
-export function isUserOTPVerification(payload: OTPVerification): payload is UserOTPVerification {
-  return 'tempUserId' in payload;
-}
-
-export function isTechnicianOTPVerification(payload: OTPVerification): payload is TechnicianOTPVerification {
-  return 'tempTechnicianId' in payload;
+export function isTechnicianOTPVerification(
+  payload: OTPVerification,
+): payload is TechnicianOTPVerification {
+  return "tempTechnicianId" in payload;
 }

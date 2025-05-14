@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Column } from "../../types/component.types";
 import { Idesignation } from "../../models/designation";
-import Modal from "../../components/common/Modal"; 
+import Modal from "../../components/common/Modal";
 
 export const getJobDesignationColumns = (
-  handleStatusToggle: (id: string) => void
+  handleStatusToggle: (id: string) => void,
 ): Column<Idesignation>[] => [
   {
     key: "_id",
@@ -43,7 +43,7 @@ export const getJobDesignationColumns = (
     render: (item) => {
       const ActionButton = () => {
         const [isOpen, setIsOpen] = useState(false);
-        
+
         function closeModal() {
           setIsOpen(false);
         }
@@ -51,11 +51,11 @@ export const getJobDesignationColumns = (
         function openModal() {
           setIsOpen(true);
         }
-        
+
         const handleConfirm = () => {
           handleStatusToggle(item._id);
         };
-        
+
         return (
           <div className="flex justify-center">
             <button
@@ -66,7 +66,7 @@ export const getJobDesignationColumns = (
             >
               {item.Status ? "Block" : "Unblock"}
             </button>
-            
+
             <Modal
               isopen={isOpen}
               onclose={closeModal}
@@ -77,7 +77,8 @@ export const getJobDesignationColumns = (
               confirmButtonColor={item.Status ? "red" : "green"}
             >
               <p>
-                Are you sure you want to {item.Status ? "block" : "unblock"} the designation "{item.designation}"?
+                Are you sure you want to {item.Status ? "block" : "unblock"} the
+                designation "{item.designation}"?
               </p>
             </Modal>
           </div>

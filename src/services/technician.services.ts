@@ -1,42 +1,65 @@
 import axiosInstance from "../config/axios.config";
 import cookies from "js-cookie";
-
-interface JobDesignationResponse {
-  message: string;
-  success: boolean;
-  designation: string[];
-  status: number;
-}
+import {
+  JobDesignationResponse,
+  SubmitTechnicianQualificationResponse,
+  TechnicianProfileResponse
+} from "../types/technicians.types";
 
 export const getJobDesignations = async (): Promise<string[]> => {
-  const response = await axiosInstance.get<JobDesignationResponse>(
-    "/technician/jobdesignations"
-  );
-  return response.data.designation;
+  try {
+    const token = cookies.get("technician_access_token");
+    const response = await axiosInstance.get<JobDesignationResponse>(
+      "/technician/jobdesignations",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data.designation;
+  } catch (error) {
+    console.error("Error fetching job designations:", error);
+    return [];
+  }
 };
 
 export const submitTechnicianQualification = async (
   formdata: FormData
-): Promise<void> => {
-  console.log("entering into the form submitting to the backend");
-  const token = cookies.get("technician_access_token");
-  console.log("token:", token);
-
-  if (token) {
-    const decoded = JSON.parse(atob(token.split(".")[1]));
-    const isExpired = decoded.exp * 1000 < Date.now();
-    console.log("Token expired?", isExpired);
+): Promise<SubmitTechnicianQualificationResponse> => {
+  try {
+    const token = cookies.get("technician_access_token");
+    const response = await axiosInstance.patch<SubmitTechnicianQualificationResponse>(
+      "/technician/qualifications",
+      formdata,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting qualification:", error);
+    throw error;
   }
+};
 
-  const response = await axiosInstance.patch(
-    "/technician/qualifications",
-    formdata,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return response.data;
+export const getTechnicianProfile = async (): Promise<TechnicianProfileResponse> => {
+  const token = cookies.get("technician_access_token");
+  try {
+    const response = await axiosInstance.get<TechnicianProfileResponse>(
+      "/technician/profile", 
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching the technician profile:", error);
+    throw error;
+  }
 };

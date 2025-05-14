@@ -18,12 +18,12 @@ function JobDesignationPage() {
     error,
     refreshDesignations,
   } = useJobDesignations();
-  
+
   const columns = getJobDesignationColumns(handleStatusToggle);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
-  
+
   const handleAddDesignationSuccess = () => {
     handleCloseModal();
   };
@@ -38,9 +38,9 @@ function JobDesignationPage() {
           Add Job Designation
         </Button>
       </div>
-      
+
       {error && <p className="text-red-500 mb-2">{error}</p>}
-      
+
       <TableWithPagination
         data={designations}
         columns={columns}
@@ -49,10 +49,10 @@ function JobDesignationPage() {
         onPageChange={setCurrentPage}
         loading={loading}
       />
-      
+
       <Modal isopen={isModalOpen} onclose={handleCloseModal}>
         <div className="p-4 w-full">
-          <AddDesignationForm 
+          <AddDesignationForm
             onSuccess={handleAddDesignationSuccess}
             onRefresh={refreshDesignations}
           />

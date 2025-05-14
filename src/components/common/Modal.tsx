@@ -2,7 +2,6 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ModalProps } from "../../types/component.types";
 
-
 const Modal: React.FC<ModalProps> = ({
   isopen,
   onclose,
@@ -11,46 +10,46 @@ const Modal: React.FC<ModalProps> = ({
   confirmText,
   cancelText,
   onConfirm,
-  confirmButtonColor = "blue"
+  confirmButtonColor = "blue",
 }) => {
   const backdropVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { duration: 0.3 }
+      transition: { duration: 0.3 },
     },
-    exit: { 
+    exit: {
       opacity: 0,
-      transition: { duration: 0.3, delay: 0.1 }
-    }
+      transition: { duration: 0.3, delay: 0.1 },
+    },
   };
 
   const modalVariants = {
-    hidden: { 
-      opacity: 0, 
-      y: 50, 
-      scale: 0.9 
+    hidden: {
+      opacity: 0,
+      y: 50,
+      scale: 0.9,
     },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
+    visible: {
+      opacity: 1,
+      y: 0,
       scale: 1,
-      transition: { 
-        type: "spring", 
-        damping: 25, 
+      transition: {
+        type: "spring",
+        damping: 25,
         stiffness: 300,
-        duration: 0.4
-      }
+        duration: 0.4,
+      },
     },
-    exit: { 
-      opacity: 0, 
-      y: 30, 
+    exit: {
+      opacity: 0,
+      y: 30,
       scale: 0.95,
-      transition: { 
+      transition: {
         duration: 0.25,
-        ease: "easeInOut"
-      }
-    }
+        ease: "easeInOut",
+      },
+    },
   };
 
   const getButtonColorClass = () => {
@@ -92,11 +91,9 @@ const Modal: React.FC<ModalProps> = ({
                     {title}
                   </h3>
                 )}
-                
+
                 <div className="mt-3">
-                  <div className="text-lg text-gray-700">
-                    {children}
-                  </div>
+                  <div className="text-lg text-gray-700">{children}</div>
                 </div>
 
                 {(cancelText || confirmText) && (
@@ -110,7 +107,7 @@ const Modal: React.FC<ModalProps> = ({
                         {cancelText}
                       </button>
                     )}
-                    
+
                     {confirmText && onConfirm && (
                       <button
                         type="button"

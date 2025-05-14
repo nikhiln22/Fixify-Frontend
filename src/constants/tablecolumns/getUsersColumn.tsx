@@ -4,7 +4,7 @@ import { Column } from "../../types/component.types";
 import Modal from "../../components/common/Modal";
 
 export const getUsersColumns = (
-  handleStatusToggle: (id: string) => void
+  handleStatusToggle: (id: string) => void,
 ): Column<Iuser>[] => [
   {
     key: "_id",
@@ -16,23 +16,17 @@ export const getUsersColumns = (
   {
     key: "username",
     label: "Name",
-    render: (item) => (
-      <div className="text-center">{item.username}</div>
-    ),
+    render: (item) => <div className="text-center">{item.username}</div>,
   },
   {
     key: "email",
     label: "Email",
-    render: (item) => (
-      <div className="text-center">{item.email}</div>
-    ),
+    render: (item) => <div className="text-center">{item.email}</div>,
   },
   {
     key: "phone",
     label: "Phone",
-    render: (item) => (
-      <div className="text-center">{item.phone}</div>
-    ),
+    render: (item) => <div className="text-center">{item.phone}</div>,
   },
   {
     key: "status",

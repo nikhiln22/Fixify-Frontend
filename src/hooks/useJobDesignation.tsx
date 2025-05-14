@@ -20,33 +20,32 @@ export default function useJobDesignations() {
 
   const [designations, setDesignations] = useState<Idesignation[]>([]);
   const [loading, setLoading] = useState(false);
-  
+
   useEffect(() => {
     if (fetchedDesignations) {
       setDesignations(fetchedDesignations);
     }
   }, [fetchedDesignations]);
-  
+
   const handleStatusToggle = async (id: string) => {
     try {
       setLoading(true);
       console.log("id in the useJobDesignation hook", id);
-      
-      setDesignations(prevDesignations =>
-        prevDesignations.map(designation =>
+
+      setDesignations((prevDesignations) =>
+        prevDesignations.map((designation) =>
           designation._id === id
             ? { ...designation, Status: !designation.Status }
-            : designation
-        )
+            : designation,
+        ),
       );
-      
+
       const res = await toggleDesignationStatus(id);
       console.log("response from the useJObDesignation hook:", res);
       showToast({ message: res.message, type: "success" });
-      
     } catch (err) {
       setDesignations(fetchedDesignations);
-      
+
       const error = err as { response?: { data?: { message?: string } } };
       showToast({
         message:

@@ -1,9 +1,8 @@
 export interface Iadmin {
   email: string;
-  role:string;
+  role: string;
   image?: string;
   createdAt: Date;
   updatedAt: Date;
-  access_token:string;
-  refresh_token:string;
+  access_token: string;
 }
