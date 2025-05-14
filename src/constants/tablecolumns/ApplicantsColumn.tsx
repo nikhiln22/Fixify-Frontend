@@ -1,4 +1,3 @@
-// import { useState } from "react";
 import { Itechnician } from "../../models/technician";
 import { Column } from "../../types/component.types";
 

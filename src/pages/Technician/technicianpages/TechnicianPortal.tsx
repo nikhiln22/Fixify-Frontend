@@ -122,7 +122,7 @@ export const TechnicianPortal: React.FC = () => {
         )}
 
         {showQualificationForm && (
-          <div className="w-full max-w-3xl">
+          <div className="w-full max-w-full">
             <QualificationForm
               onSubmit={handleFormSubmit}
               onCancel={handleFormCancel}

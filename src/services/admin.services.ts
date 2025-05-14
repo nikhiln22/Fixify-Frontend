@@ -1,4 +1,5 @@
 import axiosInstance from "../config/axios.config";
+import { Icategory } from "../models/category";
 import { Idesignation } from "../models/designation";
 import { Itechnician } from "../models/technician";
 import { Iuser } from "../models/user";
@@ -111,5 +112,72 @@ export const getAllApplicants = async (
       totalPages: 0,
       currentPage: page,
     };
+  }
+};
+
+export const createCategory = async (formData: FormData) => {
+  const response = await axiosInstance.post("/admin/addcategory", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
+export const getAllCategories = async (
+  page: number
+): Promise<{
+  data: Icategory[];
+  totalPages: number;
+  currentPage: number;
+}> => {
+  try {
+    const response = await axiosInstance.get(`/admin/categories?page=${page}`);
+    console.log("response:", response);
+    return {
+      data: response.data.categories || [],
+      totalPages: response.data.totalPages || 1,
+      currentPage: response.data.currentPage || page,
+    };
+  } catch (error) {
+    console.error("error fetching the categories:", error);
+    return {
+      data: [],
+      totalPages: 0,
+      currentPage: page,
+    };
+  }
+};
+
+export const toggleCategoryStatus = async (categoryId: string) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/admin/blockcategory/${categoryId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error toggling category status:", error);
+    throw error;
+  }
+};
+
+export const updateCategory = async (
+  categoryId: string,
+  formData: FormData
+) => {
+  try {
+    const response = await axiosInstance.put(
+      `/admin/updatecategory/${categoryId}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating category:", error);
+    throw error;
   }
 };

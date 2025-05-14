@@ -2,9 +2,6 @@ import axiosInstance from "../config/axios.config";
 import cookies from "js-cookie";
 import {
   JobDesignationResponse,
-  CityLocationResponse,
-  LocationsByCityResponse,
-  Location,
   SubmitTechnicianQualificationResponse,
   TechnicianProfileResponse
 } from "../types/technicians.types";
@@ -23,42 +20,6 @@ export const getJobDesignations = async (): Promise<string[]> => {
     return response.data.designation;
   } catch (error) {
     console.error("Error fetching job designations:", error);
-    return [];
-  }
-};
-
-export const getCityLocations = async (): Promise<string[]> => {
-  const token = cookies.get("technician_access_token");
-  try {
-    const response = await axiosInstance.get<CityLocationResponse>(
-      "/technician/cities",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data.cities || [];
-  } catch (error) {
-    console.error("Error fetching city locations:", error);
-    return [];
-  }
-};
-
-export const getLocationsByCity = async (cityName: string): Promise<Location[]> => {
-  try {
-    const token = cookies.get("technician_access_token");
-    const response = await axiosInstance.get<LocationsByCityResponse>(
-      `/technician/locations/${cityName}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data.locations || [];
-  } catch (error) {
-    console.error(`Error fetching locations for city ${cityName}:`, error);
     return [];
   }
 };

@@ -6,17 +6,15 @@ interface PaginatedResponse<T> {
   currentPage: number;
 }
 
-type FetcherFunction<T> = (page: number) => Promise<PaginatedResponse<T>>;
+type FetchFunction<T> = (page: number) => Promise<PaginatedResponse<T>>;
 
-function usePaginatedList<T extends object>(
-  fetchFunction: FetcherFunction<T>,
-  initialPage = 1,
-) {
+export const usePaginatedList = <T>(fetchFunction: FetchFunction<T>) => {
   const [data, setData] = useState<T[]>([]);
-  const [currentPage, setCurrentPage] = useState(initialPage);
-  const [totalPages, setTotalPages] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -26,8 +24,8 @@ function usePaginatedList<T extends object>(
       setData(response.data);
       setTotalPages(response.totalPages);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      setData([]);
+      console.error("Error fetching data:", err);
+      setError("Failed to load data. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -37,16 +35,18 @@ function usePaginatedList<T extends object>(
     fetchData();
   }, [fetchData]);
 
+  const refetch = useCallback(() => {
+    return fetchData();
+  }, [fetchData]);
+
   return {
     data,
+    setData,
     currentPage,
     totalPages,
     setCurrentPage,
     loading,
     error,
-    refetch: fetchData,
+    refetch
   };
-}
-
-export default usePaginatedList;
-export { usePaginatedList };
+};

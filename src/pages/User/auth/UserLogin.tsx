@@ -1,5 +1,5 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Login } from "../../../components/auth/Login";
 import authService from "../../../services/auth.services";
@@ -12,6 +12,22 @@ import { LoginFormData } from "../../../types/auth.types";
 export const UserLogin: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const message = searchParams.get("message");
+    const type = searchParams.get("type");
+
+    if (message) {
+      showToast({
+        message: decodeURIComponent(message),
+        type: (type as "success" | "error" | "warning" | "info") || "info",
+      });
+
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [searchParams]);
 
   const handleLoginSubmit = async (values: LoginFormData) => {
     try {
@@ -28,7 +44,7 @@ export const UserLogin: React.FC = () => {
 
         Cookies.set(
           `${serverRole.toLowerCase()}_access_token`,
-          response.data.access_token,
+          response.data.access_token
         );
 
         if ("user" in response.data) {
@@ -46,7 +62,7 @@ export const UserLogin: React.FC = () => {
         navigate("/user/home");
       } else {
         showToast({
-          message: response.message || "Login failed",
+          message: response.message,
           type: "error",
         });
       }

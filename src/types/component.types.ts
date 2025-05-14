@@ -109,3 +109,31 @@ export interface VerificationBannerProps {
   isSubmitted?: boolean;
   onStartVerification: () => void;
 }
+
+
+export interface AddCategoryProps {
+  onCancel?: () => void;
+  onSubmit?: (formData: FormData) => Promise<void>;
+  isLoading?: boolean;
+  initialValues?: {
+    _id?: string;
+    categoryName: string;
+    categoryImage: File | string | null;
+  };
+  isEditing?: boolean;
+}
+
+export interface AddServiceProps {
+  onCancel?: () => void;
+  onSubmit?: (formData: FormData) => Promise<void>;
+  isLoading?: boolean;
+  initialValues?: {
+    _id?: string;
+    serviceName?: string;
+    servicePrice?: string | number;
+    description?: string;
+    serviceImage?: File | string | null;
+    categoryId?: string;
+  };
+  isEditing?: boolean;
+}
