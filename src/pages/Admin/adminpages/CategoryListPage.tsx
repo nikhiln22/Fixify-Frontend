@@ -112,7 +112,7 @@ export const CategoryListPage: React.FC = () => {
   return (
     <AdminLayout>
       <div className="p-4 flex justify-between items-center">
-        <h1 className="text-xl font-semibold mb-4 text-center">Categories</h1>
+        <h1 className="text-3xl font-semibold mb-4 text-center">Categories</h1>
         <Button onClick={handleOpenAddModal} className="mb-4">
           Add Category
         </Button>

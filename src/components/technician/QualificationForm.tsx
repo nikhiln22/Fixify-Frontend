@@ -213,7 +213,7 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
               </label>
               <div className="mt-1">
                 {formik.values.profilePhoto ? (
-                  <div className="relative">
+                  <div className="relative inline-block">
                     <img
                       src={URL.createObjectURL(formik.values.profilePhoto)}
                       alt="Profile preview"
@@ -222,7 +222,7 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
                     <button
                       type="button"
                       onClick={() => removeFile("profilePhoto")}
-                      className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white h-6 w-6 rounded-full flex items-center justify-center shadow-md"
+                      className="absolute -top-3 -right-3 z-20 bg-red-500 hover:bg-red-600 text-white h-6 w-6 rounded-full flex items-center justify-center shadow-md"
                     >
                       &times;
                     </button>

@@ -51,7 +51,7 @@ export const getCategoriesColumns = (
               : "bg-red-200 text-red-800"
           }`}
         >
-          {item?.status ? "Active" : "Inactive"} {/* Added ?. */}
+          {item?.status ? "Active" : "Inactive"} 
         </span>
       </div>
     ),

@@ -6,9 +6,8 @@ import SelectField from "../../components/common/SelectField";
 import { Upload, X } from "lucide-react";
 import { AddServiceProps } from "../../types/component.types";
 import { addServiceSchema } from "../../utils/validations/formvalidationSchema";
-import {getAllCategories} from "../../services/admin.services"
+import { getAllCategories } from "../../services/admin.services";
 
-// Define the Category interface
 interface Category {
   _id: string;
   name: string;
@@ -22,25 +21,26 @@ export const AddService: React.FC<AddServiceProps> = ({
   isEditing = false,
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
   const [isFetchingCategories, setIsFetchingCategories] = useState(false);
   const [categoryError, setCategoryError] = useState<string | null>(null);
-  
 
   useEffect(() => {
     const fetchCategories = async () => {
       setIsFetchingCategories(true);
       setCategoryError(null);
-      
+
       try {
         const response = await getAllCategories(1);
         setCategories(response.data);
-        
+
         const options = response.data.map((category: Category) => ({
           value: category._id,
-          label: category.name
+          label: category.name,
         }));
-        
+
         setCategoryOptions(options);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -49,10 +49,10 @@ export const AddService: React.FC<AddServiceProps> = ({
         setIsFetchingCategories(false);
       }
     };
-    
+
     fetchCategories();
   }, []);
-  
+
   const formik = useFormik({
     initialValues: initialValues || {
       serviceName: "",
@@ -69,15 +69,15 @@ export const AddService: React.FC<AddServiceProps> = ({
         formData.append("price", values.servicePrice.toString());
         formData.append("description", values.description);
         formData.append("categoryId", values.categoryId);
-        
+
         if (values.serviceImage && values.serviceImage instanceof File) {
           formData.append("image", values.serviceImage);
         }
-        
+
         if (isEditing && initialValues?._id) {
           formData.append("serviceId", initialValues._id);
         }
-        
+
         await onSubmit?.(formData);
       } catch (error) {
         console.error("Error submitting form:", error);
@@ -167,7 +167,9 @@ export const AddService: React.FC<AddServiceProps> = ({
           onBlur={formik.handleBlur}
         />
         {formik.touched.description && formik.errors.description && (
-          <p className="mt-1 text-sm text-red-600">{formik.errors.description}</p>
+          <p className="mt-1 text-sm text-red-600">
+            {formik.errors.description}
+          </p>
         )}
       </div>
 
@@ -179,20 +181,25 @@ export const AddService: React.FC<AddServiceProps> = ({
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           options={categoryOptions}
-          placeholder={isFetchingCategories ? "Loading categories..." : "Select a category"}
+          placeholder={
+            isFetchingCategories ? "Loading categories..." : "Select a category"
+          }
           error={
-            categoryError || (formik.touched.categoryId && formik.errors.categoryId)
+            categoryError ||
+            (formik.touched.categoryId && formik.errors.categoryId)
               ? categoryError || formik.errors.categoryId
               : undefined
           }
           touched={formik.touched.categoryId || !!categoryError}
           disabled={isFetchingCategories}
         />
-        {categoryOptions.length === 0 && !isFetchingCategories && !categoryError && (
-          <p className="mt-1 text-sm text-amber-600">
-            No categories available. Please add categories first.
-          </p>
-        )}
+        {categoryOptions.length === 0 &&
+          !isFetchingCategories &&
+          !categoryError && (
+            <p className="mt-1 text-sm text-amber-600">
+              No categories available. Please add categories first.
+            </p>
+          )}
       </div>
 
       <div className="mb-6">
