@@ -1,29 +1,31 @@
 import { useState } from "react";
-import { Icategory } from "../../models/category";
+import { IService } from "../../models/service";
 import { Column } from "../../types/component.types";
 import Modal from "../../components/common/Modal";
 import Button from "../../components/common/Button";
 
-export const getCategoriesColumns = (
+export const getServicesColumns = (
   handleStatusToggle: (id: string) => Promise<void>,
-  onEditCategory: (category: Icategory) => void
-): Column<Icategory>[] => [
+  onEditService: (service: IService) => void,
+): Column<IService>[] => [
   {
     key: "_id",
     label: "Sl. No",
     render: (_, index) => (
-      <div className="flex items-center justify-center">{index + 1}</div>
+      <div className="flex items-center justify-center">
+        {index + 1}
+      </div>
     ),
   },
   {
     key: "image",
-    label: "Category Image",
+    label: "Service Image",
     render: (item) => (
       <div className="flex items-center justify-center">
-        {item?.image ? ( 
+        {item?.image ? (
           <img
             src={item.image}
-            alt={item?.name || "Category"} 
+            alt={item?.name || "Service"}
             className="w-12 h-12 rounded-md object-cover"
           />
         ) : (
@@ -36,8 +38,45 @@ export const getCategoriesColumns = (
   },
   {
     key: "name",
+    label: "Service Name",
+    render: (item) => <div className="text-center">{item?.name || "Untitled"}</div>,
+  },
+  {
+    key: "description",
+    label: "Description",
+    render: (item) => (
+      <div className="text-center">
+        {item?.description ? (
+          <div className="max-w-xs overflow-hidden">
+            <p className="truncate" title={item.description}>
+              {item.description.length > 50
+                ? `${item.description.substring(0, 50)}...`
+                : item.description}
+            </p>
+          </div>
+        ) : (
+          <span className="text-gray-400 italic">No description</span>
+        )}
+      </div>
+    ),
+  },
+  {
+    key: "category",
     label: "Category Name",
-    render: (item) => <div className="text-center">{item?.name || "Untitled"}</div>, 
+    render: (item) => (
+      <div className="text-center">
+        {item?.category?.name || "Uncategorized"}
+      </div>
+    ),
+  },
+  {
+    key: "price",
+    label: "Price",
+    render: (item) => (
+      <div className="text-center font-medium">
+        {item?.price ? `${item.price.toFixed(2)}` : "N/A"}
+      </div>
+    ),
   },
   {
     key: "status",
@@ -46,12 +85,12 @@ export const getCategoriesColumns = (
       <div className="flex justify-center">
         <span
           className={`px-2 py-1 text-xs font-medium rounded ${
-            item?.status 
+            item?.status
               ? "bg-green-200 text-green-800"
               : "bg-red-200 text-red-800"
           }`}
         >
-          {item?.status ? "Active" : "Inactive"} 
+          {item?.status ? "Active" : "Inactive"}
         </span>
       </div>
     ),
@@ -63,18 +102,15 @@ export const getCategoriesColumns = (
       if (!item) {
         return <div>Loading...</div>;
       }
-      
       const ActionButton = () => {
         const [isOpen, setIsOpen] = useState(false);
         const [isProcessing, setIsProcessing] = useState(false);
-        
         const openModal = () => setIsOpen(true);
         const closeModal = () => {
           if (!isProcessing) {
             setIsOpen(false);
           }
         };
-        
         const handleConfirm = async () => {
           setIsProcessing(true);
           try {
@@ -88,24 +124,21 @@ export const getCategoriesColumns = (
         return (
           <div className="flex justify-center space-x-3">
             <Button
-              onClick={() => onEditCategory(item)}
-              className="px-4 py-1 text-xs min-w-[80px] bg-blue-500 hover:bg-blue-600 text-white"
+              onClick={() => onEditService(item)}
+              className="px-4 py-1 text-xs w-20 bg-blue-500 hover:bg-blue-600 text-white"
             >
               Edit
             </Button>
-            
-           
             <Button
               onClick={openModal}
-              className={`px-4 py-1 text-xs min-w-[80px] ${
-                item?.status 
-                  ? "bg-red-500 hover:bg-red-600" 
+              className={`px-4 py-1 text-xs w-20 ${
+                item?.status
+                  ? "bg-red-500 hover:bg-red-600"
                   : "bg-green-500 hover:bg-green-600"
-              }`}
+              } text-white`}
             >
-              {item?.status ? "Block" : "Unblock"} 
+              {item?.status ? "Block" : "Unblock"}
             </Button>
-            
             <Modal
               isOpen={isOpen}
               onClose={closeModal}
@@ -120,8 +153,8 @@ export const getCategoriesColumns = (
               ) : (
                 <p>
                   Are you sure you want to{" "}
-                  {item?.status ? "block" : "unblock"} category{" "} 
-                  <strong>{item?.name || "this category"}</strong>? 
+                  {item?.status ? "block" : "unblock"} service{" "}
+                  <strong>{item?.name || "this service"}</strong>?
                 </p>
               )}
             </Modal>

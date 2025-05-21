@@ -4,7 +4,7 @@ import { Column } from "../../types/component.types";
 import Modal from "../../components/common/Modal";
 
 export const getUsersColumns = (
-  handleStatusToggle: (id: string) => void,
+  handleStatusToggle: (id: string) => void
 ): Column<Iuser>[] => [
   {
     key: "_id",
@@ -35,12 +35,12 @@ export const getUsersColumns = (
       <div className="flex justify-center">
         <span
           className={`px-2 py-1 text-xs font-medium rounded ${
-            item.status === "Active"
+            item.status
               ? "bg-green-200 text-green-800"
               : "bg-red-200 text-red-800"
           }`}
         >
-          {item.status === "Active" ? "Active" : "Blocked"}
+          {item.status ? "Active" : "InActive"}
         </span>
       </div>
     ),
@@ -65,24 +65,24 @@ export const getUsersColumns = (
             <button
               onClick={openModal}
               className={`px-3 py-1 rounded ${
-                item.status === "Active" ? "bg-red-500" : "bg-green-500"
+                item.status ?  "bg-red-500"  : "bg-green-500"
               } text-white`}
             >
-              {item.status === "Active" ? "Block" : "Unblock"}
+              {item.status ? "Block" : "UnBlock"}
             </button>
 
             <Modal
-              isopen={isOpen}
-              onclose={closeModal}
+              isOpen={isOpen}
+              onClose={closeModal}
               title="Confirmation"
               confirmText="Confirm"
               cancelText="Cancel"
               onConfirm={handleConfirm}
-              confirmButtonColor={item.status === "active" ? "red" : "green"}
+              confirmButtonColor={item.status ? "red" : "green"}
             >
               <p>
                 Are you sure you want to{" "}
-                {item.status === "active" ? "block" : "unblock"} user{" "}
+                {item.status ? "block" : "unblock"} user{" "}
                 <strong>{item.username}</strong>?
               </p>
             </Modal>

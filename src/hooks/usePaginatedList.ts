@@ -35,9 +35,6 @@ export const usePaginatedList = <T>(fetchFunction: FetchFunction<T>) => {
     fetchData();
   }, [fetchData]);
 
-  const refetch = useCallback(() => {
-    return fetchData();
-  }, [fetchData]);
 
   return {
     data,
@@ -47,6 +44,5 @@ export const usePaginatedList = <T>(fetchFunction: FetchFunction<T>) => {
     setCurrentPage,
     loading,
     error,
-    refetch
   };
 };

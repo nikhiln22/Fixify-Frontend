@@ -10,6 +10,8 @@ import ApplicantListPage from "../../pages/Admin/adminpages/ApplicantListPage";
 import { ApplicantDetailsPreview } from "../../pages/Admin/adminpages/ApplicantsDetailsPreview";
 import { CategoryListPage } from "../../pages/Admin/adminpages/CategoryListPage";
 import { ServiceListPage } from "../../pages/Admin/adminpages/ServiceListPage";
+
+
 export const AdminRoutes: React.FC = () => {
   return (
     <Routes>

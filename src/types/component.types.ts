@@ -21,14 +21,9 @@ export interface AuthLayoutProps {
   children: React.ReactNode;
 }
 
-export interface LoaderProps {
-  size?: "SMALL" | "MEDIUM" | "LARGE";
-  color?: string;
-}
-
 export interface ModalProps {
-  isopen: boolean;
-  onclose: () => void;
+  isOpen: boolean;
+  onClose: () => void;
   title?: string;
   children: React.ReactNode;
   confirmText?: string;
@@ -36,6 +31,7 @@ export interface ModalProps {
   onConfirm?: () => void;
   confirmButtonColor?: "red" | "green" | "blue";
   fullContent?: boolean;
+  className?: string;
 }
 
 export interface OTPInputProps {
@@ -48,6 +44,20 @@ export interface Column<T> {
   key: keyof T | "action";
   label: string;
   render?: (item: T, index: number) => React.ReactNode;
+}
+
+export interface TableProps<T> {
+  data: T[];
+  columns: Column<T>[];
+  currentPage: number;
+  loading?: boolean;
+  pageSize?: number;
+}
+
+export interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
 export interface TableWithPaginationProps<T> {
@@ -65,16 +75,10 @@ export interface ToastMessageProps {
   duration?: number;
 }
 
-export interface ApprovalModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  message: string;
-}
-
 export interface AddDesignationFormProps {
-  onSuccess: () => void;
+  onCancel?: () => void;
+  onSubmit?: (designation: string) => Promise<void>;
+  isLoading?: boolean;
 }
 
 export interface QualificationFormProps {

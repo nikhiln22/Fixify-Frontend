@@ -1,32 +1,47 @@
 import axiosInstance from "../config/axios.config";
 import { Icategory } from "../models/category";
 import { Idesignation } from "../models/designation";
+import { IService } from "../models/service";
 import { Itechnician } from "../models/technician";
 import { Iuser } from "../models/user";
 
 export const getAllDesignations = async (
-  page: number
+  page?: number,
+  search?: string
 ): Promise<{
   data: Idesignation[];
   totalPages: number;
   currentPage: number;
+  total: number;
 }> => {
   try {
-    const response = await axiosInstance.get(
-      `/admin/jobdesignations?page=${page}`
-    );
-    console.log("Response:", response);
+    let queryParams = "";
+    if (page !== undefined) {
+      queryParams += `page=${page}&limit=6`;
+      if (search && search.trim() !== "") {
+        queryParams += `&search=${encodeURIComponent(search)}`;
+      }
+    }
+    const url = queryParams
+      ? `/admin/jobdesignations?${queryParams}`
+      : "/admin/jobdesignations";
+
+    const response = await axiosInstance.get(url);
+    console.log("designations response:", response);
+
     return {
-      data: response.data.designations || [],
-      totalPages: response.data.totalPages || 1,
-      currentPage: response.data.currentPage || page,
+      data: response.data.data.designations || [],
+      totalPages: response.data.data.pagination?.pages || 1,
+      currentPage: response.data.data.pagination?.page || page || 1,
+      total: response.data.data.pagination?.total || 0,
     };
   } catch (error) {
     console.error("Error fetching designations:", error);
     return {
       data: [],
       totalPages: 0,
-      currentPage: page,
+      currentPage: page || 1,
+      total: 0,
     };
   }
 };
@@ -35,6 +50,7 @@ export const addJobDesignation = async (
   designation: string
 ): Promise<Idesignation> => {
   try {
+    console.log("adding the job new job designation into the databse");
     const response = await axiosInstance.post("/admin/addjobdesignation", {
       designation,
     });
@@ -54,26 +70,40 @@ export const toggleDesignationStatus = async (id: string) => {
 };
 
 export const getAllUsers = async (
-  page: number
+  page?: number,
+  search?: string
 ): Promise<{
   data: Iuser[];
   totalPages: number;
   currentPage: number;
+  total: number;
 }> => {
   try {
-    const response = await axiosInstance.get(`/admin/userslist?page=${page}`);
-    console.log("response:", response);
+    let queryParams = "";
+    if (page !== undefined) {
+      queryParams += `page=${page}&limit=6`;
+      if (search && search.trim() !== "") {
+        queryParams += `&search=${encodeURIComponent(search)}`;
+      }
+    }
+    const url = queryParams
+      ? `/admin/userslist?${queryParams}`
+      : "/admin/userslist";
+    const response = await axiosInstance.get(url);
+    console.log("users response:", response);
     return {
-      data: response.data.users || [],
-      totalPages: response.data.totalPages || 1,
-      currentPage: response.data.currentPage || page,
+      data: response.data.data?.users || [],
+      totalPages: response.data.data?.pagination?.pages || 1,
+      currentPage: response.data.data?.pagination?.page || page || 1,
+      total: response.data.data?.pagination?.total || 0,
     };
   } catch (error) {
-    console.error("error fetching the users:", error);
+    console.error("Error fetching the users:", error);
     return {
       data: [],
       totalPages: 0,
-      currentPage: page,
+      currentPage: page || 1,
+      total: 0,
     };
   }
 };
@@ -125,26 +155,45 @@ export const createCategory = async (formData: FormData) => {
 };
 
 export const getAllCategories = async (
-  page: number
+  page?: number,
+  search?: string
 ): Promise<{
   data: Icategory[];
   totalPages: number;
   currentPage: number;
+  total: number;
 }> => {
   try {
-    const response = await axiosInstance.get(`/admin/categories?page=${page}`);
+    console.log("fetching the categories");
+    let queryParams = "";
+
+    if (page !== undefined) {
+      queryParams += `page=${page}&limit=6`;
+
+      if (search && search.trim() !== "") {
+        queryParams += `&search=${encodeURIComponent(search)}`;
+      }
+    }
+
+    const url = queryParams
+      ? `/admin/categories?${queryParams}`
+      : "/admin/categories";
+
+    const response = await axiosInstance.get(url);
     console.log("response:", response);
     return {
-      data: response.data.categories || [],
-      totalPages: response.data.totalPages || 1,
-      currentPage: response.data.currentPage || page,
+      data: response.data.data?.categories || [],
+      totalPages: response.data.data?.pagination?.pages || 1,
+      currentPage: response.data.data?.pagination?.page || page || 1,
+      total: response.data.data?.pagination?.total || 0,
     };
   } catch (error) {
     console.error("error fetching the categories:", error);
     return {
       data: [],
       totalPages: 0,
-      currentPage: page,
+      currentPage: page || 1,
+      total: 0,
     };
   }
 };
@@ -168,6 +217,93 @@ export const updateCategory = async (
   try {
     const response = await axiosInstance.put(
       `/admin/updatecategory/${categoryId}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating category:", error);
+    throw error;
+  }
+};
+
+export const createService = async (formData: FormData) => {
+  const response = await axiosInstance.post("/admin/addservice", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
+export const getAllServices = async (
+  page?: number,
+  search?: string,
+  categoryId?: string
+): Promise<{
+  data: IService[];
+  totalPages: number;
+  currentPage: number;
+  total: number;
+}> => {
+  try {
+    let queryParams = "";
+
+    if (page !== undefined) {
+      queryParams += `page=${page}&limit=6`;
+
+      if (search && search.trim() !== "") {
+        queryParams += `&search=${encodeURIComponent(search)}`;
+      }
+      if (categoryId && categoryId.trim() !== "") {
+        queryParams += `&category=${categoryId}`;
+      }
+    }
+
+    const url = queryParams
+      ? `/admin/services?${queryParams}`
+      : "/admin/services";
+
+    const response = await axiosInstance.get(url);
+    console.log("services response:", response);
+
+    return {
+      data: response.data.data?.services || [],
+      totalPages: response.data.data?.pagination?.pages || 1,
+      currentPage: response.data.data?.pagination?.page || page || 1,
+      total: response.data.data?.pagination?.total || 0,
+    };
+  } catch (error) {
+    console.error("Error fetching the services:", error);
+    return {
+      data: [],
+      totalPages: 0,
+      currentPage: page || 1,
+      total: 0,
+    };
+  }
+};
+
+export const toggleServiceStatus = async (serviceId: string) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/admin/blockservice/${serviceId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error toggling category status:", error);
+    throw error;
+  }
+};
+
+export const updateService = async (serviceId: string, formData: FormData) => {
+  try {
+    const response = await axiosInstance.put(
+      `/admin/updateservice/${serviceId}`,
       formData,
       {
         headers: {

@@ -1,40 +1,72 @@
+import { useState, useCallback, useEffect } from "react";
 import AdminLayout from "../../../layouts/AdminLayout";
-import useUsers from "../../../hooks/useUsers";
 import { getUsersColumns } from "../../../constants/tablecolumns/getUsersColumn";
-import TableWithPagination from "../../../components/common/TableWithPagination";
-import { useState } from "react";
-import { Search } from "lucide-react"; 
-function UserListPage() {
+import Table from "../../../components/common/Table";
+import Pagination from "../../../components/common/Pagination";
+import { Search } from "lucide-react";
+import {
+  getAllUsers,
+  toggleUserStatus,
+} from "../../../services/admin.services";
+import { usePaginatedList } from "../../../hooks/usePaginatedList";
+
+const UserListPage: React.FC = () => {
+  const [inputValue, setInputValue] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const itemsPerPage = 6;
+
+  const fetchUsersWithSearch = useCallback(
+    async (page: number) => {
+      return await getAllUsers(page, searchQuery);
+    },
+    [searchQuery]
+  );
+
   const {
-    users,
+    data: users,
+    setData: setUsers,
     currentPage,
     totalPages,
     setCurrentPage,
-    handleStatusToggle,
     loading,
     error,
-  } = useUsers();
-  
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredUsers, setFilteredUsers] = useState(users);
-  
-  const columns = getUsersColumns(handleStatusToggle);
-  
-  const handleSearch = (e: any) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-    
-    if (term.trim() === "") {
-      setFilteredUsers(users);
-    } else {
-      const filtered = users.filter(user =>
-        user.username?.toLowerCase().includes(term.toLowerCase()) ||
-        user.email?.toLowerCase().includes(term.toLowerCase())
-      );
-      setFilteredUsers(filtered);
+  } = usePaginatedList(fetchUsersWithSearch);
+
+  const handleStatusToggle = async (userId: string) => {
+    try {
+      let result = await toggleUserStatus(userId);
+      if (result) {
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user._id === userId
+              ? result.data || { ...user, status: !user.status }
+              : user
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Failed to toggle user status:", error);
     }
   };
-  
+
+  const columns = getUsersColumns(handleStatusToggle);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setSearchQuery(inputValue);
+      setCurrentPage(1);
+    }, 500);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [inputValue, setCurrentPage]);
+
   return (
     <AdminLayout>
       <div className="p-4">
@@ -44,27 +76,34 @@ function UserListPage() {
             <input
               type="text"
               placeholder="Search users..."
-              value={searchTerm}
-              onChange={handleSearch}
+              value={inputValue}
+              onChange={handleInputChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <Search 
-              className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" 
-            />
+            <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
           </div>
         </div>
       </div>
-      {error && <p className="text-red-500 mb-2">{error}</p>}
-      <TableWithPagination
-        data={searchTerm.trim() === "" ? users : filteredUsers}
-        columns={columns}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-        loading={loading}
-      />
+
+      {error && <p className="text-red-500 mb-2 px-4">{error}</p>}
+
+      <div className="px-4">
+        <Table
+          data={users || []}
+          columns={columns}
+          currentPage={currentPage}
+          loading={loading}
+          pageSize={itemsPerPage}
+        />
+
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </div>
     </AdminLayout>
   );
-}
+};
 
 export default UserListPage;

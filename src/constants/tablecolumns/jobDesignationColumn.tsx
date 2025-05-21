@@ -68,8 +68,8 @@ export const getJobDesignationColumns = (
             </button>
 
             <Modal
-              isopen={isOpen}
-              onclose={closeModal}
+              isOpen={isOpen}
+              onClose={closeModal}
               title="Confirmation"
               confirmText="Confirm"
               cancelText="Cancel"
