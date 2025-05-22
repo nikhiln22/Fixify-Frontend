@@ -16,6 +16,7 @@ import housepainters from "../../../assets/images/house-painters.jpg";
 import acInstallation from "../../../assets/images/Ac installation home.jpg";
 import technicianImage from "../../../assets/images/technician.jpg";
 
+
 export const UserHome: React.FC = () => {
   return (
     <UserLayout>

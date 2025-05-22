@@ -5,47 +5,6 @@ import { IService } from "../models/service";
 import { Itechnician } from "../models/technician";
 import { Iuser } from "../models/user";
 
-export const getAllDesignations = async (
-  page?: number,
-  search?: string
-): Promise<{
-  data: Idesignation[];
-  totalPages: number;
-  currentPage: number;
-  total: number;
-}> => {
-  try {
-    let queryParams = "";
-    if (page !== undefined) {
-      queryParams += `page=${page}&limit=6`;
-      if (search && search.trim() !== "") {
-        queryParams += `&search=${encodeURIComponent(search)}`;
-      }
-    }
-    const url = queryParams
-      ? `/admin/jobdesignations?${queryParams}`
-      : "/admin/jobdesignations";
-
-    const response = await axiosInstance.get(url);
-    console.log("designations response:", response);
-
-    return {
-      data: response.data.data.designations || [],
-      totalPages: response.data.data.pagination?.pages || 1,
-      currentPage: response.data.data.pagination?.page || page || 1,
-      total: response.data.data.pagination?.total || 0,
-    };
-  } catch (error) {
-    console.error("Error fetching designations:", error);
-    return {
-      data: [],
-      totalPages: 0,
-      currentPage: page || 1,
-      total: 0,
-    };
-  }
-};
-
 export const addJobDesignation = async (
   designation: string
 ): Promise<Idesignation> => {
