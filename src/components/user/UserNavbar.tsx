@@ -46,7 +46,7 @@ export const UserNavbar: React.FC = () => {
               Home
             </Link>
             <Link
-              to="/user/services"
+              to="/user/categories"
               className="text-gray-700 hover:text-black text-base font-medium mr-12"
               >
               Services

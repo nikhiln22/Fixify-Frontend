@@ -1,7 +1,5 @@
 import axiosInstance from "../config/axios.config";
-import { Icategory } from "../models/category";
 import { Idesignation } from "../models/designation";
-import { IService } from "../models/service";
 import { Itechnician } from "../models/technician";
 import { Iuser } from "../models/user";
 
@@ -113,49 +111,7 @@ export const createCategory = async (formData: FormData) => {
   return response.data;
 };
 
-export const getAllCategories = async (
-  page?: number,
-  search?: string
-): Promise<{
-  data: Icategory[];
-  totalPages: number;
-  currentPage: number;
-  total: number;
-}> => {
-  try {
-    console.log("fetching the categories");
-    let queryParams = "";
 
-    if (page !== undefined) {
-      queryParams += `page=${page}&limit=6`;
-
-      if (search && search.trim() !== "") {
-        queryParams += `&search=${encodeURIComponent(search)}`;
-      }
-    }
-
-    const url = queryParams
-      ? `/admin/categories?${queryParams}`
-      : "/admin/categories";
-
-    const response = await axiosInstance.get(url);
-    console.log("response:", response);
-    return {
-      data: response.data.data?.categories || [],
-      totalPages: response.data.data?.pagination?.pages || 1,
-      currentPage: response.data.data?.pagination?.page || page || 1,
-      total: response.data.data?.pagination?.total || 0,
-    };
-  } catch (error) {
-    console.error("error fetching the categories:", error);
-    return {
-      data: [],
-      totalPages: 0,
-      currentPage: page || 1,
-      total: 0,
-    };
-  }
-};
 
 export const toggleCategoryStatus = async (categoryId: string) => {
   try {
@@ -199,53 +155,6 @@ export const createService = async (formData: FormData) => {
   return response.data;
 };
 
-export const getAllServices = async (
-  page?: number,
-  search?: string,
-  categoryId?: string
-): Promise<{
-  data: IService[];
-  totalPages: number;
-  currentPage: number;
-  total: number;
-}> => {
-  try {
-    let queryParams = "";
-
-    if (page !== undefined) {
-      queryParams += `page=${page}&limit=6`;
-
-      if (search && search.trim() !== "") {
-        queryParams += `&search=${encodeURIComponent(search)}`;
-      }
-      if (categoryId && categoryId.trim() !== "") {
-        queryParams += `&category=${categoryId}`;
-      }
-    }
-
-    const url = queryParams
-      ? `/admin/services?${queryParams}`
-      : "/admin/services";
-
-    const response = await axiosInstance.get(url);
-    console.log("services response:", response);
-
-    return {
-      data: response.data.data?.services || [],
-      totalPages: response.data.data?.pagination?.pages || 1,
-      currentPage: response.data.data?.pagination?.page || page || 1,
-      total: response.data.data?.pagination?.total || 0,
-    };
-  } catch (error) {
-    console.error("Error fetching the services:", error);
-    return {
-      data: [],
-      totalPages: 0,
-      currentPage: page || 1,
-      total: 0,
-    };
-  }
-};
 
 export const toggleServiceStatus = async (serviceId: string) => {
   try {
