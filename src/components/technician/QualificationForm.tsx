@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Upload, MapPin, Briefcase, Clock, User, FileText, Camera } from "lucide-react";
+import {
+  Upload,
+  MapPin,
+  Briefcase,
+  Clock,
+  User,
+  FileText,
+  Camera,
+} from "lucide-react";
 import { useFormik } from "formik";
 import InputField from "../../components/common/InputField";
 import SelectField from "../../components/common/SelectField";
 import Button from "../../components/common/Button";
-import { getJobDesignations } from "../../services/technician.services";
+import { getAllDesignations } from "../../services/common.services";
 import { QualificationFormProps } from "../../types/component.types";
 import { professionQualificationSchema } from "../../utils/validations/formvalidationSchema";
 import { showToast } from "../../utils/toast";
@@ -68,7 +76,8 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
     const fetchDesignations = async () => {
       setIsLoading(true);
       try {
-        const designationNames = await getJobDesignations();
+        const designationNames = await getAllDesignations(undefined, "", "technician");
+        console.log("designation names:", designationNames);
         setDesignations(designationNames);
       } catch (err) {
         console.error("Error fetching designations:", err);
@@ -117,7 +126,7 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
           <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">
             Basic Information
           </h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="flex items-center text-sm font-medium text-gray-700">
@@ -204,7 +213,7 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
           <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">
             Profile & Location
           </h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <label className="flex items-center text-sm font-medium text-gray-700">
@@ -283,7 +292,6 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
                     className="w-full rounded-lg border border-gray-300 relative overflow-hidden shadow-sm"
                     style={{ height: "280px", minHeight: "280px" }}
                   >
-
                     {!isMapReady && (
                       <div className="absolute inset-0 flex items-center justify-center text-gray-500 bg-gray-100">
                         <div className="text-center">
@@ -326,7 +334,7 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
           <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">
             Professional Certificates
           </h3>
-          
+
           <div className="mt-1">
             <div className="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
               <div className="space-y-1 text-center">

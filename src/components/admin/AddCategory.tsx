@@ -78,7 +78,7 @@ export const AddCategory: React.FC<AddCategoryProps> = ({
         />
       </div>
 
-      <div className="mb-6">
+      <div className="mb-6 text-left">
         <label
           htmlFor="category-image"
           className="block text-sm font-medium text-gray-700 mb-1"

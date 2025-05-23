@@ -9,6 +9,7 @@ import {
   Clock,
 } from "lucide-react";
 import useLogout from "../../hooks/useLogout";
+import { Link } from "react-router-dom";
 
 export const UserNavbar: React.FC = () => {
   const logout = useLogout();
@@ -38,18 +39,18 @@ export const UserNavbar: React.FC = () => {
 
         <div className="flex items-center">
           <nav className="hidden md:flex items-center mr-6">
-            <a
-              href="#"
+            <Link
+              to="/user/home"
               className="text-gray-700 hover:text-black text-base font-medium mr-12"
             >
               Home
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="/user/services"
               className="text-gray-700 hover:text-black text-base font-medium mr-12"
-            >
+              >
               Services
-            </a>
+            </Link>
           </nav>
 
           <div className="flex items-center">

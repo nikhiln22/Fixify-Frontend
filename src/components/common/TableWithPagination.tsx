@@ -11,9 +11,32 @@ const TableWithPagination = <T extends object>({
   return (
     <div className="overflow-x-auto w-full">
       {loading ? (
-        <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-300"></div>
-          <span className="ml-3 text-gray-600 font-medium">Loading...</span>
+        <div className="min-w-full bg-white border border-gray-200 rounded-xl shadow-md overflow-hidden">
+          <div className="bg-[#0F2942] py-3">
+            <div className="flex">
+              {columns.map((_, index) => (
+                <div
+                  key={index}
+                  className={`px-6 py-3 text-center flex-1 ${
+                    index === 0 ? "rounded-tl-xl" : ""
+                  } ${index === columns.length - 1 ? "rounded-tr-xl" : ""}`}
+                >
+                  <div className="h-5 bg-gray-300 rounded animate-pulse"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="animate-pulse">
+            {[...Array(5)].map((_, rowIndex) => (
+              <div key={rowIndex} className="flex border-b border-gray-200">
+                {columns.map((_, colIndex) => (
+                  <div key={colIndex} className="px-6 py-4 flex-1">
+                    <div className="h-4 bg-gray-200 rounded"></div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <>
@@ -25,42 +48,29 @@ const TableWithPagination = <T extends object>({
                     key={String(col.key)}
                     className={`px-6 py-3 text-center border-b border-r border-gray-200 text-white font-medium tracking-wider uppercase text-base ${
                       index === 0 ? "rounded-tl-xl" : ""
-                    } ${index === columns.length - 1 ? "rounded-tr-xl" : ""}`}
-                    style={{ width: `${100 / columns.length}%` }}
+                    } ${index === columns.length - 1 ? "rounded-tr-xl" : ""} ${
+                      col.key === "_id" ? "w-16" : ""
+                    }`}
                   >
                     {col.label}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody>
-              {data.length === 0 ? (
+            {data.length === 0 ? (
+              <tbody>
                 <tr>
                   <td
                     colSpan={columns.length}
                     className="text-center py-8 text-gray-500 bg-gray-50"
                   >
-                    <div className="flex flex-col items-center justify-center">
-                      <svg
-                        className="w-12 h-12 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 2a10 10 0 110 20 10 10 0 010-20z"
-                        ></path>
-                      </svg>
-                      <p className="mt-2 text-gray-600">No data found.</p>
-                    </div>
+                    <p className="text-gray-600 font-medium">No data found.</p>
                   </td>
                 </tr>
-              ) : (
-                data.map((row, rowIndex) => (
+              </tbody>
+            ) : (
+              <tbody>
+                {data.map((row, rowIndex) => (
                   <tr
                     key={rowIndex}
                     className="hover:bg-gray-100 transition-colors duration-150 ease-in-out"
@@ -68,20 +78,22 @@ const TableWithPagination = <T extends object>({
                     {columns.map((col) => (
                       <td
                         key={String(col.key)}
-                        className="px-6 py-4 border-b border-r border-gray-200 text-base text-gray-700"
+                        className={`px-6 py-4 border-b border-r border-gray-200 text-base text-gray-700 ${
+                          col.key === "_id" ? "w-16" : ""
+                        }`}
                       >
                         {col.render
                           ? col.render(
                               row,
-                              (currentPage - 1) * data.length + rowIndex,
+                              (currentPage - 1) * data.length + rowIndex
                             )
                           : String(row[col.key as keyof T])}
                       </td>
                     ))}
                   </tr>
-                ))
-              )}
-            </tbody>
+                ))}
+              </tbody>
+            )}
           </table>
           {totalPages > 0 && (
             <div className="flex justify-center items-center mt-6 mb-4">
@@ -106,7 +118,7 @@ const TableWithPagination = <T extends object>({
                     >
                       {page}
                     </button>
-                  ),
+                  )
                 )}
               </div>
               <button

@@ -3,7 +3,7 @@ export interface Iuser {
   username: string;
   email: string;
   phone: number;
-  status: string;
+  status: boolean;
   image?: string;
   role: string;
   createdAt: Date;
