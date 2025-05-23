@@ -60,15 +60,6 @@ export interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export interface TableWithPaginationProps<T> {
-  data: T[];
-  columns: Column<T>[];
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-  loading?: boolean;
-}
-
 export interface ToastMessageProps {
   message: string;
   type?: "success" | "error" | "warning" | "info";
@@ -108,13 +99,6 @@ export interface SelectFieldProps {
   className?: string;
 }
 
-export interface VerificationBannerProps {
-  isVerified: boolean;
-  isSubmitted?: boolean;
-  onStartVerification: () => void;
-}
-
-
 export interface AddCategoryProps {
   onCancel?: () => void;
   onSubmit?: (formData: FormData) => Promise<void>;
@@ -140,4 +124,25 @@ export interface AddServiceProps {
     categoryId?: string;
   };
   isEditing?: boolean;
+}
+
+export interface BannerProps {
+  title: string;
+  subtitle?: string;
+  backgroundImage?: string;
+  backgroundColor?: string;
+  height?: string;
+  children?: React.ReactNode;
+  className?: string;
+}
+
+export interface CardProps {
+  image?: string;
+  title?: string;
+  price?: string;
+  rating?: number;
+  reviews?: string;
+  type: "category" | "service";
+  onClick?: () => void;
+  buttonLabel?: string;
 }

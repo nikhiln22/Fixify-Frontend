@@ -4,11 +4,11 @@ import Button from "../../../components/common/Button";
 import Modal from "../../../components/common/Modal";
 import { AddCategory } from "../../../components/admin/AddCategory";
 import {
-  getAllCategories,
   createCategory,
   updateCategory,
   toggleCategoryStatus,
 } from "../../../services/admin.services";
+import { getAllCategories } from "../../../services/common.services";
 import { getCategoriesColumns } from "../../../constants/tablecolumns/CategoryColumn";
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";
