@@ -1,13 +1,18 @@
 import axiosInstance from "../config/axios.config";
 import { Icategory } from "../models/category";
+import { Idesignation } from "../models/designation";
 import { IService } from "../models/service";
-
 
 export const getAllDesignations = async (
   page?: number,
   search?: string,
-  role: "admin" | "technician" = "admin"
-): Promise<any> => {
+  role: "admin" | "technician" = "admin",
+  filterStatus?: string
+): Promise<{
+  data: Idesignation[];
+  totalPages: number;
+  currentPage: number;
+  total: number;}> => {
   try {
     let queryParams = "";
     if (page !== undefined) {
@@ -15,23 +20,30 @@ export const getAllDesignations = async (
       if (search && search.trim() !== "") {
         queryParams += `&search=${encodeURIComponent(search)}`;
       }
+      if (filterStatus && filterStatus.trim() !== "") {
+        queryParams += `&status=${encodeURIComponent(filterStatus)}`;
+      }
     }
-    
+
     const baseUrl =
       role === "admin"
         ? "/admin/jobdesignations"
         : "/technician/jobdesignations";
-        
+
     const url = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
     const response = await axiosInstance.get(url);
-    
+
     if (role === "technician") {
-      if (response.data && response.data.success && Array.isArray(response.data.designation)) {
+      if (
+        response.data &&
+        response.data.success &&
+        Array.isArray(response.data.designation)
+      ) {
         return response.data.designation;
       }
       return [];
     }
-    
+
     return {
       data: response.data.data.designations || [],
       totalPages: response.data.data.pagination?.pages || 1,
@@ -40,11 +52,11 @@ export const getAllDesignations = async (
     };
   } catch (error) {
     console.error("Error fetching designations:", error);
-    
+
     if (role === "technician") {
       return [];
     }
-    
+
     return {
       data: [],
       totalPages: 0,
@@ -53,7 +65,6 @@ export const getAllDesignations = async (
     };
   }
 };
-
 
 export const getAllCategories = async (
   page?: number,
@@ -67,7 +78,7 @@ export const getAllCategories = async (
 }> => {
   try {
     console.log(`fetching the categories for ${role}`);
-    
+
     let queryParams = "";
     if (page !== undefined) {
       queryParams += `page=${page}&limit=6`;
@@ -75,14 +86,14 @@ export const getAllCategories = async (
         queryParams += `&search=${encodeURIComponent(search)}`;
       }
     }
-    
+
     const baseUrl = role === "admin" ? "/admin/categories" : "/user/categories";
-    
+
     const url = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
-    
+
     const response = await axiosInstance.get(url);
     console.log("response:", response);
-    
+
     return {
       data: response.data.data?.categories || [],
       totalPages: response.data.data?.pagination?.pages || 1,
@@ -100,7 +111,6 @@ export const getAllCategories = async (
   }
 };
 
-
 export const getAllServices = async (
   page?: number,
   search?: string,
@@ -115,25 +125,25 @@ export const getAllServices = async (
   try {
     console.log(`fetching the services for ${role}`);
     let queryParams = "";
-    
+
     if (page !== undefined) {
       queryParams += `page=${page}&limit=6`;
-      
+
       if (search && search.trim() !== "") {
         queryParams += `&search=${encodeURIComponent(search)}`;
       }
-      
+
       if (categoryId && categoryId.trim() !== "") {
         queryParams += `&category=${categoryId}`;
       }
     }
-    
+
     const baseUrl = role === "admin" ? "/admin/services" : "/user/services";
     const url = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
-    
+
     const response = await axiosInstance.get(url);
     console.log(`services response for ${role}:`, response);
-    
+
     return {
       data: response.data.data?.services || [],
       totalPages: response.data.data?.pagination?.pages || 1,

@@ -28,7 +28,8 @@ export const toggleDesignationStatus = async (id: string) => {
 
 export const getAllUsers = async (
   page?: number,
-  search?: string
+  search?: string,
+  filterStatus?: string 
 ): Promise<{
   data: Iuser[];
   totalPages: number;
@@ -41,6 +42,10 @@ export const getAllUsers = async (
       queryParams += `page=${page}&limit=6`;
       if (search && search.trim() !== "") {
         queryParams += `&search=${encodeURIComponent(search)}`;
+      }
+
+      if (filterStatus && filterStatus.trim() !== "") {
+        queryParams += `&status=${encodeURIComponent(filterStatus)}`;
       }
     }
     const url = queryParams

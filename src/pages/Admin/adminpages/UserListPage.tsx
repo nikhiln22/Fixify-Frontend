@@ -3,6 +3,7 @@ import AdminLayout from "../../../layouts/AdminLayout";
 import { getUsersColumns } from "../../../constants/tablecolumns/getUsersColumn";
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";
+import SelectField from "../../../components/common/SelectField";
 import { Search } from "lucide-react";
 import {
   getAllUsers,
@@ -13,14 +14,21 @@ import { usePaginatedList } from "../../../hooks/usePaginatedList";
 const UserListPage: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<string>("");
 
   const itemsPerPage = 6;
 
+  const filterOptions = [
+    { value: "", label: "All Users" },
+    { value: "active", label: "Active Users" },
+    { value: "blocked", label: "Blocked Users" },
+  ];
+
   const fetchUsersWithSearch = useCallback(
     async (page: number) => {
-      return await getAllUsers(page, searchQuery);
+      return await getAllUsers(page, searchQuery, filterStatus);
     },
-    [searchQuery]
+    [searchQuery, filterStatus]
   );
 
   const {
@@ -56,6 +64,11 @@ const UserListPage: React.FC = () => {
     setInputValue(e.target.value);
   };
 
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilterStatus(e.target.value);
+    setCurrentPage(1);
+  };
+
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setSearchQuery(inputValue);
@@ -70,9 +83,12 @@ const UserListPage: React.FC = () => {
   return (
     <AdminLayout>
       <div className="p-4">
-        <h1 className="text-3xl font-semibold mb-4">Users</h1>
-        <div className="mb-4 w-full md:w-1/3">
-          <div className="relative">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-3xl font-semibold">Users</h1>
+        </div>
+
+        <div className="mb-4 flex justify-between items-center gap-4">
+          <div className="relative w-full md:w-1/3">
             <input
               type="text"
               placeholder="Search users..."
@@ -81,6 +97,17 @@ const UserListPage: React.FC = () => {
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
+          </div>
+          <div className="w-48">
+            <SelectField
+              label=""
+              name="userFilter"
+              value={filterStatus}
+              onChange={handleFilterChange}
+              options={filterOptions}
+              placeholder="Filter users"
+              className="mb-0"
+            />
           </div>
         </div>
       </div>
