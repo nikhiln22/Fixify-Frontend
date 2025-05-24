@@ -139,7 +139,7 @@ export interface BannerProps {
 export interface CardProps {
   image?: string;
   title?: string;
-  price?: string;
+  price?: number;
   rating?: number;
   reviews?: string;
   type: "category" | "service";

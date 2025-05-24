@@ -6,7 +6,7 @@ import SelectField from "../../components/common/SelectField";
 import { Upload, X } from "lucide-react";
 import { AddServiceProps } from "../../types/component.types";
 import { addServiceSchema } from "../../utils/validations/formvalidationSchema";
-import { getAllCategories } from "../../services/admin.services";
+import { getAllCategories } from "../../services/common.services";
 
 export const AddService: React.FC<AddServiceProps> = ({
   onCancel,

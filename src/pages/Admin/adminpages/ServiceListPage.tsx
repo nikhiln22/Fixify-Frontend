@@ -4,11 +4,11 @@ import Button from "../../../components/common/Button";
 import Modal from "../../../components/common/Modal";
 import { AddService } from "../../../components/admin/AddService";
 import {
-  getAllServices,
   createService,
   updateService,
   toggleServiceStatus,
 } from "../../../services/admin.services";
+import { getAllServices } from "../../../services/common.services";
 import { getServicesColumns } from "../../../constants/tablecolumns/ServiceColumn";
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";

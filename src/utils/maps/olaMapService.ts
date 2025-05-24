@@ -11,6 +11,9 @@ import { MAP_CONFIG, MAP_ERRORS } from '../../config/mapConfig';
 // Store for map instances
 const mapInstances = new Map<string, MapInstance>();
 
+// Simple flag to prevent multiple requests at once
+let isGettingLocation = false;
+
 // Reverse geocoding function
 export const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
   try {
@@ -33,84 +36,67 @@ export const reverseGeocode = async (lat: number, lng: number): Promise<string> 
 
 // Get current location using browser geolocation
 export const getCurrentLocation = async (): Promise<MapLocation> => {
-  // Debug information
-  console.log('Checking geolocation support...');
-  console.log('Navigator geolocation:', !!navigator.geolocation);
-  console.log('Protocol:', window.location.protocol);
-  console.log('Hostname:', window.location.hostname);
+  // Prevent multiple simultaneous requests
+  if (isGettingLocation) {
+    throw new Error('Location request already in progress. Please wait.');
+  }
   
-  // Check permissions
-  if (navigator.permissions) {
-    try {
-      const permission = await navigator.permissions.query({ name: 'geolocation' });
-      console.log('Permission state:', permission.state);
-    } catch (e) {
-      console.log('Permission query failed:', e);
+  isGettingLocation = true;
+
+  try {
+    console.log('Getting current location...');
+    console.log('Navigator geolocation:', !!navigator.geolocation);
+
+    if (!navigator.geolocation) {
+      throw new Error(MAP_ERRORS.POSITION_UNAVAILABLE);
     }
-  }
 
-  if (!navigator.geolocation) {
-    throw new Error(MAP_ERRORS.POSITION_UNAVAILABLE);
-  }
-
-  // Different geolocation options to try
-  const geolocationOptions = [
-    {
-      enableHighAccuracy: true,
-      timeout: 5000,
-      maximumAge: 0
-    },
-    {
-      enableHighAccuracy: false,
-      timeout: 10000,
-      maximumAge: 30000
-    },
-    {
-      enableHighAccuracy: false,
-      timeout: 20000,
-      maximumAge: 60000
-    }
-  ];
-
-  // Try each option until one works
-  for (const options of geolocationOptions) {
-    try {
-      console.log('Trying geolocation with options:', options);
-      
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, options);
-      });
-      
-      console.log('Success! Got position:', position.coords);
-      
-      // Get proper address using reverse geocoding
-      const address = await reverseGeocode(position.coords.latitude, position.coords.longitude);
-      
-      return {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        address: address
-      };
-    } catch (error) {
-      console.log(`Failed with options:`, options, error);
-      
-      if (error instanceof GeolocationPositionError) {
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            throw new Error(MAP_ERRORS.PERMISSION_DENIED);
-          case error.POSITION_UNAVAILABLE:
-            console.log('Position unavailable, trying next option...');
-            continue;
-          case error.TIMEOUT:
-            console.log('Timeout, trying next option...');
-            continue;
+    // Get location with a single attempt
+    const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          console.log('Got position:', pos.coords);
+          resolve(pos);
+        },
+        (error) => {
+          console.log('Geolocation error:', error);
+          reject(error);
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 15000,
+          maximumAge: 300000 // Use 5-minute-old cached result if available
         }
+      );
+    });
+
+    // Get address
+    const address = await reverseGeocode(position.coords.latitude, position.coords.longitude);
+    
+    return {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+      address: address
+    };
+
+  } catch (error) {
+    console.error('Location error:', error);
+    
+    if (error instanceof GeolocationPositionError) {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          throw new Error(MAP_ERRORS.PERMISSION_DENIED);
+        case error.POSITION_UNAVAILABLE:
+          throw new Error(MAP_ERRORS.POSITION_UNAVAILABLE);
+        case error.TIMEOUT:
+          throw new Error(MAP_ERRORS.TIMEOUT);
       }
     }
+    throw new Error(MAP_ERRORS.UNKNOWN_ERROR);
+  } finally {
+    // Always reset the flag
+    isGettingLocation = false;
   }
-
-  // If all methods fail, throw error (no fallback)
-  throw new Error(MAP_ERRORS.POSITION_UNAVAILABLE);
 };
 
 // Initialize map with container and options

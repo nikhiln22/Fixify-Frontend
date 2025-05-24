@@ -14,20 +14,29 @@ import {
 import { getAllDesignations } from "../../../services/common.services";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
 import { showToast } from "../../../utils/toast";
+import { Idesignation } from "../../../models/designation";
+import SelectField from "../../../components/common/SelectField";
 
 const JobDesignationPage: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const itemsPerPage = 6;
 
+  const filterOptions = [
+    { value: "", label: "All Designations" },
+    { value: "active", label: "Active Designations" },
+    { value: "blocked", label: "Blocked Designations" },
+  ];
+
   const fetchDesignationsWithSearch = useCallback(
     async (page: number) => {
-      return await getAllDesignations(page, searchQuery,'admin');
+      return await getAllDesignations(page, searchQuery, "admin", filterStatus);
     },
-    [searchQuery]
+    [searchQuery, filterStatus]
   );
 
   const {
@@ -38,11 +47,12 @@ const JobDesignationPage: React.FC = () => {
     setCurrentPage,
     loading,
     error,
-  } = usePaginatedList(fetchDesignationsWithSearch);
+  } = usePaginatedList<Idesignation>(fetchDesignationsWithSearch);
 
   const handleStatusToggle = async (designationId: string) => {
     try {
       let result = await toggleDesignationStatus(designationId);
+      console.log("result from the job designation list page:", result);
       if (result) {
         setDesignations((prevDesignations) =>
           prevDesignations.map((designation) =>
@@ -74,6 +84,11 @@ const JobDesignationPage: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
+  };
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilterStatus(e.target.value);
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -142,6 +157,17 @@ const JobDesignationPage: React.FC = () => {
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
+          </div>
+          <div className="w-48">
+            <SelectField
+              label=""
+              name="designationFilter"
+              value={filterStatus}
+              onChange={handleFilterChange}
+              options={filterOptions}
+              placeholder="Filter designations"
+              className="mb-0"
+            />
           </div>
           <Button onClick={handleOpenModal}>Add Job Designation</Button>
         </div>

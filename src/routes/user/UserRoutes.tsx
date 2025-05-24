@@ -8,6 +8,7 @@ import { UserForgotPassword } from "../../pages/User/auth/UserForgotPassword";
 import { UserResetPassword } from "../../pages/User/auth/UserResetPassword";
 import { UserPrivateRoute } from "./UserPrivateRoute";
 import { UserHome } from "../../pages/User/userpages/UserHome";
+import { UserCategory } from "../../pages/User/userpages/UserCategory";
 import { UserService } from "../../pages/User/userpages/UserService";
 
 export const UserRoutes: React.FC = () => {
@@ -25,7 +26,8 @@ export const UserRoutes: React.FC = () => {
       {/* user private routes */}
       <Route element={<UserPrivateRoute />}>
         <Route path="/user/home" element={<UserHome />} />
-        <Route path="/user/services" element={<UserService />} />
+        <Route path="/user/categories" element={<UserCategory />} />
+        <Route path="/user/services/:categoryId" element={<UserService />} />
       </Route>
     </Routes>
   );
