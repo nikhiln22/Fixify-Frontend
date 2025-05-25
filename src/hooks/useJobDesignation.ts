@@ -27,7 +27,7 @@ const useJobDesignations = () => {
         setData((prevDesignations) =>
           prevDesignations.map((designation) =>
             designation._id === designationId
-              ? result.data || { ...designation, Status: !designation.Status }
+              ? result.data || { ...designation, status: !designation.status }
               : designation
           )
         );

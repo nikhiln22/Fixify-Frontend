@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { getAllServices, toggleServiceStatus } from "../services/admin.services";
+import { toggleServiceStatus } from "../services/admin.services";
+import { getAllServices } from "../services/common.services";
 import { usePaginatedList } from "./usePaginatedList";
 import { IService } from "../models/service";
 
@@ -19,7 +20,9 @@ const useServices = () => {
   const handleStatusToggle = async (serviceId: string) => {
     setStatusUpdateLoading(serviceId);
     try {
+      console.log("toggling the service status");
       const result = await toggleServiceStatus(serviceId);
+      console.log("result from the useService hook");
       if (result) {
         setData(prevServices =>
           prevServices.map(service =>

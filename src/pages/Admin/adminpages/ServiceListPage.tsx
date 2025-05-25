@@ -8,14 +8,16 @@ import {
   updateService,
   toggleServiceStatus,
 } from "../../../services/admin.services";
-import { getAllServices } from "../../../services/common.services";
+import { getAllServices, getAllCategories } from "../../../services/common.services";
 import { getServicesColumns } from "../../../constants/tablecolumns/ServiceColumn";
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";
 import { IService } from "../../../models/service";
+import { Icategory } from "../../../models/category";
 import { showToast } from "../../../utils/toast";
 import { Search } from "lucide-react";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
+import SelectField from "../../../components/common/SelectField";
 
 export const ServiceListPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,14 +27,61 @@ export const ServiceListPage: React.FC = () => {
   );
   const [inputValue, setInputValue] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<string>("");
+  const [categories, setCategories] = useState<Icategory[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 6;
 
-  const fetchServicesWithSearch = useCallback(
+  const statusOptions = [
+    { value: "", label: "All Services" },
+    { value: "active", label: "Active Services" },
+    { value: "blocked", label: "Blocked Services" },
+  ];
+
+  const fetchCategories = async () => {
+    setCategoriesLoading(true);
+    try {
+      const response = await getAllCategories(1, "", "admin", "active");
+      if (response && response.data) {
+        setCategories(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      showToast({
+        message: "Failed to load categories",
+        type: "error",
+      });
+    } finally {
+      setCategoriesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const categoryOptions = [
+    { value: "", label: "All Categories" },
+    ...categories.map((category) => ({
+      value: category._id,
+      label: category.name,
+    })),
+  ];
+
+  const fetchServicesWithFilters = useCallback(
     async (page: number) => {
-      return await getAllServices(page, searchQuery);
+      console.log("Fetching services with filters:", { 
+        page, 
+        searchQuery, 
+        selectedCategoryId, 
+        filterStatus 
+      });
+      
+      return await getAllServices(page, searchQuery, selectedCategoryId, "admin", filterStatus);
     },
-    [searchQuery]
+    [searchQuery, selectedCategoryId, filterStatus]
   );
 
   const {
@@ -43,10 +92,22 @@ export const ServiceListPage: React.FC = () => {
     setCurrentPage,
     loading,
     error,
-  } = usePaginatedList(fetchServicesWithSearch);
+  } = usePaginatedList(fetchServicesWithFilters);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
+  };
+
+  const handleCategoryFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log("Category filter changed to:", e.target.value);
+    setSelectedCategoryId(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleStatusFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log("Status filter changed to:", e.target.value);
+    setFilterStatus(e.target.value);
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -101,6 +162,10 @@ export const ServiceListPage: React.FC = () => {
           
           setServices(firstPageItems);
           
+          if (currentPage !== 1) {
+            setCurrentPage(1);
+          }
+
           showToast({
             message: "Service added successfully",
             type: "success",
@@ -125,6 +190,7 @@ export const ServiceListPage: React.FC = () => {
   const handleStatusToggle = async (serviceId: string) => {
     try {
       const result = await toggleServiceStatus(serviceId);
+      console.log("result from toggling the service status:",result);
       if (result) {
         setServices((prevServices) =>
           prevServices.map((service) =>
@@ -136,7 +202,7 @@ export const ServiceListPage: React.FC = () => {
       }
 
       const service = services.find((svc) => svc._id === serviceId);
-      const statusLabel = service?.status ? "unblocked" : "blocked";
+      const statusLabel = service?.status ? "blocked" : "unblocked";
       showToast({
         message: `Service ${statusLabel} successfully`,
         type: "success",
@@ -170,10 +236,42 @@ export const ServiceListPage: React.FC = () => {
             />
             <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
           </div>
-          <Button onClick={handleOpenAddModal}>Add Service</Button>
+          <div className="flex items-center gap-2">
+            <div className="w-48">
+              <SelectField
+                label=""
+                name="categoryFilter"
+                value={selectedCategoryId}
+                onChange={handleCategoryFilterChange}
+                options={categoryOptions}
+                placeholder={categoriesLoading ? "Loading categories..." : "Filter by category"}
+                className="mb-0"
+                disabled={categoriesLoading}
+              />
+            </div>
+            <div className="w-48">
+              <SelectField
+                label=""
+                name="statusFilter"
+                value={filterStatus}
+                onChange={handleStatusFilterChange}
+                options={statusOptions}
+                placeholder="Filter by status"
+                className="mb-0"
+              />
+            </div>
+            <Button 
+              onClick={handleOpenAddModal} 
+              className="h-10 px-4 py-2 whitespace-nowrap"
+            >
+              Add Service
+            </Button>
+          </div>
         </div>
       </div>
+      
       {error && <p className="text-red-500 mb-2 px-4">{error}</p>}
+      
       <div className="px-4">
         <Table
           data={services || []}
@@ -188,6 +286,7 @@ export const ServiceListPage: React.FC = () => {
           onPageChange={setCurrentPage}
         />
       </div>
+      
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

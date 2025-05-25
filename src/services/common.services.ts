@@ -3,6 +3,7 @@ import { Icategory } from "../models/category";
 import { Idesignation } from "../models/designation";
 import { IService } from "../models/service";
 
+
 export const getAllDesignations = async (
   page?: number,
   search?: string,
@@ -12,7 +13,8 @@ export const getAllDesignations = async (
   data: Idesignation[];
   totalPages: number;
   currentPage: number;
-  total: number;}> => {
+  total: number;
+}> => {
   try {
     let queryParams = "";
     if (page !== undefined) {
@@ -39,9 +41,20 @@ export const getAllDesignations = async (
         response.data.success &&
         Array.isArray(response.data.designation)
       ) {
-        return response.data.designation;
+        return {
+          data: response.data.designation,
+          totalPages: 1,
+          currentPage: 1,
+          total: response.data.designation.length,
+        };
       }
-      return [];
+      
+      return {
+        data: [],
+        totalPages: 0,
+        currentPage: 1,
+        total: 0,
+      };
     }
 
     return {
@@ -52,10 +65,6 @@ export const getAllDesignations = async (
     };
   } catch (error) {
     console.error("Error fetching designations:", error);
-
-    if (role === "technician") {
-      return [];
-    }
 
     return {
       data: [],
@@ -69,7 +78,8 @@ export const getAllDesignations = async (
 export const getAllCategories = async (
   page?: number,
   search?: string,
-  role: "admin" | "user" = "admin"
+  role: "admin" | "user" = "admin",
+  filterStatus?: string
 ): Promise<{
   data: Icategory[];
   totalPages: number;
@@ -84,6 +94,9 @@ export const getAllCategories = async (
       queryParams += `page=${page}&limit=6`;
       if (search && search.trim() !== "") {
         queryParams += `&search=${encodeURIComponent(search)}`;
+      }
+      if (filterStatus && filterStatus.trim() !== "") {
+        queryParams += `&status=${encodeURIComponent(filterStatus)}`;
       }
     }
 
@@ -115,7 +128,8 @@ export const getAllServices = async (
   page?: number,
   search?: string,
   categoryId?: string,
-  role: "admin" | "user" = "admin"
+  role: "admin" | "user" = "admin",
+  filterStatus?: string
 ): Promise<{
   data: IService[];
   totalPages: number;
@@ -135,6 +149,10 @@ export const getAllServices = async (
 
       if (categoryId && categoryId.trim() !== "") {
         queryParams += `&category=${categoryId}`;
+      }
+
+      if (filterStatus && filterStatus.trim() !== "") {
+        queryParams += `&status=${encodeURIComponent(filterStatus)}`;
       }
     }
 

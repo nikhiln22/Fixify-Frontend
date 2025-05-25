@@ -34,6 +34,7 @@ const JobDesignationPage: React.FC = () => {
 
   const fetchDesignationsWithSearch = useCallback(
     async (page: number) => {
+      console.log("Fetching designations with:", { page, searchQuery, filterStatus });
       return await getAllDesignations(page, searchQuery, "admin", filterStatus);
     },
     [searchQuery, filterStatus]
@@ -57,7 +58,7 @@ const JobDesignationPage: React.FC = () => {
         setDesignations((prevDesignations) =>
           prevDesignations.map((designation) =>
             designation._id === designationId
-              ? result.data || { ...designation, Status: !designation.Status }
+              ? result.data || { ...designation, status: !designation.status }
               : designation
           )
         );
@@ -65,7 +66,7 @@ const JobDesignationPage: React.FC = () => {
         const designation = designations.find(
           (des) => des._id === designationId
         );
-        const statusLabel = designation?.Status ? "blocked" : "unblocked";
+        const statusLabel = designation?.status ? "blocked" : "unblocked";
         showToast({
           message: `Designation ${statusLabel} successfully`,
           type: "success",
@@ -87,6 +88,7 @@ const JobDesignationPage: React.FC = () => {
   };
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log("Filter changed to:", e.target.value);
     setFilterStatus(e.target.value);
     setCurrentPage(1);
   };
@@ -109,12 +111,6 @@ const JobDesignationPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       const newDesignation = await addJobDesignation(designation);
-
-      // let existing = [...designations]
-
-      // existing.splice(-1);
-
-      // setDesignations([newDesignation, ...existing]);
 
       const firstPageItems = [
         newDesignation,
@@ -158,18 +154,22 @@ const JobDesignationPage: React.FC = () => {
             />
             <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
           </div>
-          <div className="w-48">
-            <SelectField
-              label=""
-              name="designationFilter"
-              value={filterStatus}
-              onChange={handleFilterChange}
-              options={filterOptions}
-              placeholder="Filter designations"
-              className="mb-0"
-            />
+          <div className="flex items-center gap-2">
+            <div className="w-48">
+              <SelectField
+                label=""
+                name="designationFilter"
+                value={filterStatus}
+                onChange={handleFilterChange}
+                options={filterOptions}
+                placeholder="Filter designations"
+                className="mb-0"
+              />
+            </div>
+            <Button onClick={handleOpenModal} className="h-10 px-4 py-2 whitespace-nowrap">
+              Add Job Designation
+            </Button>
           </div>
-          <Button onClick={handleOpenModal}>Add Job Designation</Button>
         </div>
       </div>
       {error && <p className="text-red-500 mb-2 px-4">{error}</p>}

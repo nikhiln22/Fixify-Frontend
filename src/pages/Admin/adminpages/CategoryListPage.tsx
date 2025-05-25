@@ -16,6 +16,7 @@ import { Icategory } from "../../../models/category";
 import { showToast } from "../../../utils/toast";
 import { Search } from "lucide-react";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
+import SelectField from "../../../components/common/SelectField";
 
 export const CategoryListPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,14 +26,26 @@ export const CategoryListPage: React.FC = () => {
   );
   const [inputValue, setInputValue] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<string>("");
 
   const itemsPerPage = 6;
 
+  const filterOptions = [
+    { value: "", label: "All Categories" },
+    { value: "active", label: "Active Categories" },
+    { value: "blocked", label: "Blocked Categories" },
+  ];
+
   const fetchCategoriesWithSearch = useCallback(
     async (page: number) => {
-      return await getAllCategories(page, searchQuery);
+      console.log("Fetching categories with:", {
+        page,
+        searchQuery,
+        filterStatus,
+      });
+      return await getAllCategories(page, searchQuery, "admin", filterStatus);
     },
-    [searchQuery]
+    [searchQuery, filterStatus]
   );
 
   const {
@@ -47,6 +60,12 @@ export const CategoryListPage: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
+  };
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log("Filter changed to:", e.target.value);
+    setFilterStatus(e.target.value);
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -92,17 +111,21 @@ export const CategoryListPage: React.FC = () => {
           });
         }
       } else {
-
-       const response = await createCategory(formData);
-       console.log("response from the create category method in the add category ")
+        const response = await createCategory(formData);
+        console.log(
+          "response from the create category method in the add category "
+        );
         if (response && categories) {
           const firstPageItems = [
             response.data,
             ...categories.slice(0, itemsPerPage - 1),
           ];
-          
+
           setCategories(firstPageItems);
-          
+
+          if (currentPage !== 1) {
+            setCurrentPage(1);
+          }
 
           showToast({
             message: "Category added successfully",
@@ -173,7 +196,25 @@ export const CategoryListPage: React.FC = () => {
             />
             <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
           </div>
-          <Button onClick={handleOpenAddModal}>Add Category</Button>
+          <div className="flex items-center gap-2">
+            <div className="w-48">
+              <SelectField
+                label=""
+                name="categoryFilter"
+                value={filterStatus}
+                onChange={handleFilterChange}
+                options={filterOptions}
+                placeholder="Filter categories"
+                className="mb-0"
+              />
+            </div>
+            <Button
+              onClick={handleOpenAddModal}
+              className="h-10 px-4 py-2 whitespace-nowrap"
+            >
+              Add Category
+            </Button>
+          </div>
         </div>
       </div>
       {error && <p className="text-red-500 mb-2 px-4">{error}</p>}

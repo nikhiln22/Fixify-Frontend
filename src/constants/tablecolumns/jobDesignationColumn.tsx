@@ -21,18 +21,18 @@ export const getJobDesignationColumns = (
     ),
   },
   {
-    key: "Status",
+    key: "status",
     label: "Status",
     render: (item) => (
       <div className="flex justify-center">
         <span
           className={`px-2 py-1 text-xs font-medium rounded ${
-            item.Status
+            item.status
               ? "bg-green-200 text-green-800"
               : "bg-red-200 text-red-800"
           }`}
         >
-          {item.Status ? "Active" : "InActive"}
+          {item.status ? "Active" : "InActive"}
         </span>
       </div>
     ),
@@ -61,10 +61,10 @@ export const getJobDesignationColumns = (
             <button
               onClick={openModal}
               className={`px-3 py-1 rounded ${
-                item.Status ? "bg-red-500" : "bg-green-500"
+                item.status ? "bg-red-500" : "bg-green-500"
               } text-white`}
             >
-              {item.Status ? "Block" : "Unblock"}
+              {item.status ? "Block" : "Unblock"}
             </button>
 
             <Modal
@@ -74,10 +74,10 @@ export const getJobDesignationColumns = (
               confirmText="Confirm"
               cancelText="Cancel"
               onConfirm={handleConfirm}
-              confirmButtonColor={item.Status ? "red" : "green"}
+              confirmButtonColor={item.status ? "red" : "green"}
             >
               <p>
-                Are you sure you want to {item.Status ? "block" : "unblock"} the
+                Are you sure you want to {item.status ? "block" : "unblock"} the
                 designation "{item.designation}"?
               </p>
             </Modal>
