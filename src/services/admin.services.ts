@@ -29,7 +29,7 @@ export const toggleDesignationStatus = async (id: string) => {
 export const getAllUsers = async (
   page?: number,
   search?: string,
-  filterStatus?: string 
+  filterStatus?: string
 ): Promise<{
   data: Iuser[];
   totalPages: number;
@@ -80,30 +80,124 @@ export const toggleUserStatus = async (userId: string) => {
   }
 };
 
-export const getAllApplicants = async (
-  page: number
+export const getAllTechnicians = async (
+  page?: number,
+  search?: string,
+  filterStatus?: string,
+  filterDesignation?: string
 ): Promise<{
   data: Itechnician[];
   totalPages: number;
   currentPage: number;
+  total: number;
 }> => {
   try {
-    const response = await axiosInstance.get(
-      `/admin/applicantslist?page=${page}`
-    );
-    console.log("response:", response);
+    let queryParams = "";
+
+    if (page !== undefined) {
+      queryParams += `page=${page}&limit=6`;
+
+      if (search && search.trim() !== "") {
+        queryParams += `&search=${encodeURIComponent(search)}`;
+      }
+
+      if (filterStatus && filterStatus.trim() !== "") {
+        queryParams += `&status=${encodeURIComponent(filterStatus)}`;
+      }
+
+      if (filterDesignation && filterDesignation.trim() !== "") {
+        queryParams += `&designation=${encodeURIComponent(filterDesignation)}`;
+      }
+    }
+
+    const url = queryParams
+      ? `/admin/technicianslist?${queryParams}`
+      : "/admin/technicianslist";
+
+    const response = await axiosInstance.get(url);
+    console.log("technicians response:", response);
+
     return {
-      data: response.data.applicants || [],
-      totalPages: response.data.totalPages || 1,
-      currentPage: response.data.currentPage || page,
+      data: response.data.data?.technicians || [],
+      totalPages: response.data.data?.pagination?.pages || 1,
+      currentPage: response.data.data?.pagination?.page || page || 1,
+      total: response.data.data?.pagination?.total || 0,
     };
   } catch (error) {
-    console.error("error fetching the applicants:", error);
+    console.error("Error fetching the technicians:", error);
+    return {
+      data: [],
+      totalPages: 0,
+      currentPage: page || 1,
+      total: 0,
+    };
+  }
+};
+
+
+export const toggleTechnicianStatus = async (technicianId: string) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/admin/blocktechnician/${technicianId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error toggling technician status:", error);
+    throw error;
+  }
+};
+
+export const getAllApplicants = async (
+  page: number = 1
+): Promise<{
+  data: Itechnician[];
+  totalPages: number;
+  currentPage: number;
+  total: number;
+}> => {
+  try {
+    const url = `/admin/applicantslist?page=${page}&limit=6`;
+    const response = await axiosInstance.get(url);
+    console.log("applicants response:", response);
+
+    return {
+      data: response.data.data?.applicants || [],
+      totalPages: response.data.data?.pagination?.pages || 1,
+      currentPage: response.data.data?.pagination?.page || page,
+      total: response.data.data?.pagination?.total || 0,
+    };
+  } catch (error) {
+    console.error("Error fetching the applicants:", error);
     return {
       data: [],
       totalPages: 0,
       currentPage: page,
+      total: 0,
     };
+  }
+};
+
+export const verifyApplicant = async (applicantId: string) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/admin/verifyapplicant/${applicantId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("Error occured while verifying the technician:", error);
+    throw error;
+  }
+};
+
+export const rejectApplicant = async (applicantId: string) => {
+  try {
+    const response = await axiosInstance.delete(
+      `/admin/rejectapplicant/${applicantId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("Error occured while rejecting the technician:", error);
+    throw error;
   }
 };
 
@@ -115,7 +209,6 @@ export const createCategory = async (formData: FormData) => {
   });
   return response.data;
 };
-
 
 
 export const toggleCategoryStatus = async (categoryId: string) => {
@@ -159,7 +252,6 @@ export const createService = async (formData: FormData) => {
   });
   return response.data;
 };
-
 
 export const toggleServiceStatus = async (serviceId: string) => {
   try {

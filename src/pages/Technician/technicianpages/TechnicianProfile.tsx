@@ -27,9 +27,9 @@ const TechnicianProfile: React.FC = () => {
             name={technicianData.username || ""}
             email={technicianData.email || ""}
             phone={technicianData.phone || "+919845397500"}
-            department={technicianData.jobDesignation || "A/C Mechanic"}
+            department={technicianData.Designation || "A/C Mechanic"}
             yearOfExperience={technicianData.yearsOfExperience || 5}
-            location={technicianData.location || "HSR Layout, Bengaluru"}
+            location={technicianData.address || "HSR Layout, Bengaluru"}
             profilePhoto={technicianData.image || null}
           />
         ) : (

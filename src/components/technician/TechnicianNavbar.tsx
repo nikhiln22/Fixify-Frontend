@@ -9,13 +9,13 @@ import {
   Clock,
 } from "lucide-react";
 import useLogout from "../../hooks/useLogout";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 
 export const TechnicianNavbar: React.FC = () => {
   const isVerified = useSelector(
-    (state: RootState) => state.technician.technicianData?.is_verified || false,
+    (state: RootState) => state.technician.technicianData?.is_verified || false
   );
   const navigate = useNavigate();
   const logout = useLogout();
@@ -50,7 +50,6 @@ export const TechnicianNavbar: React.FC = () => {
     };
   }, []);
 
-  // Style for disabled nav links
   const disabledStyle = !isVerified
     ? "text-gray-400 cursor-not-allowed"
     : "text-gray-700 hover:text-black";
@@ -70,30 +69,30 @@ export const TechnicianNavbar: React.FC = () => {
 
         <nav className="hidden md:flex items-center justify-center flex-1">
           <div className="flex justify-center">
-            <button
-              onClick={() => handleNavigation("/technician/dashboard")}
-              className={`${disabledStyle} text-base font-medium mx-8`}
+            <Link
+              to={isVerified ? "/technician/portal" : "#"}
+              className={`${disabledStyle} text-base font-medium mx-8 pointer-events-${isVerified ? "auto" : "none"}`}
             >
               Dashboard
-            </button>
-            <button
-              onClick={() => handleNavigation("/technician/tasks")}
-              className={`${disabledStyle} text-base font-medium mx-8`}
+            </Link>
+            <Link
+              to={isVerified ? "/technician/tasks" : "#"}
+              className={`${disabledStyle} text-base font-medium mx-8 pointer-events-${isVerified ? "auto" : "none"}`}
             >
               Tasks
-            </button>
-            <button
-              onClick={() => handleNavigation("/technician/requests")}
-              className={`${disabledStyle} text-base font-medium mx-8`}
+            </Link>
+            <Link
+              to={isVerified ? "/technician/requests" : "#"}
+              className={`${disabledStyle} text-base font-medium mx-8 pointer-events-${isVerified ? "auto" : "none"}`}
             >
               Requests
-            </button>
-            <button
-              onClick={() => handleNavigation("/technician/history")}
-              className={`${disabledStyle} text-base font-medium mx-8`}
+            </Link>
+            <Link
+              to={isVerified ? "/technician/history" : "#"}
+              className={`${disabledStyle} text-base font-medium mx-8 pointer-events-${isVerified ? "auto" : "none"}`}
             >
               History
-            </button>
+            </Link>
           </div>
         </nav>
 
@@ -219,16 +218,16 @@ export const TechnicianNavbar: React.FC = () => {
 
             {isUserDropdownOpen && (
               <div className="absolute -right-0 top-14 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                <button
-                  onClick={() => handleNavigation("/technician/profile", true)}
-                  className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                <Link
+                  to="/technician/profile"
+                  className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
                 >
                   My Profile
-                </button>
+                </Link>
                 <div className="border-t border-gray-100"></div>
                 <button
                   onClick={logout}
-                  className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
                 >
                   Sign out
                 </button>
@@ -258,18 +257,18 @@ export const TechnicianNavbar: React.FC = () => {
                 <Search className="h-5 w-5" />
               </button>
             </div>
-            <button
-              onClick={() => handleNavigation("/technician/dashboard")}
-              className={`w-full text-left block px-3 py-2 rounded-md text-base font-medium ${isVerified ? "text-gray-700 hover:text-black hover:bg-gray-50" : "text-gray-400 cursor-not-allowed"}`}
+            <Link
+              to={isVerified ? "/technician/portal" : "#"}
+              className={`w-full block px-3 py-2 rounded-md text-base font-medium text-left ${isVerified ? "text-gray-700 hover:text-black hover:bg-gray-50" : "text-gray-400 cursor-not-allowed pointer-events-none"}`}
             >
               Dashboard
-            </button>
-            <button
-              onClick={() => handleNavigation("/technician/tasks")}
-              className={`w-full text-left block px-3 py-2 rounded-md text-base font-medium ${isVerified ? "text-gray-700 hover:text-black hover:bg-gray-50" : "text-gray-400 cursor-not-allowed"}`}
+            </Link>
+            <Link
+              to={isVerified ? "/technician/tasks" : "#"}
+              className={`w-full block px-3 py-2 rounded-md text-base font-medium text-left ${isVerified ? "text-gray-700 hover:text-black hover:bg-gray-50" : "text-gray-400 cursor-not-allowed pointer-events-none"}`}
             >
               Tasks
-            </button>
+            </Link>
           </div>
         </div>
       )}

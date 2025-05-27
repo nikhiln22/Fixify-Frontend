@@ -78,7 +78,7 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
       try {
         const designationNames = await getAllDesignations(undefined, "", "technician");
         console.log("designation names:", designationNames);
-        setDesignations(designationNames);
+        setDesignations(designationNames as string[]);
       } catch (err) {
         console.error("Error fetching designations:", err);
         showToast({

@@ -1,15 +1,6 @@
 import React from "react";
 import { MapPin } from "lucide-react";
-
-interface TechnicianProfileCardProps {
-  name: string;
-  email: string;
-  phone: number;
-  Designation: string;
-  yearsOfExperience: number;
-  profilePhoto?: string | null;
-  location?: string;
-}
+import { TechnicianProfileCardProps } from "../../types/component.types";
 
 const TechnicianProfileCard: React.FC<TechnicianProfileCardProps> = ({
   name,
@@ -18,23 +9,22 @@ const TechnicianProfileCard: React.FC<TechnicianProfileCardProps> = ({
   Designation,
   yearsOfExperience,
   profilePhoto,
-  location = "HSR Layout, Bengaluru"
+  address = "HSR Layout, Bengaluru"
 }) => {
   return (
-    <div className="bg-gray-100 rounded-3xl shadow-md overflow-hidden h-64">
-      <div className="p-6 h-full">
-        {/* Profile Information Container */}
-        <div className="flex items-start h-full">
-          {/* Left side - Profile Photo */}
-          <div className="mr-8">
+    <div className="bg-white rounded-3xl shadow-md overflow-hidden w-full">
+      <div className="p-8">
+        <div className="flex items-center justify-between">
+          {/* Profile Photo Section */}
+          <div className="flex-shrink-0 mr-8">
             {profilePhoto ? (
               <img 
                 src={profilePhoto} 
                 alt={`${name}'s profile`} 
-                className="w-36 h-44 rounded-lg object-cover border border-gray-200"
+                className="w-40 h-48 rounded-xl object-cover border border-gray-200"
               />
             ) : (
-              <div className="w-36 h-44 rounded-lg bg-white flex items-center justify-center">
+              <div className="w-40 h-48 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-200">
                 <svg className="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                 </svg>
@@ -42,21 +32,39 @@ const TechnicianProfileCard: React.FC<TechnicianProfileCardProps> = ({
             )}
           </div>
           
-          {/* Middle - Personal Details */}
-          <div className="flex-grow pt-2">
-            <h3 className="text-xl font-semibold text-gray-800 mb-3">{name}</h3>
-            <p className="text-gray-600 text-sm my-2">Email : {email}</p>
-            <p className="text-gray-600 text-sm my-2">Phone no : {phone}</p>
-            <p className="text-gray-600 text-sm my-2">Year of Experience : {yearsOfExperience} years</p>
-            <p className="text-gray-600 text-sm my-2">Designation : {department}</p>
+          {/* Details Section */}
+          <div className="flex-grow">
+            <h3 className="text-2xl font-semibold text-gray-800 mb-6">{name}</h3>
+            <div className="space-y-3">
+              <div className="flex items-center">
+                <span className="text-gray-500 text-base w-32">Email:</span>
+                <span className="text-gray-800 text-base font-medium">{email}</span>
+              </div>
+              <div className="flex items-center">
+                <span className="text-gray-500 text-base w-32">Phone no:</span>
+                <span className="text-gray-800 text-base font-medium">{phone}</span>
+              </div>
+              <div className="flex items-center">
+                <span className="text-gray-500 text-base w-32">Experience:</span>
+                <span className="text-gray-800 text-base font-medium">{yearsOfExperience} years</span>
+              </div>
+              <div className="flex items-center">
+                <span className="text-gray-500 text-base w-32">Designation:</span>
+                <span className="text-gray-800 text-base font-medium">{Designation}</span>
+              </div>
+            </div>
           </div>
           
-          {/* Right side - Location Button */}
-          <div className="self-center flex flex-col items-center">
-            <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-3">
+          {/* Location Section - Pin at Top, Address at Bottom */}
+          <div className="flex-shrink-0 flex flex-col items-center ml-8">
+            {/* Pin Icon at Top - Made Bigger */}
+            <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4">
               <MapPin className="h-8 w-8 text-white" />
             </div>
-            <p className="text-xs text-center">{location}</p>
+            {/* Address at Bottom */}
+            <div className="text-center">
+              <p className="text-base text-gray-700 font-medium whitespace-nowrap">{address}</p>
+            </div>
           </div>
         </div>
       </div>

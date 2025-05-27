@@ -5,8 +5,6 @@ export const professionQualificationSchema = Yup.object().shape({
     .required("Experience is required")
     .matches(/^[0-9]+$/, "Experience must be a number"),
   designation: Yup.string().required("Designation is required"),
-  city: Yup.string().required("city is required"),
-  preferredWorkLocation: Yup.string().required("location is required"),
   about: Yup.string()
     .required("About description is required")
     .min(10, "About must be at least 10 characters")

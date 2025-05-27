@@ -2,6 +2,8 @@ import axiosInstance from "../config/axios.config";
 import { Icategory } from "../models/category";
 import { Idesignation } from "../models/designation";
 import { IService } from "../models/service";
+import { Itechnician } from "../models/technician";
+import { TechnicianProfileResponse } from "../types/technicians.types";
 
 
 export const getAllDesignations = async (
@@ -9,7 +11,7 @@ export const getAllDesignations = async (
   search?: string,
   role: "admin" | "technician" = "admin",
   filterStatus?: string
-): Promise<{
+): Promise<string[] | {
   data: Idesignation[];
   totalPages: number;
   currentPage: number;
@@ -39,22 +41,16 @@ export const getAllDesignations = async (
       if (
         response.data &&
         response.data.success &&
-        Array.isArray(response.data.designation)
+        response.data.data &&
+        Array.isArray(response.data.data.designations)
       ) {
-        return {
-          data: response.data.designation,
-          totalPages: 1,
-          currentPage: 1,
-          total: response.data.designation.length,
-        };
+        const designationNames = response.data.data.designations.map(
+          (item: any) => item.designation
+        );
+        return designationNames;
       }
       
-      return {
-        data: [],
-        totalPages: 0,
-        currentPage: 1,
-        total: 0,
-      };
+      return [];
     }
 
     return {
@@ -65,6 +61,10 @@ export const getAllDesignations = async (
     };
   } catch (error) {
     console.error("Error fetching designations:", error);
+
+    if (role === "technician") {
+      return [];
+    }
 
     return {
       data: [],
@@ -176,5 +176,40 @@ export const getAllServices = async (
       currentPage: page || 1,
       total: 0,
     };
+  }
+};
+
+export const getTechnicianProfile = async (
+  role: "admin" | "technician" = "technician",
+  technicianId?: string
+): Promise<Itechnician> => {
+  try {
+    console.log(`fetching technician profile for ${role}`);
+    
+    let url: string;
+    
+    if (role === "technician") {
+      url = "/technician/profile";
+    } else if (role === "admin") {
+      if (!technicianId) {
+        throw new Error("Technician ID is required for admin access");
+      }
+      url = `/admin/technicianprofile/${technicianId}`;
+    } else {
+      throw new Error("Invalid role specified");
+    }
+
+    const response = await axiosInstance.get<TechnicianProfileResponse>(url);
+    
+    console.log(`technician profile response for ${role}:`, response);
+    
+    if (response.data.technician) {
+      return response.data.technician;
+    } else {
+      throw new Error("Technician data not found in response");
+    }
+  } catch (error) {
+    console.error(`Error fetching technician profile for ${role}:`, error);
+    throw error;
   }
 };

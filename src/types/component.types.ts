@@ -146,3 +146,13 @@ export interface CardProps {
   onClick?: () => void;
   buttonLabel?: string;
 }
+
+export interface TechnicianProfileCardProps {
+  name: string;
+  email: string;
+  phone: number;
+  Designation: string;
+  yearsOfExperience: number;
+  profilePhoto?: string | null;
+  address?: string;
+}

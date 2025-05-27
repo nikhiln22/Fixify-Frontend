@@ -28,14 +28,12 @@ export const submitTechnicianQualification = async (
   formdata: FormData
 ): Promise<SubmitTechnicianQualificationResponse> => {
   try {
-    const token = cookies.get("technician_access_token");
     const response = await axiosInstance.patch<SubmitTechnicianQualificationResponse>(
       "/technician/qualifications",
       formdata,
       {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
         },
       }
     );

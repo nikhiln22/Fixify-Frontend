@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import TechnicianLayout from "../../../layouts/TechnicianLayout";
 import { VerificationBanner } from "../../../components/technician/VerificationBanner";
 import { QualificationForm } from "../../../components/technician/QualificationForm";
+import Banner from "../../../components/common/Banner";
+import Button from "../../../components/common/Button";
 import {
   submitTechnicianQualification,
-  getTechnicianProfile,
 } from "../../../services/technician.services";
+import { getTechnicianProfile } from "../../../services/common.services";
 import { useDispatch } from "react-redux";
 import { updateTechnicianData } from "../../../redux/slices/technicianslice";
 
@@ -13,6 +15,7 @@ export const TechnicianPortal: React.FC = () => {
   const dispatch = useDispatch();
 
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
   const [showQualificationForm, setShowQualificationForm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -21,20 +24,21 @@ export const TechnicianPortal: React.FC = () => {
       try {
         setIsLoading(true);
         const response = await getTechnicianProfile();
-        console.log("response from the technician profile:", response);
-        if (response.success && response.technician) {
+        console.log("technician profile in the technician portal page:",response);
+        if (response) {
           const hasQualifications = !!(
-            response.technician.yearsOfExperience ||
-            response.technician.Designation ||
-            response.technician.About ||
-            response.technician.image ||
-            response.technician.city ||
-            response.technician.preferredWorkLocation ||
-            (response.technician.certificates &&
-              response.technician.certificates.length > 0)
+            response.yearsOfExperience ||
+            response.Designation ||
+            response.About ||
+            response.image ||
+            response.address ||
+            (response.certificates &&
+              response.certificates.length > 0)
           );
 
           setIsSubmitted(hasQualifications);
+          
+          setIsVerified(response.is_verified || false);
         }
       } catch (error) {
         console.error("Error fetching technician profile:", error);
@@ -57,8 +61,17 @@ export const TechnicianPortal: React.FC = () => {
       data.append("experience", formData.experience);
       data.append("designation", formData.designation);
       data.append("about", formData.about);
-      data.append("city", formData.city);
-      data.append("preferredWorkLocation", formData.preferredWorkLocation);
+      if (formData.currentLocation) {
+        data.append("address", formData.currentLocation.address || "");
+        data.append(
+          "latitude",
+          formData.currentLocation.latitude?.toString() || ""
+        );
+        data.append(
+          "longitude",
+          formData.currentLocation.longitude?.toString() || ""
+        );
+      }
       if (formData.profilePhoto) {
         data.append("profilePhoto", formData.profilePhoto);
       }
@@ -74,8 +87,7 @@ export const TechnicianPortal: React.FC = () => {
         const technicianData = {
           yearsOfExperience: response.technician.yearsOfExperience,
           Designation: response.technician.Designation,
-          city: response.technician.city,
-          preferredWorkLocation: response.technician.preferredWorkLocation,
+          address: response.technician.address,
           About: response.technician.About,
           image: response.technician.image,
           certificates: response.technician.certificates,
@@ -100,45 +112,90 @@ export const TechnicianPortal: React.FC = () => {
     setShowQualificationForm(false);
   };
 
+  const handleViewAllBookings = () => {
+    console.log("View all bookings clicked");
+  };
+
+  const handleTimeSlots = () => {
+    console.log("Time slots clicked");
+  };
+
   return (
     <TechnicianLayout>
-      <div className="flex flex-col items-center p-4 mt-8">
-        <h1 className="text-3xl font-bold text-center mb-12">
-          Welcome to Technician Portal
-        </h1>
-
-        {!isLoading && !showQualificationForm && (
-          <VerificationBanner
-            isVerified={false}
-            isSubmitted={isSubmitted}
-            onStartVerification={handleStartVerification}
-          />
-        )}
-
-        {isLoading && (
+      {isLoading && (
+        <div className="flex flex-col items-center">
           <div className="my-4 text-center">
             <p>Loading your profile information...</p>
           </div>
+        </div>
+      )}
+
+
+      {!isLoading && isVerified && (
+        <>
+          <Banner
+            title="Welcome Back!"
+            subtitle="Your account is verified and ready to receive bookings"
+            backgroundColor="#10B981"
+            height="400px"
+            className="mb-8"
+          />
+          
+          <div className="flex flex-col items-center">
+            <div className="w-full max-w-md space-y-4">
+              <Button
+                onClick={handleViewAllBookings}
+                className="w-full"
+                variant="primary"
+              >
+                View All Bookings
+              </Button>
+              
+              <Button
+                onClick={handleTimeSlots}
+                className="w-full"
+                variant="outline"
+              >
+                Time Slots
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
+
+        {!isLoading && showQualificationForm && (
+          <div className="flex flex-col items-center">
+            <div className="w-full max-w-full">
+              <QualificationForm
+                onSubmit={handleFormSubmit}
+                onCancel={handleFormCancel}
+              />
+            </div>
+          </div>
         )}
 
-        {showQualificationForm && (
-          <div className="w-full max-w-full">
-            <QualificationForm
-              onSubmit={handleFormSubmit}
-              onCancel={handleFormCancel}
+        {!isLoading && !isVerified && !showQualificationForm && (
+          <div className="flex flex-col items-center">
+            <h1 className="text-3xl font-bold text-center mb-12">
+              Welcome to Technician Portal
+            </h1>
+            
+            <VerificationBanner
+              isVerified={false}
+              isSubmitted={isSubmitted}
+              onStartVerification={handleStartVerification}
             />
-          </div>
-        )}
 
-        {!isLoading && !showQualificationForm && !isSubmitted && (
-          <div className="mt-8 text-center max-w-2xl">
-            <p className="text-gray-700">
-              Complete your verification to access all features of the
-              technician portal.
-            </p>
+            {!isSubmitted && (
+              <div className="mt-8 text-center max-w-2xl">
+                <p className="text-gray-700">
+                  Complete your verification to access all features of the
+                  technician portal.
+                </p>
+              </div>
+            )}
           </div>
         )}
-      </div>
     </TechnicianLayout>
   );
 };

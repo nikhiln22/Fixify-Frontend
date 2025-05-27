@@ -31,10 +31,14 @@ export const getApplicantsColumns = (
   },
   {
     key: "createdAt",
-    label: "Request Date",
+    label: "Application Date",
     render: (item) => (
       <div className="text-center">
-        {new Date(item.createdAt).toLocaleDateString()}
+         {new Date(item.createdAt).toLocaleDateString('en-US', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        })}
       </div>
     ),
   },
