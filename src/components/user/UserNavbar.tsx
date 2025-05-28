@@ -158,12 +158,12 @@ export const UserNavbar: React.FC = () => {
 
               {isUserDropdownOpen && (
                 <div className="absolute -right-0 top-14 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                  <a
-                    href="#"
+                  <Link 
+                    to="/user/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     My Profile
-                  </a>
+                  </Link>
                   <a
                     href="#"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

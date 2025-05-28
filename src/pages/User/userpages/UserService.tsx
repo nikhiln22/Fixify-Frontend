@@ -80,13 +80,11 @@ export const UserService: React.FC = () => {
                 ))}
               </div>
               
-              {totalPages > 1 && (
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
                 />
-              )}
               
               <div className="text-center py-12">
                 <h3 className="text-2xl font-bold mb-2">

@@ -12,8 +12,10 @@ import {
 import { getAllDesignations } from "../../../services/common.services";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
 import { Itechnician } from "../../../models/technician";
+import { useNavigate } from "react-router-dom";
 
 export const TechnicianListPage: React.FC = () => {
+  const navigate = useNavigate();
   const [inputValue, setInputValue] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
@@ -106,8 +108,7 @@ export const TechnicianListPage: React.FC = () => {
 
   const handleView = (technician: Itechnician) => {
     console.log("View technician:", technician);
-    // You can navigate to a detailed view or open a modal
-    // Example: navigate(`/admin/technicians/${technician._id}`);
+    navigate(`/admin/applicant/${technician._id}`)
   };
 
   const columns = getTechniciansColumns(handleStatusToggle, handleView);

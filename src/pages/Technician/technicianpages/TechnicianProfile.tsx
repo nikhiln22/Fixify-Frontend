@@ -9,6 +9,8 @@ const TechnicianProfile: React.FC = () => {
     (state) => state.technician.technicianData
   );
 
+  console.log("technicianData:",technicianData);
+
   const handleEditClick = () => {
     console.log("Edit button clicked");
   };

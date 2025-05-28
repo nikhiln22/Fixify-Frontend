@@ -8,13 +8,10 @@ import {
 } from '../../types/map.types';
 import { MAP_CONFIG, MAP_ERRORS } from '../../config/mapConfig';
 
-// Store for map instances
 const mapInstances = new Map<string, MapInstance>();
 
-// Simple flag to prevent multiple requests at once
 let isGettingLocation = false;
 
-// Reverse geocoding function
 export const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
   try {
     const apiKey = import.meta.env.VITE_OLA_MAPS_API_KEY;
@@ -34,9 +31,7 @@ export const reverseGeocode = async (lat: number, lng: number): Promise<string> 
   }
 };
 
-// Get current location using browser geolocation
 export const getCurrentLocation = async (): Promise<MapLocation> => {
-  // Prevent multiple simultaneous requests
   if (isGettingLocation) {
     throw new Error('Location request already in progress. Please wait.');
   }
@@ -44,14 +39,10 @@ export const getCurrentLocation = async (): Promise<MapLocation> => {
   isGettingLocation = true;
 
   try {
-    console.log('Getting current location...');
-    console.log('Navigator geolocation:', !!navigator.geolocation);
-
     if (!navigator.geolocation) {
       throw new Error(MAP_ERRORS.POSITION_UNAVAILABLE);
     }
 
-    // Get location with a single attempt
     const position = await new Promise<GeolocationPosition>((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -65,12 +56,11 @@ export const getCurrentLocation = async (): Promise<MapLocation> => {
         {
           enableHighAccuracy: false,
           timeout: 15000,
-          maximumAge: 300000 // Use 5-minute-old cached result if available
+          maximumAge: 300000 
         }
       );
     });
 
-    // Get address
     const address = await reverseGeocode(position.coords.latitude, position.coords.longitude);
     
     return {
@@ -94,12 +84,10 @@ export const getCurrentLocation = async (): Promise<MapLocation> => {
     }
     throw new Error(MAP_ERRORS.UNKNOWN_ERROR);
   } finally {
-    // Always reset the flag
     isGettingLocation = false;
   }
 };
 
-// Initialize map with container and options
 export const initializeMap = (
   container: HTMLElement,
   location: MapLocation,
@@ -110,24 +98,17 @@ export const initializeMap = (
     throw new Error('Container element is required');
   }
 
-  // Ensure container has an ID
   if (!container.id) {
     container.id = `ola-map-${Date.now()}`;
   }
 
   try {
     const apiKey = import.meta.env.VITE_OLA_MAPS_API_KEY;
-    console.log('OlaMaps initialization starting...');
-    console.log('Container ID:', container.id);
-    console.log('API Key present:', !!apiKey);
 
-    // Create OlaMaps instance with API key
     const olaMaps = new OlaMaps({
       apiKey: apiKey || '',
     });
-    console.log('OlaMaps instance created');
 
-    // Initialize the map with proper options
     const mapCenter: [number, number] = [location.longitude, location.latitude];
     console.log('Map center:', mapCenter);
     
@@ -138,7 +119,6 @@ export const initializeMap = (
     });
     console.log('Map initialized successfully');
 
-    // Add navigation controls
     try {
       olaMaps.addNavigationControls();
       console.log('Navigation controls added');
@@ -146,7 +126,6 @@ export const initializeMap = (
       console.error('Error adding navigation controls:', error);
     }
     
-    // Add marker with proper drag handling
     const marker = olaMaps.addMarker({
       color: '#FF0000',
       draggable: true,
@@ -154,15 +133,12 @@ export const initializeMap = (
     .setLngLat(mapCenter)
     .addTo(map);
     
-    console.log('Marker added successfully');
 
-    // Handle marker drag
     marker.on('dragend', async () => {
       const position = marker.getLngLat();
       console.log('Marker dragged to:', position);
       
       if (position && callbacks?.onMarkerDragEnd) {
-        // Get address for new position
         const address = await reverseGeocode(position.lat, position.lng);
         
         const newLocation: MapLocation = { 
@@ -176,7 +152,6 @@ export const initializeMap = (
       }
     });
 
-    // Create map instance object
     const mapInstance: MapInstance = {
       map,
       marker,
@@ -195,7 +170,6 @@ export const initializeMap = (
       },
     };
 
-    // Store instance
     mapInstances.set(container.id, mapInstance);
     
     console.log('Map initialization complete');
@@ -206,12 +180,10 @@ export const initializeMap = (
   }
 };
 
-// Get a stored map instance by ID
 export const getMapInstance = (id: string): MapInstance | undefined => {
   return mapInstances.get(id);
 };
 
-// Remove all map instances (cleanup)
 export const removeAllMaps = (): void => {
   mapInstances.forEach(instance => {
     instance.remove();
@@ -219,7 +191,6 @@ export const removeAllMaps = (): void => {
   mapInstances.clear();
 };
 
-// Check if OlaMaps is properly loaded
 export const isMapServiceAvailable = (): boolean => {
   const available = typeof OlaMaps !== 'undefined';
   console.log('OlaMaps available:', available);

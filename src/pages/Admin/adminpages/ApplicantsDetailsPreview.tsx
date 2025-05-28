@@ -83,7 +83,7 @@ export const ApplicantDetailsPreview: React.FC = () => {
       console.error("Error rejecting technician:", error);
        showToast({
         message: "failed to reject applicant",
-        type: "success",
+        type: "error",
       });
     }
   };
@@ -96,12 +96,17 @@ export const ApplicantDetailsPreview: React.FC = () => {
     return null;
   }
 
+  // Determine the page title based on verification status
+  const pageTitle = applicant.is_verified 
+    ? "Technician Details" 
+    : "Technician Application Details";
+
   return (
     <AdminLayout>
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-semibold">
-            Technician Application Details
+            {pageTitle}
           </h1>
           <Button onClick={handleBack} variant="outline" className="px-6 py-2">
             Back

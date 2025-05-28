@@ -10,6 +10,7 @@ import { UserPrivateRoute } from "./UserPrivateRoute";
 import { UserHome } from "../../pages/User/userpages/UserHome";
 import { UserCategory } from "../../pages/User/userpages/UserCategory";
 import { UserService } from "../../pages/User/userpages/UserService";
+import { UserProfile } from "../../pages/User/userpages/UserProfile";
 
 export const UserRoutes: React.FC = () => {
   return (
@@ -28,6 +29,7 @@ export const UserRoutes: React.FC = () => {
         <Route path="/user/home" element={<UserHome />} />
         <Route path="/user/categories" element={<UserCategory />} />
         <Route path="/user/services/:categoryId" element={<UserService />} />
+        <Route path="/user/profile" element={<UserProfile />} />
       </Route>
     </Routes>
   );

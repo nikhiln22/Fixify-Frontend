@@ -30,15 +30,6 @@ export const useOlaMap = ({ onLocationChange, defaultLocation }: UseOlaMapProps 
       return;
     }
 
-    console.log('Starting map initialization...');
-    console.log('Map container element:', mapContainerRef.current);
-    console.log('Container ID:', mapContainerRef.current.id);
-    console.log('Container dimensions:', {
-      width: mapContainerRef.current.offsetWidth,
-      height: mapContainerRef.current.offsetHeight
-    });
-    console.log('Location data:', mapLocation);
-
     try {
       const callbacks: MapCallbacks = {
         onMarkerDragEnd: (newLocation: MapLocation) => {

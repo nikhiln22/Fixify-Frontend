@@ -24,21 +24,28 @@ export const TechnicianPortal: React.FC = () => {
       try {
         setIsLoading(true);
         const response = await getTechnicianProfile();
-        console.log("technician profile in the technician portal page:",response);
+        console.log("technician profile in the technician portal page:", response);
+        
         if (response) {
+          const isVerifiedFromDB = response.is_verified || false;
+          setIsVerified(isVerifiedFromDB);
+          
           const hasQualifications = !!(
             response.yearsOfExperience ||
             response.Designation ||
             response.About ||
             response.image ||
             response.address ||
-            (response.certificates &&
-              response.certificates.length > 0)
+            (response.certificates && response.certificates.length > 0)
           );
-
-          setIsSubmitted(hasQualifications);
           
-          setIsVerified(response.is_verified || false);
+          if (isVerifiedFromDB) {
+            setIsSubmitted(false);
+          } else if (hasQualifications) {
+            setIsSubmitted(true);
+          } else {
+            setIsSubmitted(false);
+          }
         }
       } catch (error) {
         console.error("Error fetching technician profile:", error);
@@ -80,6 +87,7 @@ export const TechnicianPortal: React.FC = () => {
           data.append("certificates", certificate);
         });
       }
+      
       const response = await submitTechnicianQualification(data);
       console.log("response from the technician portal:", response);
 
@@ -95,12 +103,14 @@ export const TechnicianPortal: React.FC = () => {
         console.log("Dispatching updateTechnicianData with:", technicianData);
         dispatch(updateTechnicianData(technicianData));
         console.log("Dispatched updateTechnicianData");
+        
+        setIsSubmitted(true);
+        setIsVerified(false);
       } else {
         console.log("No technician data in response or success is false");
       }
 
       setShowQualificationForm(false);
-      setIsSubmitted(true);
       return Promise.resolve();
     } catch (error) {
       console.error("Error submitting qualification:", error);
@@ -129,7 +139,6 @@ export const TechnicianPortal: React.FC = () => {
           </div>
         </div>
       )}
-
 
       {!isLoading && isVerified && (
         <>
@@ -163,39 +172,39 @@ export const TechnicianPortal: React.FC = () => {
         </>
       )}
 
-        {!isLoading && showQualificationForm && (
-          <div className="flex flex-col items-center">
-            <div className="w-full max-w-full">
-              <QualificationForm
-                onSubmit={handleFormSubmit}
-                onCancel={handleFormCancel}
-              />
-            </div>
-          </div>
-        )}
-
-        {!isLoading && !isVerified && !showQualificationForm && (
-          <div className="flex flex-col items-center">
-            <h1 className="text-3xl font-bold text-center mb-12">
-              Welcome to Technician Portal
-            </h1>
-            
-            <VerificationBanner
-              isVerified={false}
-              isSubmitted={isSubmitted}
-              onStartVerification={handleStartVerification}
+      {!isLoading && showQualificationForm && (
+        <div className="flex flex-col items-center">
+          <div className="w-full max-w-full">
+            <QualificationForm
+              onSubmit={handleFormSubmit}
+              onCancel={handleFormCancel}
             />
-
-            {!isSubmitted && (
-              <div className="mt-8 text-center max-w-2xl">
-                <p className="text-gray-700">
-                  Complete your verification to access all features of the
-                  technician portal.
-                </p>
-              </div>
-            )}
           </div>
-        )}
+        </div>
+      )}
+
+      {!isLoading && !isVerified && !showQualificationForm && (
+        <div className="flex flex-col items-center">
+          <h1 className="text-3xl font-bold text-center mb-12">
+            Welcome to Technician Portal
+          </h1>
+          
+          <VerificationBanner
+            isVerified={isVerified}  
+            isSubmitted={isSubmitted} 
+            onStartVerification={handleStartVerification}
+          />
+
+          {!isSubmitted && (
+            <div className="mt-8 text-center max-w-2xl">
+              <p className="text-gray-700">
+                Complete your verification to access all features of the
+                technician portal.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </TechnicianLayout>
   );
 };

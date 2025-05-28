@@ -9,13 +9,12 @@ const TechnicianProfileCard: React.FC<TechnicianProfileCardProps> = ({
   Designation,
   yearsOfExperience,
   profilePhoto,
-  address = "HSR Layout, Bengaluru"
+  address
 }) => {
   return (
     <div className="bg-white rounded-3xl shadow-md overflow-hidden w-full">
       <div className="p-8">
         <div className="flex items-center justify-between">
-          {/* Profile Photo Section */}
           <div className="flex-shrink-0 mr-8">
             {profilePhoto ? (
               <img 
@@ -32,7 +31,6 @@ const TechnicianProfileCard: React.FC<TechnicianProfileCardProps> = ({
             )}
           </div>
           
-          {/* Details Section */}
           <div className="flex-grow">
             <h3 className="text-2xl font-semibold text-gray-800 mb-6">{name}</h3>
             <div className="space-y-3">
@@ -44,28 +42,31 @@ const TechnicianProfileCard: React.FC<TechnicianProfileCardProps> = ({
                 <span className="text-gray-500 text-base w-32">Phone no:</span>
                 <span className="text-gray-800 text-base font-medium">{phone}</span>
               </div>
-              <div className="flex items-center">
-                <span className="text-gray-500 text-base w-32">Experience:</span>
-                <span className="text-gray-800 text-base font-medium">{yearsOfExperience} years</span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-gray-500 text-base w-32">Designation:</span>
-                <span className="text-gray-800 text-base font-medium">{Designation}</span>
-              </div>
+              {yearsOfExperience && (
+                <div className="flex items-center">
+                  <span className="text-gray-500 text-base w-32">Experience:</span>
+                  <span className="text-gray-800 text-base font-medium">{yearsOfExperience} years</span>
+                </div>
+              )}
+              {Designation && (
+                <div className="flex items-center">
+                  <span className="text-gray-500 text-base w-32">Designation:</span>
+                  <span className="text-gray-800 text-base font-medium">{Designation}</span>
+                </div>
+              )}
             </div>
           </div>
           
-          {/* Location Section - Pin at Top, Address at Bottom */}
-          <div className="flex-shrink-0 flex flex-col items-center ml-8">
-            {/* Pin Icon at Top - Made Bigger */}
-            <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4">
-              <MapPin className="h-8 w-8 text-white" />
+          {address && (
+            <div className="flex-shrink-0 flex flex-col items-center ml-8">
+              <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4">
+                <MapPin className="h-8 w-8 text-white" />
+              </div>
+              <div className="text-center">
+                <p className="text-base text-gray-700 font-medium whitespace-nowrap">{address}</p>
+              </div>
             </div>
-            {/* Address at Bottom */}
-            <div className="text-center">
-              <p className="text-base text-gray-700 font-medium whitespace-nowrap">{address}</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

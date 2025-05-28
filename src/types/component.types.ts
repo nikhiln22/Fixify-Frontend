@@ -151,8 +151,8 @@ export interface TechnicianProfileCardProps {
   name: string;
   email: string;
   phone: number;
-  Designation: string;
-  yearsOfExperience: number;
+  Designation?: string;
+  yearsOfExperience?: number;
   profilePhoto?: string | null;
   address?: string;
 }
