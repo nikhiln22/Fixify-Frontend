@@ -19,10 +19,13 @@ const useApplicants = () => {
   } = usePaginatedList<Itechnician>(getAllApplicants);
 
   // Action: View/Edit applicant details
-  const handleViewDetails = useCallback((applicantId: string) => {
-    console.log("Viewing details for applicant:", applicantId);
-    navigate(`/admin/applicantdetailpreview/${applicantId}`);
-  }, [navigate]);
+  const handleViewDetails = useCallback(
+    (applicantId: string) => {
+      console.log("Viewing details for applicant:", applicantId);
+      navigate(`/admin/applicantdetailpreview/${applicantId}`);
+    },
+    [navigate],
+  );
 
   return {
     applicants,

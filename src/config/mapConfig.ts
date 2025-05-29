@@ -1,4 +1,3 @@
-
 export const MAP_CONFIG = {
   defaultZoom: 15,
   defaultCenter: {
@@ -22,10 +21,11 @@ export const MAP_CONFIG = {
 };
 
 export const MAP_ERRORS = {
-  PERMISSION_DENIED: 'Location permission denied. Please enable location services.',
-  POSITION_UNAVAILABLE: 'Location information is unavailable.',
-  TIMEOUT: 'Location request timed out.',
-  UNKNOWN_ERROR: 'An unknown error occurred while getting location.',
-  MAP_INIT_ERROR: 'Failed to initialize map.',
-  GEOCODING_ERROR: 'Failed to get address for location.',
+  PERMISSION_DENIED:
+    "Location permission denied. Please enable location services.",
+  POSITION_UNAVAILABLE: "Location information is unavailable.",
+  TIMEOUT: "Location request timed out.",
+  UNKNOWN_ERROR: "An unknown error occurred while getting location.",
+  MAP_INIT_ERROR: "Failed to initialize map.",
+  GEOCODING_ERROR: "Failed to get address for location.",
 };

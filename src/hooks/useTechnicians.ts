@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { getAllTechnicians, toggleTechnicianStatus } from "../services/admin.services";
+import {
+  getAllTechnicians,
+  toggleTechnicianStatus,
+} from "../services/admin.services";
 import { usePaginatedList } from "./usePaginatedList";
 import { Itechnician } from "../models/technician";
 
@@ -11,22 +14,24 @@ const useTechnicians = () => {
     totalPages,
     setCurrentPage,
     loading,
-    error
+    error,
   } = usePaginatedList<Itechnician>(getAllTechnicians);
 
-  const [statusUpdateLoading, setStatusUpdateLoading] = useState<string | null>(null);
+  const [statusUpdateLoading, setStatusUpdateLoading] = useState<string | null>(
+    null,
+  );
 
   const handleStatusToggle = async (technicianId: string) => {
     setStatusUpdateLoading(technicianId);
     try {
       const result = await toggleTechnicianStatus(technicianId);
       if (result) {
-        setData(prevTechnicians =>
-          prevTechnicians.map(technician =>
+        setData((prevTechnicians) =>
+          prevTechnicians.map((technician) =>
             technician._id === technicianId
-              ? (result.data || { ...technician, status: !technician.status })
-              : technician
-          )
+              ? result.data || { ...technician, status: !technician.status }
+              : technician,
+          ),
         );
       }
     } catch (error) {
@@ -45,7 +50,7 @@ const useTechnicians = () => {
     currentPage,
     setCurrentPage,
     handleStatusToggle,
-    statusUpdateLoading
+    statusUpdateLoading,
   };
 };
 

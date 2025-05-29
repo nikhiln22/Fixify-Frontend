@@ -33,10 +33,9 @@ export const addDesignationSchema = Yup.object().shape({
     .max(50, "Designation must not exceed 50 characters")
     .matches(
       /^[a-zA-Z0-9\s-]+$/,
-      "Designation can only contain letters, numbers, spaces, and hyphens"
+      "Designation can only contain letters, numbers, spaces, and hyphens",
     ),
 });
-
 
 export const addCategorySchema = Yup.object().shape({
   categoryName: Yup.string()
@@ -46,7 +45,7 @@ export const addCategorySchema = Yup.object().shape({
     .max(50, "Category name must not exceed 50 characters")
     .matches(
       /^[a-zA-Z0-9\s-]+$/,
-      "Category name can only contain letters, numbers, spaces, and hyphens"
+      "Category name can only contain letters, numbers, spaces, and hyphens",
     ),
   categoryImage: Yup.mixed()
     .required("Category image is required")
@@ -59,7 +58,7 @@ export const addCategorySchema = Yup.object().shape({
       return (
         value instanceof File &&
         ["image/jpeg", "image/png", "image/jpg", "application/pdf"].includes(
-          value.type
+          value.type,
         )
       );
     }),
@@ -73,9 +72,9 @@ export const addServiceSchema = Yup.object().shape({
     .max(50, "Service name must not exceed 50 characters")
     .matches(
       /^[a-zA-Z0-9\s-]+$/,
-      "Service name can only contain letters, numbers, spaces, and hyphens"
+      "Service name can only contain letters, numbers, spaces, and hyphens",
     ),
-  
+
   servicePrice: Yup.number()
     .required("Service price is required")
     .typeError("Price must be a number")
@@ -83,18 +82,17 @@ export const addServiceSchema = Yup.object().shape({
     .test(
       "maxDigits",
       "Price cannot exceed 6 digits",
-      (value) => !value || String(value).replace(/[.-]/g, "").length <= 6
+      (value) => !value || String(value).replace(/[.-]/g, "").length <= 6,
     ),
-  
+
   description: Yup.string()
     .trim()
     .required("Description is required")
     .min(10, "Description must be at least 10 characters")
     .max(500, "Description must not exceed 500 characters"),
-  
-  categoryId: Yup.string()
-    .required("Category selection is required"),
-  
+
+  categoryId: Yup.string().required("Category selection is required"),
+
   serviceImage: Yup.mixed()
     .required("Service image is required")
     .test("fileSize", "File too large, max size is 10MB", (value) => {
@@ -106,7 +104,7 @@ export const addServiceSchema = Yup.object().shape({
       return (
         value instanceof File &&
         ["image/jpeg", "image/png", "image/jpg", "application/pdf"].includes(
-          value.type
+          value.type,
         )
       );
     }),

@@ -34,10 +34,14 @@ const JobDesignationPage: React.FC = () => {
 
   const fetchDesignationsWithSearch = useCallback(
     async (page: number) => {
-      console.log("Fetching designations with:", { page, searchQuery, filterStatus });
+      console.log("Fetching designations with:", {
+        page,
+        searchQuery,
+        filterStatus,
+      });
       return await getAllDesignations(page, searchQuery, "admin", filterStatus);
     },
-    [searchQuery, filterStatus]
+    [searchQuery, filterStatus],
   );
 
   const {
@@ -52,19 +56,19 @@ const JobDesignationPage: React.FC = () => {
 
   const handleStatusToggle = async (designationId: string) => {
     try {
-      let result = await toggleDesignationStatus(designationId);
+      const result = await toggleDesignationStatus(designationId);
       console.log("result from the job designation list page:", result);
       if (result) {
         setDesignations((prevDesignations) =>
           prevDesignations.map((designation) =>
             designation._id === designationId
               ? result.data || { ...designation, status: !designation.status }
-              : designation
-          )
+              : designation,
+          ),
         );
 
         const designation = designations.find(
-          (des) => des._id === designationId
+          (des) => des._id === designationId,
         );
         const statusLabel = designation?.status ? "blocked" : "unblocked";
         showToast({
@@ -166,7 +170,10 @@ const JobDesignationPage: React.FC = () => {
                 className="mb-0"
               />
             </div>
-            <Button onClick={handleOpenModal} className="h-10 px-4 py-2 whitespace-nowrap">
+            <Button
+              onClick={handleOpenModal}
+              className="h-10 px-4 py-2 whitespace-nowrap"
+            >
               Add Job Designation
             </Button>
           </div>

@@ -14,14 +14,23 @@ import {
   VerifyResetOtpResponse,
 } from "../types/auth.types";
 
-
 const getAuthUrl = (role: UserLikeRoles | Role, endpoint: string) =>
-  `/${role.toLowerCase()}/${endpoint}`;
+  `/api/${role.toLowerCase()}/${endpoint}`;
 
 let isRefreshing = false;
 let pendingRequests: ((token: string | null) => void)[] = [];
 
-const refreshToken = async (role: Role) => {
+const getRoleFromUrl = (url: string): Role => {
+  if (url.includes("/api/technician/")) {
+    return "TECHNICIAN";
+  } else if (url.includes("/api/admin/")) {
+    return "ADMIN";
+  } else {
+    return "USER";
+  }
+};
+
+export const refreshToken = async (role: Role) => {
   try {
     if (isRefreshing) {
       console.log("Token refresh already in progress");
@@ -34,9 +43,9 @@ const refreshToken = async (role: Role) => {
     console.log("Started initiating the new access token");
 
     const response = await axios.post(
-      `${envConfig.apiUrl}/refreshtoken`,
+      `${envConfig.apiUrl}/api/refreshtoken`,
       { role: role.toLowerCase() },
-      { withCredentials: true }
+      { withCredentials: true },
     );
 
     console.log("Response data:", response.data);
@@ -70,74 +79,70 @@ const refreshToken = async (role: Role) => {
   }
 };
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const urlpath = config.url || "";
-    let role = "user";
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const urlpath = error.config?.url || "";
+    const role = getRoleFromUrl(urlpath);
 
-    if (urlpath.includes("/technician/")) {
-      role = "technician";
-    } else if (urlpath.includes("/admin/")) {
-      role = "admin";
-    } else {
-      role = "user";
+    if (
+      error.response?.status === 403 &&
+      error.response?.data?.accountBlocked
+    ) {
+      console.log("Account is blocked, redirecting to login...");
+
+      Cookies.remove(`${role.toLowerCase()}_access_token`);
+
+      delete axiosInstance.defaults.headers.common["Authorization"];
+
+      window.location.href = `/${role.toLowerCase()}/login?blocked=true`;
+
+      return Promise.reject(error);
     }
 
-    const accessToken = Cookies.get(`${role}_access_token`);
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !error.config.url.includes("/api/refreshtoken")
+    ) {
+      try {
+        const newAccessToken = await refreshToken(role);
+        if (newAccessToken) {
+          const newConfig = { ...error.config };
+          if (!newConfig.headers) {
+            newConfig.headers = {};
+          }
+          newConfig.headers["Authorization"] = `Bearer ${newAccessToken}`;
 
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+          return axios(newConfig);
+        } else {
+          throw new Error("Could not get a new token");
+        }
+      } catch (refreshError) {
+        console.error("Could not refresh token, logging out...");
+        Cookies.remove(`${role.toLowerCase()}_access_token`);
+        window.location.href = `/${role.toLowerCase()}/login`;
+        return Promise.reject(refreshError);
+      }
     }
-
-    return config;
-  },
-  (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const urlpath = error.config?.url || "";
-    if (
-      error.response &&
-      error.response.status === 403 &&
-      error.response.data &&
-      error.response.data?.message?.includes("blocked") &&
-      (urlpath.includes("/user/") || urlpath.includes("/technician/"))
-    ) {
-      console.log("Account being blocked by the admin...logging out");
-
-      let role: "USER" | "TECHNICIAN" = "USER";
-      if (urlpath.includes("/technician/")) {
-        role = "TECHNICIAN";
-      }
-
-      Cookies.remove(`${role.toLowerCase()}_access_token`);
-
-      if (role === "USER") {
-        localStorage.removeItem("persist:user");
-      } else if (role === "TECHNICIAN") {
-        localStorage.removeItem("persist:technician");
-      }
-
-      const message = encodeURIComponent("Your account has been blocked by the administrator");
-      window.location.href = `/${role.toLowerCase()}/login?message=${message}&type=error`;
-
-      return Promise.reject(error);
-    }
     if (
       error.response &&
       error.response.status === 401 &&
-      !error.config.url.includes("/refreshtoken")
+      !error.config.url.includes("/api/refreshtoken")
     ) {
       const urlpath = error.config.url || "";
       let role: Role;
 
-      if (urlpath.includes("/technician/")) {
+      if (urlpath.includes("/api/technician/")) {
         role = "TECHNICIAN";
-      } else if (urlpath.includes("/admin/")) {
+      } else if (urlpath.includes("/api/admin/")) {
         role = "ADMIN";
       } else {
         role = "USER";
@@ -145,7 +150,6 @@ axiosInstance.interceptors.response.use(
 
       try {
         const newAccessToken = await refreshToken(role);
-
         if (newAccessToken) {
           const newConfig = { ...error.config };
           if (!newConfig.headers) {
@@ -166,31 +170,48 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
+);
+
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const urlpath = config.url || "";
+    let role = "user";
+
+    if (urlpath.includes("/api/technician/")) {
+      role = "technician";
+    } else if (urlpath.includes("/api/admin/")) {
+      role = "admin";
+    } else {
+      role = "user";
+    }
+
+    const accessToken = Cookies.get(`${role}_access_token`);
+
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
 );
 
 const login = async (formData: LoginFormData, role: Role) => {
   const response = await axiosInstance.post<LoginResponse>(
     getAuthUrl(role, "login"),
     formData,
-    { withCredentials: true }
+    { withCredentials: true },
   );
   return response.data;
-};
-
-const checkUserStatus = async (role: UserLikeRoles | Role) => {
-  try {
-    const response = await axiosInstance.get(getAuthUrl(role, "checkstatus"));
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
 };
 
 const register = async (formData: RegisterFormData, role: UserLikeRoles) => {
   const response = await axiosInstance.post<TempRegisterResponse>(
     getAuthUrl(role, "register"),
-    formData
+    formData,
   );
   return response.data;
 };
@@ -198,7 +219,7 @@ const register = async (formData: RegisterFormData, role: UserLikeRoles) => {
 const verifyOtp = async (
   data: OTPVerification,
   role: UserLikeRoles,
-  purpose: "REGISTRATION" | "PASSWORD_RESET" = "REGISTRATION"
+  purpose: "REGISTRATION" | "PASSWORD_RESET" = "REGISTRATION",
 ) => {
   let payload;
   if (role.toLowerCase() === "technician") {
@@ -224,7 +245,7 @@ const resendOtp = async (email: string, role: UserLikeRoles) => {
 const forgotPassword = async (email: string, role: UserLikeRoles) => {
   const response = await axiosInstance.post(
     getAuthUrl(role, "forgotpassword"),
-    { email }
+    { email },
   );
   return response.data;
 };
@@ -232,7 +253,7 @@ const forgotPassword = async (email: string, role: UserLikeRoles) => {
 const resetPassword = async (
   email: string,
   password: string,
-  role: UserLikeRoles
+  role: UserLikeRoles,
 ): Promise<{ message: string }> => {
   const response = await axiosInstance.post(getAuthUrl(role, "resetpassword"), {
     email,
@@ -260,7 +281,7 @@ const authService = {
   resendOtp,
   forgotPassword,
   resetPassword,
-  checkUserStatus,
+  refreshToken,
   logOut,
 };
 

@@ -1,16 +1,16 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { UserPublicRoute } from "./UserPublicRoute";
-import { UserLogin } from "../../pages/User/auth/UserLogin";
-import { UserRegister } from "../../pages/User/auth/UserRegister";
-import { UserOtp } from "../../pages/User/auth/UserOtp";
-import { UserForgotPassword } from "../../pages/User/auth/UserForgotPassword";
-import { UserResetPassword } from "../../pages/User/auth/UserResetPassword";
-import { UserPrivateRoute } from "./UserPrivateRoute";
-import { UserHome } from "../../pages/User/userpages/UserHome";
-import { UserCategory } from "../../pages/User/userpages/UserCategory";
-import { UserService } from "../../pages/User/userpages/UserService";
-import { UserProfile } from "../../pages/User/userpages/UserProfile";
+import { UserPrivateRoute } from "./PrivateRoutes";
+import { UserPublicRoute } from "./PublicRoutes";
+import { UserLogin } from "../pages/User/auth/UserLogin";
+import { UserRegister } from "../pages/User/auth/UserRegister";
+import { UserOtp } from "../pages/User/auth/UserOtp";
+import { UserForgotPassword } from "../pages/User/auth/UserForgotPassword";
+import { UserResetPassword } from "../pages/User/auth/UserResetPassword";
+import { UserHome } from "../pages/User/userpages/UserHome";
+import { UserCategory } from "../pages/User/userpages/UserCategory";
+import { UserService } from "../pages/User/userpages/UserService";
+import { UserProfile } from "../pages/User/userpages/UserProfile";
 
 export const UserRoutes: React.FC = () => {
   return (

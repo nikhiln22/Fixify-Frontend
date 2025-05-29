@@ -4,9 +4,7 @@ import { VerificationBanner } from "../../../components/technician/VerificationB
 import { QualificationForm } from "../../../components/technician/QualificationForm";
 import Banner from "../../../components/common/Banner";
 import Button from "../../../components/common/Button";
-import {
-  submitTechnicianQualification,
-} from "../../../services/technician.services";
+import { submitTechnicianQualification } from "../../../services/technician.services";
 import { getTechnicianProfile } from "../../../services/common.services";
 import { useDispatch } from "react-redux";
 import { updateTechnicianData } from "../../../redux/slices/technicianslice";
@@ -24,12 +22,15 @@ export const TechnicianPortal: React.FC = () => {
       try {
         setIsLoading(true);
         const response = await getTechnicianProfile();
-        console.log("technician profile in the technician portal page:", response);
-        
+        console.log(
+          "technician profile in the technician portal page:",
+          response,
+        );
+
         if (response) {
           const isVerifiedFromDB = response.is_verified || false;
           setIsVerified(isVerifiedFromDB);
-          
+
           const hasQualifications = !!(
             response.yearsOfExperience ||
             response.Designation ||
@@ -38,7 +39,7 @@ export const TechnicianPortal: React.FC = () => {
             response.address ||
             (response.certificates && response.certificates.length > 0)
           );
-          
+
           if (isVerifiedFromDB) {
             setIsSubmitted(false);
           } else if (hasQualifications) {
@@ -72,11 +73,11 @@ export const TechnicianPortal: React.FC = () => {
         data.append("address", formData.currentLocation.address || "");
         data.append(
           "latitude",
-          formData.currentLocation.latitude?.toString() || ""
+          formData.currentLocation.latitude?.toString() || "",
         );
         data.append(
           "longitude",
-          formData.currentLocation.longitude?.toString() || ""
+          formData.currentLocation.longitude?.toString() || "",
         );
       }
       if (formData.profilePhoto) {
@@ -87,7 +88,7 @@ export const TechnicianPortal: React.FC = () => {
           data.append("certificates", certificate);
         });
       }
-      
+
       const response = await submitTechnicianQualification(data);
       console.log("response from the technician portal:", response);
 
@@ -103,7 +104,7 @@ export const TechnicianPortal: React.FC = () => {
         console.log("Dispatching updateTechnicianData with:", technicianData);
         dispatch(updateTechnicianData(technicianData));
         console.log("Dispatched updateTechnicianData");
-        
+
         setIsSubmitted(true);
         setIsVerified(false);
       } else {
@@ -149,7 +150,7 @@ export const TechnicianPortal: React.FC = () => {
             height="400px"
             className="mb-8"
           />
-          
+
           <div className="flex flex-col items-center">
             <div className="w-full max-w-md space-y-4">
               <Button
@@ -159,7 +160,7 @@ export const TechnicianPortal: React.FC = () => {
               >
                 View All Bookings
               </Button>
-              
+
               <Button
                 onClick={handleTimeSlots}
                 className="w-full"
@@ -188,10 +189,10 @@ export const TechnicianPortal: React.FC = () => {
           <h1 className="text-3xl font-bold text-center mb-12">
             Welcome to Technician Portal
           </h1>
-          
+
           <VerificationBanner
-            isVerified={isVerified}  
-            isSubmitted={isSubmitted} 
+            isVerified={isVerified}
+            isSubmitted={isSubmitted}
             onStartVerification={handleStartVerification}
           />
 

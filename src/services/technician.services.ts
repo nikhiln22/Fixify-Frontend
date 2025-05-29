@@ -2,22 +2,23 @@ import axiosInstance from "../config/axios.config";
 import cookies from "js-cookie";
 import {
   SubmitTechnicianQualificationResponse,
-  TechnicianProfileResponse
+  TechnicianProfileResponse,
 } from "../types/technicians.types";
 
 export const submitTechnicianQualification = async (
-  formdata: FormData
+  formdata: FormData,
 ): Promise<SubmitTechnicianQualificationResponse> => {
   try {
-    const response = await axiosInstance.patch<SubmitTechnicianQualificationResponse>(
-      "/technician/qualifications",
-      formdata,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
+    const response =
+      await axiosInstance.patch<SubmitTechnicianQualificationResponse>(
+        "/api/technician/qualifications",
+        formdata,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         },
-      }
-    );
+      );
     return response.data;
   } catch (error) {
     console.error("Error submitting qualification:", error);
@@ -25,20 +26,21 @@ export const submitTechnicianQualification = async (
   }
 };
 
-export const getTechnicianProfile = async (): Promise<TechnicianProfileResponse> => {
-  const token = cookies.get("technician_access_token");
-  try {
-    const response = await axiosInstance.get<TechnicianProfileResponse>(
-      "/technician/profile", 
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+export const getTechnicianProfile =
+  async (): Promise<TechnicianProfileResponse> => {
+    const token = cookies.get("technician_access_token");
+    try {
+      const response = await axiosInstance.get<TechnicianProfileResponse>(
+        "/api/technician/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching the technician profile:", error);
-    throw error;
-  }
-};
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching the technician profile:", error);
+      throw error;
+    }
+  };

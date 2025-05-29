@@ -89,7 +89,7 @@ export const AddService: React.FC<AddServiceProps> = ({
   const removeImage = () => {
     formik.setFieldValue("serviceImage", null);
     const fileInput = document.getElementById(
-      "service-image"
+      "service-image",
     ) as HTMLInputElement;
     if (fileInput) {
       fileInput.value = "";

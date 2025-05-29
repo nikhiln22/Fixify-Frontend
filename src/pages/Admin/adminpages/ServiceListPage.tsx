@@ -8,7 +8,10 @@ import {
   updateService,
   toggleServiceStatus,
 } from "../../../services/admin.services";
-import { getAllServices, getAllCategories } from "../../../services/common.services";
+import {
+  getAllServices,
+  getAllCategories,
+} from "../../../services/common.services";
 import { getServicesColumns } from "../../../constants/tablecolumns/ServiceColumn";
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";
@@ -22,9 +25,7 @@ import SelectField from "../../../components/common/SelectField";
 export const ServiceListPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedService, setSelectedService] = useState<IService | null>(
-    null
-  );
+  const [selectedService, setSelectedService] = useState<IService | null>(null);
   const [inputValue, setInputValue] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
@@ -72,16 +73,22 @@ export const ServiceListPage: React.FC = () => {
 
   const fetchServicesWithFilters = useCallback(
     async (page: number) => {
-      console.log("Fetching services with filters:", { 
-        page, 
-        searchQuery, 
-        selectedCategoryId, 
-        filterStatus 
+      console.log("Fetching services with filters:", {
+        page,
+        searchQuery,
+        selectedCategoryId,
+        filterStatus,
       });
-      
-      return await getAllServices(page, searchQuery, selectedCategoryId, "admin", filterStatus);
+
+      return await getAllServices(
+        page,
+        searchQuery,
+        selectedCategoryId,
+        "admin",
+        filterStatus,
+      );
     },
-    [searchQuery, selectedCategoryId, filterStatus]
+    [searchQuery, selectedCategoryId, filterStatus],
   );
 
   const {
@@ -98,13 +105,17 @@ export const ServiceListPage: React.FC = () => {
     setInputValue(e.target.value);
   };
 
-  const handleCategoryFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCategoryFilterChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
     console.log("Category filter changed to:", e.target.value);
     setSelectedCategoryId(e.target.value);
     setCurrentPage(1);
   };
 
-  const handleStatusFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleStatusFilterChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
     console.log("Status filter changed to:", e.target.value);
     setFilterStatus(e.target.value);
     setCurrentPage(1);
@@ -144,8 +155,8 @@ export const ServiceListPage: React.FC = () => {
         if (response && services) {
           setServices(
             services.map((svc) =>
-              svc._id === selectedService._id ? response.data : svc
-            )
+              svc._id === selectedService._id ? response.data : svc,
+            ),
           );
           showToast({
             message: "Service updated successfully",
@@ -159,9 +170,9 @@ export const ServiceListPage: React.FC = () => {
             response.data,
             ...services.slice(0, itemsPerPage - 1),
           ];
-          
+
           setServices(firstPageItems);
-          
+
           if (currentPage !== 1) {
             setCurrentPage(1);
           }
@@ -176,7 +187,7 @@ export const ServiceListPage: React.FC = () => {
     } catch (error) {
       console.error(
         `Error ${selectedService ? "updating" : "creating"} service:`,
-        error
+        error,
       );
       showToast({
         message: `Failed to ${selectedService ? "update" : "add"} service`,
@@ -190,14 +201,14 @@ export const ServiceListPage: React.FC = () => {
   const handleStatusToggle = async (serviceId: string) => {
     try {
       const result = await toggleServiceStatus(serviceId);
-      console.log("result from toggling the service status:",result);
+      console.log("result from toggling the service status:", result);
       if (result) {
         setServices((prevServices) =>
           prevServices.map((service) =>
             service._id === serviceId
               ? result.data || { ...service, status: !service.status }
-              : service
-          )
+              : service,
+          ),
         );
       }
 
@@ -244,7 +255,11 @@ export const ServiceListPage: React.FC = () => {
                 value={selectedCategoryId}
                 onChange={handleCategoryFilterChange}
                 options={categoryOptions}
-                placeholder={categoriesLoading ? "Loading categories..." : "Filter by category"}
+                placeholder={
+                  categoriesLoading
+                    ? "Loading categories..."
+                    : "Filter by category"
+                }
                 className="mb-0"
                 disabled={categoriesLoading}
               />
@@ -260,8 +275,8 @@ export const ServiceListPage: React.FC = () => {
                 className="mb-0"
               />
             </div>
-            <Button 
-              onClick={handleOpenAddModal} 
+            <Button
+              onClick={handleOpenAddModal}
               className="h-10 px-4 py-2 whitespace-nowrap"
             >
               Add Service
@@ -269,9 +284,9 @@ export const ServiceListPage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {error && <p className="text-red-500 mb-2 px-4">{error}</p>}
-      
+
       <div className="px-4">
         <Table
           data={services || []}
@@ -286,7 +301,7 @@ export const ServiceListPage: React.FC = () => {
           onPageChange={setCurrentPage}
         />
       </div>
-      
+
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

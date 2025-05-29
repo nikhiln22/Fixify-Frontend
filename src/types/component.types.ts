@@ -1,4 +1,5 @@
 import React, { ButtonHTMLAttributes } from "react";
+import { Role } from "./auth.types";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -155,4 +156,13 @@ export interface TechnicianProfileCardProps {
   yearsOfExperience?: number;
   profilePhoto?: string | null;
   address?: string;
+}
+
+export interface PrivateRouteProps {
+  role: Role;
+}
+
+export interface PublicRouteProps {
+  role: Role;
+  redirectTo: string;
 }

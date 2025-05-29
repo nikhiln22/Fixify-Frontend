@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { getAllCategories, toggleCategoryStatus } from "../services/admin.services";
+import {
+  getAllCategories,
+  toggleCategoryStatus,
+} from "../services/admin.services";
 import { usePaginatedList } from "./usePaginatedList";
 import { Icategory } from "../models/category";
 
@@ -11,22 +14,24 @@ const useCategories = () => {
     totalPages,
     setCurrentPage,
     loading,
-    error
+    error,
   } = usePaginatedList<Icategory>(getAllCategories);
-  
-  const [statusUpdateLoading, setStatusUpdateLoading] = useState<string | null>(null);
-  
+
+  const [statusUpdateLoading, setStatusUpdateLoading] = useState<string | null>(
+    null,
+  );
+
   const handleStatusToggle = async (categoryId: string) => {
     setStatusUpdateLoading(categoryId);
     try {
       const result = await toggleCategoryStatus(categoryId);
       if (result) {
-        setData(prevCategories =>
-          prevCategories.map(category =>
+        setData((prevCategories) =>
+          prevCategories.map((category) =>
             category._id === categoryId
-              ? (result.data || { ...category, status: !category.status })
-              : category
-          )
+              ? result.data || { ...category, status: !category.status }
+              : category,
+          ),
         );
       }
     } catch (error) {
@@ -35,7 +40,7 @@ const useCategories = () => {
       setStatusUpdateLoading(null);
     }
   };
-  
+
   return {
     categories,
     setData,
@@ -45,7 +50,7 @@ const useCategories = () => {
     currentPage,
     setCurrentPage,
     handleStatusToggle,
-    statusUpdateLoading
+    statusUpdateLoading,
   };
 };
 

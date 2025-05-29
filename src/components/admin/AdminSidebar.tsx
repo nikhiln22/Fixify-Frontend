@@ -7,7 +7,7 @@ import {
   FileText,
   Briefcase,
   Grid3x3,
-  Wrench    
+  Wrench,
 } from "lucide-react";
 
 const AdminSidebar: React.FC = () => {
@@ -105,7 +105,7 @@ const AdminSidebar: React.FC = () => {
               <span>Categories</span>
             </NavLink>
           </li>
-             <li>
+          <li>
             <NavLink
               to="/admin/services"
               className={({ isActive }) =>

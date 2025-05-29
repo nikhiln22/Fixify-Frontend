@@ -67,7 +67,7 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
       formik.setFieldValue("currentLocation.longitude", newLocation.longitude);
       formik.setFieldValue(
         "currentLocation.address",
-        newLocation.address || ""
+        newLocation.address || "",
       );
     },
   });
@@ -76,7 +76,11 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
     const fetchDesignations = async () => {
       setIsLoading(true);
       try {
-        const designationNames = await getAllDesignations(undefined, "", "technician");
+        const designationNames = await getAllDesignations(
+          undefined,
+          "",
+          "technician",
+        );
         console.log("designation names:", designationNames);
         setDesignations(designationNames as string[]);
       } catch (err) {

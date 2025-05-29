@@ -1,14 +1,14 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import { TechnicianPublicRoute } from "./TechnicianPublicRoute";
-import { TechnicianLogin } from "../../pages/Technician/auth/TechnicianLogin";
-import { TechnicianRegister } from "../../pages/Technician/auth/TechnicianRegister";
-import { TechnicianOtp } from "../../pages/Technician/auth/TechnicianOtp";
-import { TechnicianForgotPassword } from "../../pages/Technician/auth/TechnicianForgotPassword";
-import { TechnicianResetPassword } from "../../pages/Technician/auth/TechnicianResetPassword";
-import { TechnicianPrivateRoute } from "./TechnicianPrivateRoute";
-import { TechnicianPortal } from "../../pages/Technician/technicianpages/TechnicianPortal";
-import TechnicianProfile from "../../pages/Technician/technicianpages/TechnicianProfile";
+import { TechnicianPrivateRoute } from "./PrivateRoutes";
+import { TechnicianPublicRoute } from "./PublicRoutes";
+import { TechnicianLogin } from "../pages/Technician/auth/TechnicianLogin";
+import { TechnicianRegister } from "../pages/Technician/auth/TechnicianRegister";
+import { TechnicianOtp } from "../pages/Technician/auth/TechnicianOtp";
+import { TechnicianForgotPassword } from "../pages/Technician/auth/TechnicianForgotPassword";
+import { TechnicianResetPassword } from "../pages/Technician/auth/TechnicianResetPassword";
+import { TechnicianPortal } from "../pages/Technician/technicianpages/TechnicianPortal";
+import TechnicianProfile from "../pages/Technician/technicianpages/TechnicianProfile";
 
 export const TechnicianRoutes: React.FC = () => {
   return (

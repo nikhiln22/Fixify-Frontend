@@ -12,9 +12,7 @@ export const getServicesColumns = (
     key: "_id",
     label: "Sl. No",
     render: (_, index) => (
-      <div className="flex items-center justify-center">
-        {index + 1}
-      </div>
+      <div className="flex items-center justify-center">{index + 1}</div>
     ),
   },
   {
@@ -39,7 +37,9 @@ export const getServicesColumns = (
   {
     key: "name",
     label: "Service Name",
-    render: (item) => <div className="text-center">{item?.name || "Untitled"}</div>,
+    render: (item) => (
+      <div className="text-center">{item?.name || "Untitled"}</div>
+    ),
   },
   {
     key: "description",
@@ -120,7 +120,7 @@ export const getServicesColumns = (
             setIsProcessing(false);
           }
         };
-        
+
         return (
           <div className="flex justify-center space-x-3">
             <Button
@@ -152,9 +152,8 @@ export const getServicesColumns = (
                 <p className="text-center py-4">Processing your request...</p>
               ) : (
                 <p>
-                  Are you sure you want to{" "}
-                  {item?.status ? "block" : "unblock"} service{" "}
-                  <strong>{item?.name || "this service"}</strong>?
+                  Are you sure you want to {item?.status ? "block" : "unblock"}{" "}
+                  service <strong>{item?.name || "this service"}</strong>?
                 </p>
               )}
             </Modal>

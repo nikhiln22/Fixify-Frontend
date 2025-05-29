@@ -11,22 +11,24 @@ const useUsers = () => {
     totalPages,
     setCurrentPage,
     loading,
-    error
+    error,
   } = usePaginatedList<Iuser>(getAllUsers);
 
-  const [statusUpdateLoading, setStatusUpdateLoading] = useState<string | null>(null);
+  const [statusUpdateLoading, setStatusUpdateLoading] = useState<string | null>(
+    null,
+  );
 
   const handleStatusToggle = async (userId: string) => {
     setStatusUpdateLoading(userId);
     try {
       const result = await toggleUserStatus(userId);
       if (result) {
-        setData(prevUsers =>
-          prevUsers.map(user =>
+        setData((prevUsers) =>
+          prevUsers.map((user) =>
             user._id === userId
-              ? (result.data || { ...user, status: !user.status })
-              : user
-          )
+              ? result.data || { ...user, status: !user.status }
+              : user,
+          ),
         );
       }
     } catch (error) {
@@ -45,7 +47,7 @@ const useUsers = () => {
     currentPage,
     setCurrentPage,
     handleStatusToggle,
-    statusUpdateLoading
+    statusUpdateLoading,
   };
 };
 

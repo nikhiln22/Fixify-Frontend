@@ -70,10 +70,10 @@ export const TechnicianListPage: React.FC = () => {
         page,
         searchQuery,
         filterStatus,
-        filterDesignation
+        filterDesignation,
       );
     },
-    [searchQuery, filterStatus, filterDesignation]
+    [searchQuery, filterStatus, filterDesignation],
   );
 
   const {
@@ -91,14 +91,14 @@ export const TechnicianListPage: React.FC = () => {
       const result = await toggleTechnicianStatus(technicianId);
       console.log(
         "result of toggling the technician status from the admin side:",
-        result
+        result,
       );
 
       if (result && result.technician) {
         setTechnicians((prevTechnicians) =>
           prevTechnicians.map((technician) =>
-            technician._id === technicianId ? result.technician : technician
-          )
+            technician._id === technicianId ? result.technician : technician,
+          ),
         );
       }
     } catch (error) {
@@ -108,7 +108,7 @@ export const TechnicianListPage: React.FC = () => {
 
   const handleView = (technician: Itechnician) => {
     console.log("View technician:", technician);
-    navigate(`/admin/applicant/${technician._id}`)
+    navigate(`/admin/applicant/${technician._id}`);
   };
 
   const columns = getTechniciansColumns(handleStatusToggle, handleView);
@@ -123,7 +123,7 @@ export const TechnicianListPage: React.FC = () => {
   };
 
   const handleDesignationFilterChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
+    e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     setFilterDesignation(e.target.value);
     setCurrentPage(1);
@@ -187,8 +187,6 @@ export const TechnicianListPage: React.FC = () => {
               />
             </div>
           </div>
-
-
         </div>
       </div>
 

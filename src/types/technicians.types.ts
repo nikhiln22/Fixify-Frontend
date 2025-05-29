@@ -28,5 +28,3 @@ export interface TechnicianProfileResponse {
   status: number;
   technician?: Itechnician;
 }
-
-

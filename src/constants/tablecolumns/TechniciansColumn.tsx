@@ -5,7 +5,7 @@ import Modal from "../../components/common/Modal";
 
 export const getTechniciansColumns = (
   handleStatusToggle: (id: string) => void,
-  handleView: (technician: Itechnician) => void
+  handleView: (technician: Itechnician) => void,
 ): Column<Itechnician>[] => [
   {
     key: "_id",
@@ -24,7 +24,9 @@ export const getTechniciansColumns = (
     label: "Contact Info",
     render: (item) => (
       <div className="text-center">
-        <div className="text-center">{item.email}, {item.phone}</div>
+        <div className="text-center">
+          {item.email}, {item.phone}
+        </div>
       </div>
     ),
   },
@@ -73,11 +75,12 @@ export const getTechniciansColumns = (
 
         return (
           <div className="flex justify-center gap-2">
-
-             <button
+            <button
               onClick={openModal}
               className={`px-3 py-1 rounded ${
-                item.status === "Active" ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+                item.status === "Active"
+                  ? "bg-red-500 hover:bg-red-600"
+                  : "bg-green-500 hover:bg-green-600"
               } text-white`}
             >
               {item.status === "Active" ? "Block" : "UnBlock"}
@@ -100,9 +103,8 @@ export const getTechniciansColumns = (
               confirmButtonColor={item.status ? "red" : "green"}
             >
               <p>
-                Are you sure you want to{" "}
-                {item.status ? "block" : "unblock"} user{" "}
-                <strong>{item.username}</strong>?
+                Are you sure you want to {item.status ? "block" : "unblock"}{" "}
+                user <strong>{item.username}</strong>?
               </p>
             </Modal>
           </div>

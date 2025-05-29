@@ -6,10 +6,10 @@ import { useAppSelector } from "../../../hooks/useRedux";
 
 const TechnicianProfile: React.FC = () => {
   const technicianData = useAppSelector(
-    (state) => state.technician.technicianData
+    (state) => state.technician.technicianData,
   );
 
-  console.log("technicianData:",technicianData);
+  console.log("technicianData:", technicianData);
 
   const handleEditClick = () => {
     console.log("Edit button clicked");

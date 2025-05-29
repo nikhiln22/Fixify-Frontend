@@ -25,7 +25,9 @@ export const getApplicantsColumns = (
     label: "Contact Info",
     render: (item) => (
       <div className="text-center">
-        <div>{item.email},{item.phone}</div>
+        <div>
+          {item.email},{item.phone}
+        </div>
       </div>
     ),
   },
@@ -34,10 +36,10 @@ export const getApplicantsColumns = (
     label: "Application Date",
     render: (item) => (
       <div className="text-center">
-         {new Date(item.createdAt).toLocaleDateString('en-US', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric'
+        {new Date(item.createdAt).toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
         })}
       </div>
     ),

@@ -4,11 +4,11 @@ import { Itechnician } from "../models/technician";
 import { Iuser } from "../models/user";
 
 export const addJobDesignation = async (
-  designation: string
+  designation: string,
 ): Promise<Idesignation> => {
   try {
     console.log("adding the job new job designation into the databse");
-    const response = await axiosInstance.post("/admin/addjobdesignation", {
+    const response = await axiosInstance.post("/api/admin/addjobdesignation", {
       designation,
     });
     return response.data.designation;
@@ -20,7 +20,7 @@ export const addJobDesignation = async (
 
 export const toggleDesignationStatus = async (id: string) => {
   const response = await axiosInstance.patch(
-    `/admin/blockjobdesignation/${id}`
+    `/api/admin/blockjobdesignation/${id}`,
   );
   console.log("response from the toggledesignationstatus:", response.data);
   return response.data;
@@ -29,7 +29,7 @@ export const toggleDesignationStatus = async (id: string) => {
 export const getAllUsers = async (
   page?: number,
   search?: string,
-  filterStatus?: string
+  filterStatus?: string,
 ): Promise<{
   data: Iuser[];
   totalPages: number;
@@ -49,8 +49,8 @@ export const getAllUsers = async (
       }
     }
     const url = queryParams
-      ? `/admin/userslist?${queryParams}`
-      : "/admin/userslist";
+      ? `/api/admin/userslist?${queryParams}`
+      : "/api/admin/userslist";
     const response = await axiosInstance.get(url);
     console.log("users response:", response);
     return {
@@ -72,7 +72,9 @@ export const getAllUsers = async (
 
 export const toggleUserStatus = async (userId: string) => {
   try {
-    const response = await axiosInstance.patch(`/admin/blockuser/${userId}`);
+    const response = await axiosInstance.patch(
+      `/api/admin/blockuser/${userId}`,
+    );
     return response.data;
   } catch (error) {
     console.log("error toggling user status:", error);
@@ -84,7 +86,7 @@ export const getAllTechnicians = async (
   page?: number,
   search?: string,
   filterStatus?: string,
-  filterDesignation?: string
+  filterDesignation?: string,
 ): Promise<{
   data: Itechnician[];
   totalPages: number;
@@ -111,8 +113,8 @@ export const getAllTechnicians = async (
     }
 
     const url = queryParams
-      ? `/admin/technicianslist?${queryParams}`
-      : "/admin/technicianslist";
+      ? `/api/admin/technicianslist?${queryParams}`
+      : "/api/admin/technicianslist";
 
     const response = await axiosInstance.get(url);
     console.log("technicians response:", response);
@@ -134,11 +136,10 @@ export const getAllTechnicians = async (
   }
 };
 
-
 export const toggleTechnicianStatus = async (technicianId: string) => {
   try {
     const response = await axiosInstance.patch(
-      `/admin/blocktechnician/${technicianId}`
+      `/api/admin/blocktechnician/${technicianId}`,
     );
     return response.data;
   } catch (error) {
@@ -148,7 +149,7 @@ export const toggleTechnicianStatus = async (technicianId: string) => {
 };
 
 export const getAllApplicants = async (
-  page: number = 1
+  page: number = 1,
 ): Promise<{
   data: Itechnician[];
   totalPages: number;
@@ -156,7 +157,7 @@ export const getAllApplicants = async (
   total: number;
 }> => {
   try {
-    const url = `/admin/applicantslist?page=${page}&limit=6`;
+    const url = `/api/admin/applicantslist?page=${page}&limit=6`;
     const response = await axiosInstance.get(url);
     console.log("applicants response:", response);
 
@@ -180,7 +181,7 @@ export const getAllApplicants = async (
 export const verifyApplicant = async (applicantId: string) => {
   try {
     const response = await axiosInstance.patch(
-      `/admin/verifyapplicant/${applicantId}`
+      `/api/admin/verifyapplicant/${applicantId}`,
     );
     return response.data;
   } catch (error) {
@@ -192,7 +193,7 @@ export const verifyApplicant = async (applicantId: string) => {
 export const rejectApplicant = async (applicantId: string) => {
   try {
     const response = await axiosInstance.delete(
-      `/admin/rejectapplicant/${applicantId}`
+      `/api/admin/rejectapplicant/${applicantId}`,
     );
     return response.data;
   } catch (error) {
@@ -202,19 +203,22 @@ export const rejectApplicant = async (applicantId: string) => {
 };
 
 export const createCategory = async (formData: FormData) => {
-  const response = await axiosInstance.post("/admin/addcategory", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
+  const response = await axiosInstance.post(
+    "/api/admin/addcategory",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     },
-  });
+  );
   return response.data;
 };
-
 
 export const toggleCategoryStatus = async (categoryId: string) => {
   try {
     const response = await axiosInstance.patch(
-      `/admin/blockcategory/${categoryId}`
+      `/api/admin/blockcategory/${categoryId}`,
     );
     return response.data;
   } catch (error) {
@@ -225,17 +229,17 @@ export const toggleCategoryStatus = async (categoryId: string) => {
 
 export const updateCategory = async (
   categoryId: string,
-  formData: FormData
+  formData: FormData,
 ) => {
   try {
     const response = await axiosInstance.put(
-      `/admin/updatecategory/${categoryId}`,
+      `/api/admin/updatecategory/${categoryId}`,
       formData,
       {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      }
+      },
     );
     return response.data;
   } catch (error) {
@@ -245,7 +249,7 @@ export const updateCategory = async (
 };
 
 export const createService = async (formData: FormData) => {
-  const response = await axiosInstance.post("/admin/addservice", formData, {
+  const response = await axiosInstance.post("/api/admin/addservice", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -256,7 +260,7 @@ export const createService = async (formData: FormData) => {
 export const toggleServiceStatus = async (serviceId: string) => {
   try {
     const response = await axiosInstance.patch(
-      `/admin/blockservice/${serviceId}`
+      `/api/admin/blockservice/${serviceId}`,
     );
     return response.data;
   } catch (error) {
@@ -268,13 +272,13 @@ export const toggleServiceStatus = async (serviceId: string) => {
 export const updateService = async (serviceId: string, formData: FormData) => {
   try {
     const response = await axiosInstance.put(
-      `/admin/updateservice/${serviceId}`,
+      `/api/admin/updateservice/${serviceId}`,
       formData,
       {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      }
+      },
     );
     return response.data;
   } catch (error) {

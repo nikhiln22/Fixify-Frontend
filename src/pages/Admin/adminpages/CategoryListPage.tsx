@@ -22,7 +22,7 @@ export const CategoryListPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Icategory | null>(
-    null
+    null,
   );
   const [inputValue, setInputValue] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -45,7 +45,7 @@ export const CategoryListPage: React.FC = () => {
       });
       return await getAllCategories(page, searchQuery, "admin", filterStatus);
     },
-    [searchQuery, filterStatus]
+    [searchQuery, filterStatus],
   );
 
   const {
@@ -102,8 +102,8 @@ export const CategoryListPage: React.FC = () => {
         if (response && categories) {
           setCategories(
             categories.map((cat) =>
-              cat._id === selectedCategory._id ? response.data : cat
-            )
+              cat._id === selectedCategory._id ? response.data : cat,
+            ),
           );
           showToast({
             message: "Category updated successfully",
@@ -113,7 +113,7 @@ export const CategoryListPage: React.FC = () => {
       } else {
         const response = await createCategory(formData);
         console.log(
-          "response from the create category method in the add category "
+          "response from the create category method in the add category ",
         );
         if (response && categories) {
           const firstPageItems = [
@@ -137,7 +137,7 @@ export const CategoryListPage: React.FC = () => {
     } catch (error) {
       console.error(
         `Error ${selectedCategory ? "updating" : "creating"} category:`,
-        error
+        error,
       );
       showToast({
         message: `Failed to ${selectedCategory ? "update" : "add"} category`,
@@ -156,8 +156,8 @@ export const CategoryListPage: React.FC = () => {
           prevCategories.map((category) =>
             category._id === categoryId
               ? result.data || { ...category, status: !category.status }
-              : category
-          )
+              : category,
+          ),
         );
       }
 

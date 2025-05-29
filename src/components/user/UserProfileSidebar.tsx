@@ -1,42 +1,35 @@
+import React, { useState } from "react";
+import { User, Calendar, Wallet, Settings, HelpCircle } from "lucide-react";
 
-import React, { useState } from 'react';
-import { 
-  User, 
-  Calendar, 
-  Wallet, 
-  Settings, 
-  HelpCircle
-} from 'lucide-react';
-
-export const UserProfileSidebar:React.FC = () => {
-  const [activeSection, setActiveSection] = useState('profile');
+export const UserProfileSidebar: React.FC = () => {
+  const [activeSection, setActiveSection] = useState("profile");
 
   const sidebarItems = [
     {
-      id: 'profile',
-      label: 'Profile Info',
-      icon: User
+      id: "profile",
+      label: "Profile Info",
+      icon: User,
     },
     {
-      id: 'bookings',
-      label: 'My Bookings',
-      icon: Calendar
+      id: "bookings",
+      label: "My Bookings",
+      icon: Calendar,
     },
     {
-      id: 'wallet',
-      label: 'Wallet & Payments',
-      icon: Wallet
+      id: "wallet",
+      label: "Wallet & Payments",
+      icon: Wallet,
     },
     {
-      id: 'settings',
-      label: 'Account Settings',
-      icon: Settings
+      id: "settings",
+      label: "Account Settings",
+      icon: Settings,
     },
     {
-      id: 'support',
-      label: 'Help & Support',
-      icon: HelpCircle
-    }
+      id: "support",
+      label: "Help & Support",
+      icon: HelpCircle,
+    },
   ];
 
   return (
@@ -46,7 +39,7 @@ export const UserProfileSidebar:React.FC = () => {
           {sidebarItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
-            
+
             return (
               <li key={item.id}>
                 <button

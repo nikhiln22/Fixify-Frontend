@@ -1,12 +1,13 @@
 import cookie from "js-cookie";
+import { Role } from "../types/auth.types";
 
-export const getAccessToken = (role: "user" | "admin" | "technician") => {
+export const getAccessToken = (role: Role) => {
   switch (role) {
-    case "user":
+    case "USER":
       return cookie.get("user_access_token");
-    case "admin":
+    case "ADMIN":
       return cookie.get("admin_access_token");
-    case "technician":
+    case "TECHNICIAN":
       return cookie.get("technician_access_token");
     default:
       return null;

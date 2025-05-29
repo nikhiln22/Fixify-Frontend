@@ -14,7 +14,7 @@ import { showToast } from "../../../utils/toast";
 
 export const ApplicantDetailsPreview: React.FC = () => {
   const [selectedCertificate, setSelectedCertificate] = useState<string | null>(
-    null
+    null,
   );
   const [applicant, setApplicant] = useState<Itechnician | null>(null);
 
@@ -59,7 +59,7 @@ export const ApplicantDetailsPreview: React.FC = () => {
         message: "technician approved successfully",
         type: "success",
       });
-      navigate('/admin/technicianlist');
+      navigate("/admin/technicianlist");
     } catch (error) {
       console.error("Error approving technician:", error);
       showToast({
@@ -81,7 +81,7 @@ export const ApplicantDetailsPreview: React.FC = () => {
       navigate("/admin/applicantslist");
     } catch (error) {
       console.error("Error rejecting technician:", error);
-       showToast({
+      showToast({
         message: "failed to reject applicant",
         type: "error",
       });
@@ -97,17 +97,15 @@ export const ApplicantDetailsPreview: React.FC = () => {
   }
 
   // Determine the page title based on verification status
-  const pageTitle = applicant.is_verified 
-    ? "Technician Details" 
+  const pageTitle = applicant.is_verified
+    ? "Technician Details"
     : "Technician Application Details";
 
   return (
     <AdminLayout>
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-semibold">
-            {pageTitle}
-          </h1>
+          <h1 className="text-3xl font-semibold">{pageTitle}</h1>
           <Button onClick={handleBack} variant="outline" className="px-6 py-2">
             Back
           </Button>

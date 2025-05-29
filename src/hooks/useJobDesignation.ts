@@ -16,7 +16,7 @@ const useJobDesignations = () => {
   } = usePaginatedList<Idesignation>(getAllDesignations);
 
   const [statusUpdateLoading, setStatusUpdateLoading] = useState<string | null>(
-    null
+    null,
   );
 
   const handleStatusToggle = async (designationId: string) => {
@@ -28,8 +28,8 @@ const useJobDesignations = () => {
           prevDesignations.map((designation) =>
             designation._id === designationId
               ? result.data || { ...designation, status: !designation.status }
-              : designation
-          )
+              : designation,
+          ),
         );
       }
     } catch (error) {
