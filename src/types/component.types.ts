@@ -1,5 +1,6 @@
 import React, { ButtonHTMLAttributes } from "react";
 import { Role } from "./auth.types";
+import { IAddress } from "../models/address";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -155,7 +156,48 @@ export interface TechnicianProfileCardProps {
   Designation?: string;
   yearsOfExperience?: number;
   profilePhoto?: string | null;
-  address?: string;
+}
+
+export interface AddressCardProps {
+  address: IAddress;
+  onEdit: (address: IAddress) => void;
+  onDelete?: (id: string) => void;
+}
+
+export interface ProfileData {
+  name?: string;
+  phone?: number;
+  image?: string;
+  Designation?: string;
+  yearsOfExperience?: number;
+}
+
+export interface ProfileCardProps {
+  name: string;
+  email: string;
+  phone: number;
+  image?: string;
+  role: "user" | "technician";
+  Designation?: string;
+  yearsOfExperience?: number;
+  isEditable?: boolean;
+  onSave?: (formData: FormData) => void | Promise<void>;
+}
+
+export interface AddressFormProps {
+  isOpen: boolean;
+  mode: "add" | "edit";
+  initialData?: IAddress;
+  onSave: (address: Partial<IAddress>) => void;
+  onClose: () => void;
+}
+
+export interface AddressManagerProps {
+  userId?: string;
+  addresses?: IAddress[];
+  onAddressChange: (addresses: IAddress[]) => void;
+  onAddressSave: (addressData: Partial<IAddress>) => Promise<IAddress | void>;
+  onAddressDelete: (addressId: string) => Promise<void>;
 }
 
 export interface PrivateRouteProps {

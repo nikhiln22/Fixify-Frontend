@@ -1,5 +1,4 @@
 import React from "react";
-import { MapPin } from "lucide-react";
 import { TechnicianProfileCardProps } from "../../types/component.types";
 
 const TechnicianProfileCard: React.FC<TechnicianProfileCardProps> = ({
@@ -9,7 +8,6 @@ const TechnicianProfileCard: React.FC<TechnicianProfileCardProps> = ({
   Designation,
   yearsOfExperience,
   profilePhoto,
-  address,
 }) => {
   return (
     <div className="bg-white rounded-3xl shadow-md overflow-hidden w-full">
@@ -78,19 +76,6 @@ const TechnicianProfileCard: React.FC<TechnicianProfileCardProps> = ({
               )}
             </div>
           </div>
-
-          {address && (
-            <div className="flex-shrink-0 flex flex-col items-center ml-8">
-              <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4">
-                <MapPin className="h-8 w-8 text-white" />
-              </div>
-              <div className="text-center">
-                <p className="text-base text-gray-700 font-medium whitespace-nowrap">
-                  {address}
-                </p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

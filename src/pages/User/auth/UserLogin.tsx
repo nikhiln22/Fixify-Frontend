@@ -45,7 +45,7 @@ export const UserLogin: React.FC = () => {
 
         Cookies.set(
           `${serverRole.toLowerCase()}_access_token`,
-          response.data.access_token,
+          response.data.access_token
         );
 
         if ("user" in response.data) {
@@ -55,6 +55,7 @@ export const UserLogin: React.FC = () => {
             username: userData.username,
             email: userData.email,
             phone: userData.phone,
+            image: userData.image,
           };
           console.log("before dispatching the user details to the state");
           dispatch(setUserData(userInfo));

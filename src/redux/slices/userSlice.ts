@@ -27,9 +27,17 @@ const userSlice = createSlice({
     setUserData: (state, action: PayloadAction<UserReduxData>) => {
       state.userData = action.payload;
     },
+    updateUserData: (state, action: PayloadAction<Partial<UserReduxData>>) => {
+      if (state.userData) {
+        state.userData = {
+          ...state.userData,
+          ...action.payload,
+        };
+      }
+    },
   },
 });
 
-export const { setUserData } = userSlice.actions;
+export const { setUserData, updateUserData } = userSlice.actions;
 
 export default userSlice.reducer;
