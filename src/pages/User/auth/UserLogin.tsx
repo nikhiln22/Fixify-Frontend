@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Login } from "../../../components/auth/Login";
 import authService from "../../../services/auth.services";
@@ -12,22 +12,23 @@ import { LoginFormData } from "../../../types/auth.types";
 export const UserLogin: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const [searchParams] = useSearchParams();
+  const [isBlocked, setIsBlocked] = useState(false);
 
   useEffect(() => {
-    const message = searchParams.get("message");
-    const type = searchParams.get("type");
+    const urlParams = new URLSearchParams(window.location.search);
+    const blockedParam = urlParams.get("blocked");
 
-    if (message) {
+    if (blockedParam === "true") {
+      setIsBlocked(true);
       showToast({
-        message: decodeURIComponent(message),
-        type: (type as "success" | "error" | "warning" | "info") || "info",
+        message: "Your account has been suspended. Please contact support.",
+        type: "error",
       });
 
-      window.history.replaceState({}, document.title, window.location.pathname);
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, "", newUrl);
     }
-  }, [searchParams]);
+  }, []);
 
   const handleLoginSubmit = async (values: LoginFormData) => {
     try {
@@ -54,6 +55,7 @@ export const UserLogin: React.FC = () => {
             username: userData.username,
             email: userData.email,
             phone: userData.phone,
+            image: userData.image,
           };
           console.log("before dispatching the user details to the state");
           dispatch(setUserData(userInfo));
@@ -74,9 +76,5 @@ export const UserLogin: React.FC = () => {
     }
   };
 
-  return (
-    <div>
-      <Login role="USER" onsubmit={handleLoginSubmit} />
-    </div>
-  );
+  return <Login role="USER" onsubmit={handleLoginSubmit} />;
 };

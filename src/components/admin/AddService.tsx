@@ -6,7 +6,7 @@ import SelectField from "../../components/common/SelectField";
 import { Upload, X } from "lucide-react";
 import { AddServiceProps } from "../../types/component.types";
 import { addServiceSchema } from "../../utils/validations/formvalidationSchema";
-import { getAllCategories } from "../../services/common.services";
+import { getAllCategories, getAllDesignations } from "../../services/common.services";
 
 export const AddService: React.FC<AddServiceProps> = ({
   onCancel,
@@ -15,36 +15,63 @@ export const AddService: React.FC<AddServiceProps> = ({
   initialValues,
   isEditing = false,
 }) => {
+  // Category state
   const [categoryOptions, setCategoryOptions] = useState<
     { value: string; label: string }[]
   >([]);
   const [isFetchingCategories, setIsFetchingCategories] = useState(false);
   const [categoryError, setCategoryError] = useState<string | null>(null);
 
+  // Job Designation state
+  const [designationOptions, setDesignationOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [isFetchingDesignations, setIsFetchingDesignations] = useState(false);
+  const [designationError, setDesignationError] = useState<string | null>(null);
+
+  // Fetch Categories and Job Designations
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
+      // Set loading states
       setIsFetchingCategories(true);
+      setIsFetchingDesignations(true);
       setCategoryError(null);
+      setDesignationError(null);
 
       try {
-        const response = await getAllCategories();
-        console.log("response from the add category form component:", response);
+        // Fetch both categories and designations in parallel
+        const [categoriesResponse, designationsResponse] = await Promise.all([
+          getAllCategories(),
+          getAllDesignations()
+        ]);
 
-        const options = response.data.map((category: any) => ({
+        // Process categories
+        console.log("response from the add category form component:", categoriesResponse);
+        const categoryOptions = categoriesResponse.data.map((category: any) => ({
           value: category._id,
           label: category.name,
         }));
+        setCategoryOptions(categoryOptions);
 
-        setCategoryOptions(options);
+        // Process job designations
+        console.log("Job designations response:", designationsResponse);
+        const designationOptions = designationsResponse.data.map((designation: any) => ({
+          value: designation._id,
+          label: designation.designation,
+        }));
+        setDesignationOptions(designationOptions);
+
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error("Error fetching data:", error);
         setCategoryError("Failed to load categories. Please try again later.");
+        setDesignationError("Failed to load job designations. Please try again later.");
       } finally {
         setIsFetchingCategories(false);
+        setIsFetchingDesignations(false);
       }
     };
 
-    fetchCategories();
+    fetchData();
   }, []);
 
   const formik = useFormik({
@@ -54,6 +81,7 @@ export const AddService: React.FC<AddServiceProps> = ({
       description: "",
       serviceImage: null as File | null,
       categoryId: "",
+      designationId: "", // Added designation field
     },
     validationSchema: addServiceSchema,
     onSubmit: async (values) => {
@@ -63,6 +91,7 @@ export const AddService: React.FC<AddServiceProps> = ({
         formData.append("price", values.servicePrice?.toString() || "0");
         formData.append("description", values.description || "");
         formData.append("categoryId", values.categoryId || "");
+        formData.append("designationId", values.designationId || ""); // Added designation to form data
 
         if (values.serviceImage && values.serviceImage instanceof File) {
           formData.append("image", values.serviceImage);
@@ -89,7 +118,7 @@ export const AddService: React.FC<AddServiceProps> = ({
   const removeImage = () => {
     formik.setFieldValue("serviceImage", null);
     const fileInput = document.getElementById(
-      "service-image"
+      "service-image",
     ) as HTMLInputElement;
     if (fileInput) {
       fileInput.value = "";
@@ -198,6 +227,36 @@ export const AddService: React.FC<AddServiceProps> = ({
           )}
       </div>
 
+      {/* Job Designation Select Field */}
+      <div className="mb-6 text-left">
+        <SelectField
+          label="Select Job Designation"
+          name="designationId"
+          value={formik.values.designationId || ""}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          options={designationOptions}
+          placeholder={
+            isFetchingDesignations ? "Loading designations..." : "Select a job designation"
+          }
+          error={
+            designationError ||
+            (formik.touched.designationId && formik.errors.designationId)
+              ? designationError || formik.errors.designationId?.toString()
+              : undefined
+          }
+          touched={formik.touched.designationId || !!designationError}
+          disabled={isFetchingDesignations}
+        />
+        {designationOptions.length === 0 &&
+          !isFetchingDesignations &&
+          !designationError && (
+            <p className="mt-1 text-sm text-amber-600">
+              No job designations available. Please add job designations first.
+            </p>
+          )}
+      </div>
+
       <div className="mb-6 text-left">
         <label
           htmlFor="service-image"
@@ -283,7 +342,7 @@ export const AddService: React.FC<AddServiceProps> = ({
           type="submit"
           variant="primary"
           isLoading={isLoading || formik.isSubmitting}
-          disabled={formik.isSubmitting || isFetchingCategories}
+          disabled={formik.isSubmitting || isFetchingCategories || isFetchingDesignations}
           className="py-2 px-4 w-24"
         >
           {isEditing ? "Update" : "Add"}

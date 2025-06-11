@@ -46,7 +46,7 @@ export const AddCategory: React.FC<AddCategoryProps> = ({
   const removeImage = () => {
     formik.setFieldValue("categoryImage", null);
     const fileInput = document.getElementById(
-      "category-image"
+      "category-image",
     ) as HTMLInputElement;
     if (fileInput) {
       fileInput.value = "";

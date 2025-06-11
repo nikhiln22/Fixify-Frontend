@@ -1,43 +1,5 @@
-
 import { Itechnician } from "../models/technician";
-
-export interface Location {
-  locationName: string;
-  pincode: string;
-  cityName: string;
-}
-
-export interface JobDesignationResponse {
-  message: string;
-  success: boolean;
-  designation: string[];
-  status: number;
-}
-
-export interface CityLocationResponse {
-  cities?: string[];
-  message: string;
-  success: boolean;
-  status: number;
-}
-
-export interface LocationsByCityResponse {
-  success: boolean;
-  message?: string;
-  status: number;
-  locations?: Location[];
-}
-
-
-export interface TechnicianQualificationData {
-  experience: string;
-  designation: string;
-  about: string;
-  city: string;
-  preferredWorkLocation: string;
-  profilePhoto: File | null;
-  certificates: File[]; 
-}
+import { ITimeSlot } from "../models/timeslot";
 
 export interface SubmitTechnicianQualificationResponse {
   message: string;
@@ -45,7 +7,12 @@ export interface SubmitTechnicianQualificationResponse {
   status: number;
   technician: Pick<
     Itechnician,
-    "yearsOfExperience" | "Designation" | "About" | "image" | "certificates" | "city" | "preferredWorkLocation"
+    | "yearsOfExperience"
+    | "Designation"
+    | "About"
+    | "image"
+    | "certificates"
+    | "address"
   >;
 }
 
@@ -54,4 +21,22 @@ export interface TechnicianProfileResponse {
   success: boolean;
   status: number;
   technician?: Itechnician;
+}
+
+export interface TimeSlotData {
+  startTime: string;
+  endTime: string;
+}
+
+export interface CreateTimeSlotsResponse {
+  success: boolean;
+  message: string;
+  data?: any; 
+}
+
+export interface GetTimeSlotResponse{
+  success:boolean;
+  message:string;
+  status:number;
+  data?:ITimeSlot[];
 }

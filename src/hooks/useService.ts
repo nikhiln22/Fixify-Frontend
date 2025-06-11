@@ -12,10 +12,12 @@ const useServices = () => {
     totalPages,
     setCurrentPage,
     loading,
-    error
+    error,
   } = usePaginatedList<IService>(getAllServices);
 
-  const [statusUpdateLoading, setStatusUpdateLoading] = useState<string | null>(null);
+  const [statusUpdateLoading, setStatusUpdateLoading] = useState<string | null>(
+    null,
+  );
 
   const handleStatusToggle = async (serviceId: string) => {
     setStatusUpdateLoading(serviceId);
@@ -24,12 +26,12 @@ const useServices = () => {
       const result = await toggleServiceStatus(serviceId);
       console.log("result from the useService hook");
       if (result) {
-        setData(prevServices =>
-          prevServices.map(service =>
+        setData((prevServices) =>
+          prevServices.map((service) =>
             service._id === serviceId
-              ? (result.data || { ...service, status: !service.status })
-              : service
-          )
+              ? result.data || { ...service, status: !service.status }
+              : service,
+          ),
         );
       }
     } catch (error) {
@@ -48,7 +50,7 @@ const useServices = () => {
     currentPage,
     setCurrentPage,
     handleStatusToggle,
-    statusUpdateLoading
+    statusUpdateLoading,
   };
 };
 

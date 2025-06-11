@@ -1,7 +1,5 @@
-
-
-import { Map as MapLibreMap } from 'maplibre-gl';
-import { Marker } from 'maplibre-gl';
+import { Map as MapLibreMap } from "maplibre-gl";
+import { Marker } from "maplibre-gl";
 
 export interface MapLocation {
   latitude: number;

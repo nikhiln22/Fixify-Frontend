@@ -24,6 +24,8 @@
     "maplibre-gl": "^5.5.0",
     "olamaps-web-sdk": "^1.1.2",
     "react": "^19.0.0",
+    "react-calendar": "^6.0.0",
+    "react-datepicker": "^8.4.0",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.4.0",

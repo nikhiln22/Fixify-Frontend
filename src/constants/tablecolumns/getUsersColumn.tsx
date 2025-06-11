@@ -4,7 +4,7 @@ import { Column } from "../../types/component.types";
 import Modal from "../../components/common/Modal";
 
 export const getUsersColumns = (
-  handleStatusToggle: (id: string) => void
+  handleStatusToggle: (id: string) => void,
 ): Column<Iuser>[] => [
   {
     key: "_id",
@@ -65,7 +65,7 @@ export const getUsersColumns = (
             <button
               onClick={openModal}
               className={`px-3 py-1 rounded ${
-                item.status ?  "bg-red-500"  : "bg-green-500"
+                item.status ? "bg-red-500" : "bg-green-500"
               } text-white`}
             >
               {item.status ? "Block" : "UnBlock"}
@@ -81,9 +81,8 @@ export const getUsersColumns = (
               confirmButtonColor={item.status ? "red" : "green"}
             >
               <p>
-                Are you sure you want to{" "}
-                {item.status ? "block" : "unblock"} user{" "}
-                <strong>{item.username}</strong>?
+                Are you sure you want to {item.status ? "block" : "unblock"}{" "}
+                user <strong>{item.username}</strong>?
               </p>
             </Modal>
           </div>

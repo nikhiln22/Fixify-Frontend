@@ -5,13 +5,13 @@ import Card from "../../../components/common/Card";
 import { getAllServices } from "../../../services/common.services";
 import Pagination from "../../../components/common/Pagination";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { IService } from "../../../models/service"; 
+import { IService } from "../../../models/service";
 
 export const UserService: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { categoryId } = useParams<{ categoryId: string }>();
-  
+
   const [services, setServices] = useState<IService[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -45,7 +45,7 @@ export const UserService: React.FC = () => {
 
   const handleServiceClick = (service: IService) => {
     console.log("service clicked", service);
-    navigate(`/user/service-details/${service._id}`);
+    navigate(`/user/servicedetails/${service._id}`);
   };
 
   return (
@@ -72,22 +72,22 @@ export const UserService: React.FC = () => {
                     key={service._id}
                     image={service.image || "/default-service-image.jpg"}
                     title={service.name}
-                    price={service.price || Math.floor(Math.random() * 2000) + 500}
+                    price={
+                      service.price || Math.floor(Math.random() * 2000) + 500
+                    }
                     type="service"
                     onClick={() => handleServiceClick(service)}
                     buttonLabel="Book Now"
                   />
                 ))}
               </div>
-              
-              {totalPages > 1 && (
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
-              )}
-              
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+
               <div className="text-center py-12">
                 <h3 className="text-2xl font-bold mb-2">
                   Ready to Get Started? Choose Your Service and Let's Go!
@@ -96,7 +96,9 @@ export const UserService: React.FC = () => {
             </>
           ) : (
             <div className="flex justify-center items-center py-20">
-              <p className="text-lg text-gray-600">No services found for this category</p>
+              <p className="text-lg text-gray-600">
+                No services found for this category
+              </p>
             </div>
           )}
         </div>

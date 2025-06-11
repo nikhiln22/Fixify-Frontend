@@ -15,7 +15,6 @@ export const usePaginatedList = <T>(fetchFunction: FetchFunction<T>) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -34,7 +33,6 @@ export const usePaginatedList = <T>(fetchFunction: FetchFunction<T>) => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
 
   return {
     data,

@@ -23,10 +23,12 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const [designations, setDesignations] = useState<string[]>([]);
+  const [designations, setDesignations] = useState<
+    { _id: string; name: string }[]
+  >([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const formik = useFormik({
+    const formik = useFormik({
     initialValues: {
       experience: "",
       designation: "",
@@ -76,15 +78,29 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
     const fetchDesignations = async () => {
       setIsLoading(true);
       try {
-        const designationNames = await getAllDesignations(undefined, "", "technician");
-        console.log("designation names:", designationNames);
-        setDesignations(designationNames);
+        const designationNames = await getAllDesignations(
+          undefined,
+          "",
+          "technician"
+        );
+        console.log("Raw API response:", designationNames);
+        console.log("Type of response:", typeof designationNames);
+        console.log("Is array:", Array.isArray(designationNames));
+        
+        if (Array.isArray(designationNames)) {
+          console.log("First item:", designationNames[0]);
+          setDesignations(designationNames as { _id: string; name: string }[]);
+        } else {
+          console.log("Response is not an array, setting empty array");
+          setDesignations([]);
+        }
       } catch (err) {
         console.error("Error fetching designations:", err);
         showToast({
           message: "Failed to load job designations. Please try again later.",
           type: "error",
         });
+        setDesignations([]);
       } finally {
         setIsLoading(false);
       }
@@ -142,10 +158,15 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
                 options={
                   isLoading
                     ? [{ value: "", label: "Loading designations..." }]
-                    : designations.map((designationName) => ({
-                        value: designationName,
-                        label: designationName,
-                      }))
+                    : (() => {
+                        console.log("Designations for options:", designations);
+                        const options = designations.map((designation) => ({
+                          value: designation._id,
+                          label: designation.name,
+                        }));
+                        console.log("Generated options:", options);
+                        return options;
+                      })()
                 }
                 placeholder="Select your specialization"
                 required={true}

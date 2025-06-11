@@ -3,20 +3,18 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./assets/toast-overides.css";
 import { LandingPage } from "./pages/LandingPage";
-import { UserRoutes } from "./routes/user/UserRoutes";
-import { TechnicianRoutes } from "./routes/technician/TechnicianRoutes";
-import { AdminRoutes } from "./routes/admin/AdminRoutes";
+import { UserRoutes } from "./routes/UserRoutes";
+import { TechnicianRoutes } from "./routes/TechnicianRoutes";
+import { AdminRoutes } from "./routes/AdminRoutes";
 import { store, persistor } from "./redux/store";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-import { BlockedUserGuard } from "./components/common/BlockedUserGuard";
 
 function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
-        <BlockedUserGuard>
           <ToastContainer
             position="top-center"
             autoClose={5000}
@@ -38,7 +36,6 @@ function App() {
           <UserRoutes />
           <TechnicianRoutes />
           <AdminRoutes />
-          </BlockedUserGuard>
         </BrowserRouter>
       </PersistGate>
     </Provider>

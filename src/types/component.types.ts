@@ -1,4 +1,8 @@
 import React, { ButtonHTMLAttributes } from "react";
+import { Role } from "./auth.types";
+import { IAddress } from "../models/address";
+import { ITimeSlot } from "../models/timeslot";
+import { TimeSlotData } from "./technicians.types";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -122,6 +126,7 @@ export interface AddServiceProps {
     description?: string;
     serviceImage?: File | string | null;
     categoryId?: string;
+    designationId: string;
   };
   isEditing?: boolean;
 }
@@ -145,4 +150,74 @@ export interface CardProps {
   type: "category" | "service";
   onClick?: () => void;
   buttonLabel?: string;
+}
+
+export interface TechnicianProfileCardProps {
+  name: string;
+  email: string;
+  phone: number;
+  Designation?: string;
+  yearsOfExperience?: number;
+  profilePhoto?: string | null;
+}
+
+export interface AddressCardProps {
+  address: IAddress;
+  onEdit: (address: IAddress) => void;
+  onDelete?: (id: string) => void;
+}
+
+export interface ProfileData {
+  name?: string;
+  phone?: number;
+  image?: string;
+  Designation?: string;
+  yearsOfExperience?: number;
+}
+
+export interface ProfileCardProps {
+  name: string;
+  email: string;
+  phone: number;
+  image?: string;
+  role: "user" | "technician";
+  Designation?: string;
+  yearsOfExperience?: number;
+  isEditable?: boolean;
+  onSave?: (formData: FormData) => void | Promise<void>;
+}
+
+export interface AddressFormProps {
+  isOpen: boolean;
+  mode: "add" | "edit";
+  initialData?: IAddress;
+  onSave: (address: Partial<IAddress>) => void;
+  onClose: () => void;
+}
+
+export interface AddressManagerProps {
+  userId?: string;
+  addresses?: IAddress[];
+  onAddressChange: (addresses: IAddress[]) => void;
+  onAddressSave: (addressData: Partial<IAddress>) => Promise<IAddress | void>;
+  onAddressDelete: (addressId: string) => Promise<void>;
+}
+
+export interface TimeSlotDisplayProps {
+  timeSlots: ITimeSlot[];
+}
+
+export interface TimeSlotFormProps {
+  onSubmit: (data: TimeSlotData) => Promise<void>;
+  onCancel: () => void;
+  isLoading?: boolean;
+}
+
+export interface PrivateRouteProps {
+  role: Role;
+}
+
+export interface PublicRouteProps {
+  role: Role;
+  redirectTo: string;
 }

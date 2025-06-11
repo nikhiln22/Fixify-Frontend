@@ -1,20 +1,25 @@
 import axiosInstance from "../config/axios.config";
+import { IBooking } from "../models/booking";
 import { Icategory } from "../models/category";
 import { Idesignation } from "../models/designation";
 import { IService } from "../models/service";
-
+import { Itechnician } from "../models/technician";
+import { TechnicianProfileResponse } from "../types/technicians.types";
 
 export const getAllDesignations = async (
   page?: number,
   search?: string,
   role: "admin" | "technician" = "admin",
   filterStatus?: string
-): Promise<{
-  data: Idesignation[];
-  totalPages: number;
-  currentPage: number;
-  total: number;
-}> => {
+): Promise<
+  | { _id: string; name: string }[]
+  | {
+      data: Idesignation[];
+      totalPages: number;
+      currentPage: number;
+      total: number;
+    }
+> => {
   try {
     let queryParams = "";
     if (page !== undefined) {
@@ -29,8 +34,8 @@ export const getAllDesignations = async (
 
     const baseUrl =
       role === "admin"
-        ? "/admin/jobdesignations"
-        : "/technician/jobdesignations";
+        ? "/api/admin/jobdesignations"
+        : "/api/technician/jobdesignations";
 
     const url = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
     const response = await axiosInstance.get(url);
@@ -39,22 +44,16 @@ export const getAllDesignations = async (
       if (
         response.data &&
         response.data.success &&
-        Array.isArray(response.data.designation)
+        response.data.data &&
+        Array.isArray(response.data.data.designations)
       ) {
-        return {
-          data: response.data.designation,
-          totalPages: 1,
-          currentPage: 1,
-          total: response.data.designation.length,
-        };
+        return response.data.data.designations.map((item: any) => ({
+          _id: item._id,
+          name: item.designation,
+        }));
       }
-      
-      return {
-        data: [],
-        totalPages: 0,
-        currentPage: 1,
-        total: 0,
-      };
+
+      return [];
     }
 
     return {
@@ -65,6 +64,10 @@ export const getAllDesignations = async (
     };
   } catch (error) {
     console.error("Error fetching designations:", error);
+
+    if (role === "technician") {
+      return [];
+    }
 
     return {
       data: [],
@@ -100,7 +103,8 @@ export const getAllCategories = async (
       }
     }
 
-    const baseUrl = role === "admin" ? "/admin/categories" : "/user/categories";
+    const baseUrl =
+      role === "admin" ? "/api/admin/categories" : "/api/user/categories";
 
     const url = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
 
@@ -156,7 +160,8 @@ export const getAllServices = async (
       }
     }
 
-    const baseUrl = role === "admin" ? "/admin/services" : "/user/services";
+    const baseUrl =
+      role === "admin" ? "/api/admin/services" : "/api/user/services";
     const url = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
 
     const response = await axiosInstance.get(url);
@@ -178,3 +183,94 @@ export const getAllServices = async (
     };
   }
 };
+
+export const getTechnicianProfile = async (
+  role: "admin" | "technician" = "technician",
+  technicianId?: string
+): Promise<Itechnician> => {
+  try {
+    console.log(`fetching technician profile for ${role}`);
+
+    let url: string;
+
+    if (role === "technician") {
+      url = "/api/technician/profile";
+    } else if (role === "admin") {
+      if (!technicianId) {
+        throw new Error("Technician ID is required for admin access");
+      }
+      url = `/api/admin/technicianprofile/${technicianId}`;
+    } else {
+      throw new Error("Invalid role specified");
+    }
+
+    const response = await axiosInstance.get<TechnicianProfileResponse>(url);
+
+    console.log(`technician profile response for ${role}:`, response);
+
+    if (response.data.technician) {
+      return response.data.technician;
+    } else {
+      throw new Error("Technician data not found in response");
+    }
+  } catch (error) {
+    console.error(`Error fetching technician profile for ${role}:`, error);
+    throw error;
+  }
+};
+
+
+
+export const getUserBookings = async (
+  page?: number,
+  role: "user" | "technician" | "admin" = "user"
+): Promise<{
+  data: IBooking[];
+  totalPages: number;
+  currentPage: number;
+  total: number;
+}> => {
+  try {
+    console.log(`fetching the bookings for ${role}`);
+
+    let queryParams = "";
+    if (page !== undefined) {
+      queryParams += `page=${page}&limit=6`;
+    }
+
+    let baseUrl = "";
+    switch (role) {
+      case "user":
+        baseUrl = "/api/user/bookings";
+        break;
+      case "technician":
+        baseUrl = "/api/technician/bookings";
+        break;
+      case "admin":
+        baseUrl = "/api/admin/bookings";
+        break;
+      default:
+        baseUrl = "/api/user/bookings";
+    }
+
+    const url = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
+
+    const response = await axiosInstance.get(url);
+    console.log("bookings response:", response);
+
+    return {
+      data: response.data.data?.bookings || [],
+      totalPages: response.data.data?.pagination?.pages || 1,
+      currentPage: response.data.data?.pagination?.page || page || 1,
+      total: response.data.data?.pagination?.total || 0,
+    };
+  } catch (error) {
+    console.error(`error fetching the bookings for ${role}:`, error);
+    return {
+      data: [],
+      totalPages: 0,
+      currentPage: page || 1,
+      total: 0,
+    };
+  }
+}

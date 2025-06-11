@@ -69,7 +69,7 @@ const Modal: React.FC<ModalProps> = ({
       {isOpen && (
         <>
           <motion.div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]"
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
@@ -77,7 +77,7 @@ const Modal: React.FC<ModalProps> = ({
             onClick={onClose}
           />
 
-          <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="fixed inset-0 z-[70] overflow-y-auto">
             <div className="flex min-h-full items-center justify-center p-4 text-center">
               <motion.div
                 className={`w-full transform overflow-hidden rounded-lg bg-gradient-to-b from-gray-50 to-white px-8 py-6 text-center align-middle shadow-xl border border-gray-100 ${className || "max-w-2xl"}`}

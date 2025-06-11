@@ -28,7 +28,7 @@ const UserListPage: React.FC = () => {
     async (page: number) => {
       return await getAllUsers(page, searchQuery, filterStatus);
     },
-    [searchQuery, filterStatus]
+    [searchQuery, filterStatus],
   );
 
   const {
@@ -43,14 +43,14 @@ const UserListPage: React.FC = () => {
 
   const handleStatusToggle = async (userId: string) => {
     try {
-      let result = await toggleUserStatus(userId);
+      const result = await toggleUserStatus(userId);
       if (result) {
         setUsers((prevUsers) =>
           prevUsers.map((user) =>
             user._id === userId
               ? result.data || { ...user, status: !user.status }
-              : user
-          )
+              : user,
+          ),
         );
       }
     } catch (error) {
