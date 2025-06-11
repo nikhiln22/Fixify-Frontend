@@ -5,14 +5,16 @@ import { IAddress } from "../../models/address";
 
 export interface AddressCardProps {
   address: IAddress;
-  onEdit: (address: IAddress) => void;
+  onEdit?: (address: IAddress) => void;
   onDelete?: (addressId: string) => void;
+  showActions?: boolean;
 }
 
 export const AddressCard: React.FC<AddressCardProps> = ({
   address,
   onEdit,
   onDelete,
+  showActions = true,
 }) => {
   const getAddressIcon = (type: "Home" | "Work") => {
     switch (type) {
@@ -28,7 +30,9 @@ export const AddressCard: React.FC<AddressCardProps> = ({
   const IconComponent = getAddressIcon(address.addressType);
 
   const handleEdit = () => {
-    onEdit(address);
+    if (onEdit) {
+      onEdit(address);
+    }
   };
 
   const handleDelete = () => {
@@ -49,27 +53,31 @@ export const AddressCard: React.FC<AddressCardProps> = ({
             {address.addressType}
           </h4>
 
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={handleEdit}
-              className="px-4 py-2 flex items-center gap-2"
-            >
-              <Edit className="w-4 h-4" />
-              Edit
-            </Button>
+          {showActions && (onEdit || onDelete) && (
+            <div className="flex items-center gap-2">
+              {onEdit && (
+                <Button
+                  variant="outline"
+                  onClick={handleEdit}
+                  className="px-4 py-2 flex items-center gap-2"
+                >
+                  <Edit className="w-4 h-4" />
+                  Edit
+                </Button>
+              )}
 
-            {onDelete && (
-              <Button
-                variant="outline"
-                onClick={handleDelete}
-                className="px-4 py-2 flex items-center gap-2 text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400"
-              >
-                <Trash2 className="w-4 h-4" />
-                Delete
-              </Button>
-            )}
-          </div>
+              {onDelete && (
+                <Button
+                  variant="outline"
+                  onClick={handleDelete}
+                  className="px-4 py-2 flex items-center gap-2 text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         <p className="text-gray-600 leading-relaxed">{address.fullAddress}</p>

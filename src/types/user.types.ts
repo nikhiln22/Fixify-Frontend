@@ -1,5 +1,6 @@
 import { Iuser } from "../models/user";
 import { IAddress } from "../models/address";
+import { IBooking } from "../models/booking";
 
 export interface UserProfileResponse {
   message: string;
@@ -42,4 +43,22 @@ export interface DeleteAddressResponse {
   success: boolean;
   message: string;
   status: number;
+}
+
+export interface CreateBookingRequest {
+  technicianId: string;
+  serviceId: string;
+  addressId: string;
+  timeSlotId: string;
+  date: string;
+  totalAmount: number;
+  paymentMethod: "Cash" | "online" | "Wallet";
+}
+
+
+export interface BookServiceResponse {
+  success: boolean;
+  message: string;
+  data?: IBooking;
+  error?: string;
 }

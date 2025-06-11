@@ -1,8 +1,8 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { User, Calendar, Wallet, Settings, HelpCircle } from "lucide-react";
+import { User, Settings, Clock, Briefcase, DollarSign } from "lucide-react";
 
-export const UserProfileSidebar: React.FC = () => {
+export const TechnicianProfileSidebar: React.FC = () => {
   const location = useLocation();
 
   const sidebarItems = [
@@ -10,31 +10,31 @@ export const UserProfileSidebar: React.FC = () => {
       id: "profile",
       label: "Profile Info",
       icon: User,
-      path: "/user/profile",
+      path: "/technician/profile",
     },
     {
-      id: "bookings",
-      label: "My Bookings",
-      icon: Calendar,
-      path: "/user/bookinglist",
+      id: "availability",
+      label: "Availability & Schedule",
+      icon: Clock,
+      path: "/technician/availability",
     },
     {
-      id: "wallet",
-      label: "Wallet & Payments",
-      icon: Wallet,
-      path: "/user/wallet", 
+      id: "jobs",
+      label: "My Jobs",
+      icon: Briefcase,
+      path: "/technician/jobs",
+    },
+    {
+      id: "earnings",
+      label: "Earnings & Payments",
+      icon: DollarSign,
+      path: "/technician/earnings",
     },
     {
       id: "settings",
       label: "Account Settings",
       icon: Settings,
-      path: "/user/settings", 
-    },
-    {
-      id: "support",
-      label: "Help & Support",
-      icon: HelpCircle,
-      path: "/user/support", 
+      path: "/technician/settings",
     },
   ];
 

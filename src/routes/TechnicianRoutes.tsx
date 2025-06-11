@@ -8,9 +8,13 @@ import { TechnicianOtp } from "../pages/Technician/auth/TechnicianOtp";
 import { TechnicianForgotPassword } from "../pages/Technician/auth/TechnicianForgotPassword";
 import { TechnicianResetPassword } from "../pages/Technician/auth/TechnicianResetPassword";
 import { TechnicianPortal } from "../pages/Technician/technicianpages/TechnicianPortal";
-import TechnicianProfile from "../pages/Technician/technicianpages/TechnicianProfile";
+import { TechnicianProfile } from "../pages/Technician/technicianpages/TechnicianProfile";
+import { TechnicianAvailability } from "../pages/Technician/technicianpages/TechnicianAvailability";
+import { PageNotFound } from "../components/common/PageNotFound";
+import { useAppSelector } from "../hooks/useRedux";
 
 export const TechnicianRoutes: React.FC = () => {
+  const user = useAppSelector((state)=>state.technician.technicianData?.username)
   return (
     <Routes>
       {/* Technician public routes */}
@@ -32,7 +36,12 @@ export const TechnicianRoutes: React.FC = () => {
       <Route element={<TechnicianPrivateRoute />}>
         <Route path="/technician/portal" element={<TechnicianPortal />} />
         <Route path="/technician/profile" element={<TechnicianProfile />} />
+        <Route
+          path="/technician/availability"
+          element={<TechnicianAvailability />}
+        />
       </Route>
+      <Route path="/technician/*" element={<PageNotFound userName={user} userRole="technician" />}/>
     </Routes>
   );
 };

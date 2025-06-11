@@ -322,6 +322,7 @@ export const ServiceListPage: React.FC = () => {
                     description: selectedService.description,
                     serviceImage: selectedService.image || null,
                     categoryId: selectedService.category?._id,
+                    designationId:selectedService.designation?._id
                   }
                 : undefined
             }

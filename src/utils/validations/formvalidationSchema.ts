@@ -92,6 +92,7 @@ export const addServiceSchema = Yup.object().shape({
     .max(500, "Description must not exceed 500 characters"),
 
   categoryId: Yup.string().required("Category selection is required"),
+  designationId: Yup.string().required("Job designation is required"),
 
   serviceImage: Yup.mixed()
     .required("Service image is required")
@@ -108,4 +109,120 @@ export const addServiceSchema = Yup.object().shape({
         )
       );
     }),
+});
+
+
+export const timeSlotFormSchema = Yup.object().shape({
+  startDate: Yup.date()
+    .required("Start date is required")
+    .nullable()
+    .typeError("Please select a valid start date")
+    .test(
+      "is-future-date",
+      "Start date must be from tomorrow onwards",
+      function (value) {
+        if (!value) return true; 
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        const selectedDate = new Date(value);
+        selectedDate.setHours(0, 0, 0, 0);
+        return selectedDate >= tomorrow;
+      }
+    ),
+
+  endDate: Yup.date()
+    .required("End date is required")
+    .nullable()
+    .typeError("Please select a valid end date")
+    .test(
+      "is-after-start-date",
+      "End date must be same as or after start date",
+      function (value) {
+        const { startDate } = this.parent;
+        if (!value || !startDate) return true; 
+        const endDateOnly = new Date(value);
+        endDateOnly.setHours(0, 0, 0, 0);
+        const startDateOnly = new Date(startDate);
+        startDateOnly.setHours(0, 0, 0, 0);
+        return endDateOnly >= startDateOnly;
+      }
+    )
+    .test(
+      "is-future-date",
+      "End date must be from tomorrow onwards",
+      function (value) {
+        if (!value) return true; 
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        const selectedDate = new Date(value);
+        selectedDate.setHours(0, 0, 0, 0);
+        return selectedDate >= tomorrow;
+      }
+    ),
+
+  startTime: Yup.string()
+    .required("Start time is required")
+    .matches(
+      /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
+      "Please select a valid start time"
+    )
+    .test(
+      "valid-start-time-range",
+      "Start time must be between 6:00 AM and 2:00 PM",
+      function (value) {
+        if (!value) return true; 
+        const [hours] = value.split(':').map(Number);
+        return hours >= 6 && hours <= 14;
+      }
+    ),
+
+  endTime: Yup.string()
+    .required("End time is required")
+    .matches(
+      /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
+      "Please select a valid end time"
+    )
+    .test(
+      "valid-end-time-range",
+      "End time must be between 2:00 PM and 10:00 PM",
+      function (value) {
+        if (!value) return true; 
+        const [hours] = value.split(':').map(Number);
+        return hours >= 14 && hours <= 22;
+      }
+    )
+    .test(
+      "end-time-after-start-time",
+      "End time must be after start time",
+      function (value) {
+        const { startTime } = this.parent;
+        if (!value || !startTime) return true;
+        
+        const [startHours, startMinutes] = startTime.split(':').map(Number);
+        const [endHours, endMinutes] = value.split(':').map(Number);
+        
+        const startTotalMinutes = startHours * 60 + startMinutes;
+        const endTotalMinutes = endHours * 60 + endMinutes;
+        
+        return endTotalMinutes > startTotalMinutes;
+      }
+    )
+    .test(
+      "minimum-duration",
+      "There must be at least 1 hour difference between start and end time",
+      function (value) {
+        const { startTime } = this.parent;
+        if (!value || !startTime) return true; 
+        
+        const [startHours, startMinutes] = startTime.split(':').map(Number);
+        const [endHours, endMinutes] = value.split(':').map(Number);
+        
+        const startTotalMinutes = startHours * 60 + startMinutes;
+        const endTotalMinutes = endHours * 60 + endMinutes;
+        
+        return (endTotalMinutes - startTotalMinutes) >= 60;
+      }
+    ),
 });

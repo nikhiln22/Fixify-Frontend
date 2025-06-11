@@ -1,11 +1,5 @@
 import { Itechnician } from "../models/technician";
-
-export interface JobDesignationResponse {
-  message: string;
-  success: boolean;
-  designation: string[];
-  status: number;
-}
+import { ITimeSlot } from "../models/timeslot";
 
 export interface SubmitTechnicianQualificationResponse {
   message: string;
@@ -27,4 +21,22 @@ export interface TechnicianProfileResponse {
   success: boolean;
   status: number;
   technician?: Itechnician;
+}
+
+export interface TimeSlotData {
+  startTime: string;
+  endTime: string;
+}
+
+export interface CreateTimeSlotsResponse {
+  success: boolean;
+  message: string;
+  data?: any; 
+}
+
+export interface GetTimeSlotResponse{
+  success:boolean;
+  message:string;
+  status:number;
+  data?:ITimeSlot[];
 }

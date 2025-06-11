@@ -45,7 +45,7 @@ export const UserService: React.FC = () => {
 
   const handleServiceClick = (service: IService) => {
     console.log("service clicked", service);
-    navigate(`/user/service-details/${service._id}`);
+    navigate(`/user/servicedetails/${service._id}`);
   };
 
   return (

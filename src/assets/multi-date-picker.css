@@ -1,0 +1,89 @@
+
+.multi-date-picker .react-calendar {
+  width: 100%;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-family: inherit;
+  line-height: 1.125em;
+}
+
+.multi-date-picker .react-calendar--selectRange .react-calendar__tile--hover {
+  background-color: #e5e7eb;
+}
+
+.multi-date-picker .react-calendar__tile {
+  max-width: 100%;
+  padding: 0.75em 0.5em;
+  background: none;
+  text-align: center;
+  line-height: 16px;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  position: relative;
+}
+
+.multi-date-picker .react-calendar__tile:enabled:hover,
+.multi-date-picker .react-calendar__tile:enabled:focus {
+  background-color: #f3f4f6;
+}
+
+.multi-date-picker .react-calendar__tile--active {
+  background: #1f2937;
+  color: white;
+}
+
+.multi-date-picker .react-calendar__tile.selected-date {
+  background: #3b82f6 !important;
+  color: white !important;
+  font-weight: 600;
+}
+
+.multi-date-picker .react-calendar__tile.selected-date:hover {
+  background: #2563eb !important;
+}
+
+.multi-date-picker .react-calendar__tile.sunday-disabled {
+  background-color: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.multi-date-picker .react-calendar__tile.sunday-disabled:hover {
+  background-color: #f9fafb !important;
+}
+
+.multi-date-picker .react-calendar__tile--disabled {
+  background-color: #f9fafb;
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.multi-date-picker .react-calendar__navigation button {
+  color: #374151;
+  min-width: 44px;
+  background: none;
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+.multi-date-picker .react-calendar__navigation button:enabled:hover,
+.multi-date-picker .react-calendar__navigation button:enabled:focus {
+  background-color: #f3f4f6;
+}
+
+.multi-date-picker .react-calendar__navigation button[disabled] {
+  background-color: #f9fafb;
+  color: #d1d5db;
+}
+
+.multi-date-picker .selected-date-indicator {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+}

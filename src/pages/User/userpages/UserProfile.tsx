@@ -159,7 +159,6 @@ export const UserProfile: React.FC = () => {
     try {
       const response = await deleteAddress(addressId);
       if (response.success) {
-        // Remove the address from local state without refetching
         setUserAddresses(prev => prev.filter(addr => addr._id !== addressId));
         
         showToast({

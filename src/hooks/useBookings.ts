@@ -1,32 +1,32 @@
 import { useCallback } from "react";
-import { getAllApplicants } from "../services/admin.services";
+import { getUserBookings } from "../services/common.services";
 import { usePaginatedList } from "./usePaginatedList";
-import { Itechnician } from "../models/technician";
+import { IBooking } from "../models/booking";
 import { useNavigate } from "react-router-dom";
 
-const useApplicants = () => {
+const useBookings = () => {
   const navigate = useNavigate();
 
   const {
-    data: applicants,
+    data: bookings,
     setData,
     currentPage,
     totalPages,
     setCurrentPage,
     loading,
     error,
-  } = usePaginatedList<Itechnician>(getAllApplicants);
+  } = usePaginatedList<IBooking>(getUserBookings);
 
   const handleViewDetails = useCallback(
-    (applicantId: string) => {
-      console.log("Viewing details for applicant:", applicantId);
-      navigate(`/admin/applicantdetailpreview/${applicantId}`);
+    (bookingId: string) => {
+      console.log("Viewing details for booking:", bookingId);
+      navigate(`/user/bookingdetails/${bookingId}`);
     },
     [navigate],
   );
 
   return {
-    applicants,
+    bookings,
     setData,
     currentPage,
     totalPages,
@@ -37,4 +37,4 @@ const useApplicants = () => {
   };
 };
 
-export default useApplicants;
+export default useBookings;

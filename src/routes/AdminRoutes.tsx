@@ -11,8 +11,10 @@ import { ApplicantDetailsPreview } from "../pages/Admin/adminpages/ApplicantsDet
 import { CategoryListPage } from "../pages/Admin/adminpages/CategoryListPage";
 import { ServiceListPage } from "../pages/Admin/adminpages/ServiceListPage";
 import { TechnicianListPage } from "../pages/Admin/adminpages/TechnicianListPage";
+import { PageNotFound } from "../components/common/PageNotFound";
 
 export const AdminRoutes: React.FC = () => {
+  const user: string = "Admin";
   return (
     <Routes>
       {/* admin public routes */}
@@ -37,6 +39,7 @@ export const AdminRoutes: React.FC = () => {
         <Route path="/admin/categories" element={<CategoryListPage />} />
         <Route path="/admin/services" element={<ServiceListPage />} />
       </Route>
+      <Route path="/admin/*" element={<PageNotFound userName={user} userRole="admin" />} />
     </Routes>
   );
 };

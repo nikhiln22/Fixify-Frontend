@@ -1,6 +1,8 @@
 import React, { ButtonHTMLAttributes } from "react";
 import { Role } from "./auth.types";
 import { IAddress } from "../models/address";
+import { ITimeSlot } from "../models/timeslot";
+import { TimeSlotData } from "./technicians.types";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -124,6 +126,7 @@ export interface AddServiceProps {
     description?: string;
     serviceImage?: File | string | null;
     categoryId?: string;
+    designationId: string;
   };
   isEditing?: boolean;
 }
@@ -198,6 +201,16 @@ export interface AddressManagerProps {
   onAddressChange: (addresses: IAddress[]) => void;
   onAddressSave: (addressData: Partial<IAddress>) => Promise<IAddress | void>;
   onAddressDelete: (addressId: string) => Promise<void>;
+}
+
+export interface TimeSlotDisplayProps {
+  timeSlots: ITimeSlot[];
+}
+
+export interface TimeSlotFormProps {
+  onSubmit: (data: TimeSlotData) => Promise<void>;
+  onCancel: () => void;
+  isLoading?: boolean;
 }
 
 export interface PrivateRouteProps {

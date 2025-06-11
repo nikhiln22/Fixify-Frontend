@@ -1,4 +1,5 @@
 import axiosInstance from "../config/axios.config";
+import { IBooking } from "../models/booking";
 import { Icategory } from "../models/category";
 import { Idesignation } from "../models/designation";
 import { IService } from "../models/service";
@@ -9,9 +10,9 @@ export const getAllDesignations = async (
   page?: number,
   search?: string,
   role: "admin" | "technician" = "admin",
-  filterStatus?: string,
+  filterStatus?: string
 ): Promise<
-  | string[]
+  | { _id: string; name: string }[]
   | {
       data: Idesignation[];
       totalPages: number;
@@ -46,10 +47,10 @@ export const getAllDesignations = async (
         response.data.data &&
         Array.isArray(response.data.data.designations)
       ) {
-        const designationNames = response.data.data.designations.map(
-          (item: any) => item.designation,
-        );
-        return designationNames;
+        return response.data.data.designations.map((item: any) => ({
+          _id: item._id,
+          name: item.designation,
+        }));
       }
 
       return [];
@@ -81,7 +82,7 @@ export const getAllCategories = async (
   page?: number,
   search?: string,
   role: "admin" | "user" = "admin",
-  filterStatus?: string,
+  filterStatus?: string
 ): Promise<{
   data: Icategory[];
   totalPages: number;
@@ -132,7 +133,7 @@ export const getAllServices = async (
   search?: string,
   categoryId?: string,
   role: "admin" | "user" = "admin",
-  filterStatus?: string,
+  filterStatus?: string
 ): Promise<{
   data: IService[];
   totalPages: number;
@@ -185,7 +186,7 @@ export const getAllServices = async (
 
 export const getTechnicianProfile = async (
   role: "admin" | "technician" = "technician",
-  technicianId?: string,
+  technicianId?: string
 ): Promise<Itechnician> => {
   try {
     console.log(`fetching technician profile for ${role}`);
@@ -193,7 +194,7 @@ export const getTechnicianProfile = async (
     let url: string;
 
     if (role === "technician") {
-      url = "/technician/profile";
+      url = "/api/technician/profile";
     } else if (role === "admin") {
       if (!technicianId) {
         throw new Error("Technician ID is required for admin access");
@@ -217,3 +218,59 @@ export const getTechnicianProfile = async (
     throw error;
   }
 };
+
+
+
+export const getUserBookings = async (
+  page?: number,
+  role: "user" | "technician" | "admin" = "user"
+): Promise<{
+  data: IBooking[];
+  totalPages: number;
+  currentPage: number;
+  total: number;
+}> => {
+  try {
+    console.log(`fetching the bookings for ${role}`);
+
+    let queryParams = "";
+    if (page !== undefined) {
+      queryParams += `page=${page}&limit=6`;
+    }
+
+    let baseUrl = "";
+    switch (role) {
+      case "user":
+        baseUrl = "/api/user/bookings";
+        break;
+      case "technician":
+        baseUrl = "/api/technician/bookings";
+        break;
+      case "admin":
+        baseUrl = "/api/admin/bookings";
+        break;
+      default:
+        baseUrl = "/api/user/bookings";
+    }
+
+    const url = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
+
+    const response = await axiosInstance.get(url);
+    console.log("bookings response:", response);
+
+    return {
+      data: response.data.data?.bookings || [],
+      totalPages: response.data.data?.pagination?.pages || 1,
+      currentPage: response.data.data?.pagination?.page || page || 1,
+      total: response.data.data?.pagination?.total || 0,
+    };
+  } catch (error) {
+    console.error(`error fetching the bookings for ${role}:`, error);
+    return {
+      data: [],
+      totalPages: 0,
+      currentPage: page || 1,
+      total: 0,
+    };
+  }
+}
