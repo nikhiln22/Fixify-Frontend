@@ -10,11 +10,14 @@ import { TechnicianResetPassword } from "../pages/Technician/auth/TechnicianRese
 import { TechnicianPortal } from "../pages/Technician/technicianpages/TechnicianPortal";
 import { TechnicianProfile } from "../pages/Technician/technicianpages/TechnicianProfile";
 import { TechnicianAvailability } from "../pages/Technician/technicianpages/TechnicianAvailability";
+import { TechnicianEarnings } from "../pages/Technician/technicianpages/TechnicianEarnings";
 import { PageNotFound } from "../components/common/PageNotFound";
 import { useAppSelector } from "../hooks/useRedux";
 
 export const TechnicianRoutes: React.FC = () => {
-  const user = useAppSelector((state)=>state.technician.technicianData?.username)
+  const user = useAppSelector(
+    (state) => state.technician.technicianData?.username
+  );
   return (
     <Routes>
       {/* Technician public routes */}
@@ -40,8 +43,12 @@ export const TechnicianRoutes: React.FC = () => {
           path="/technician/availability"
           element={<TechnicianAvailability />}
         />
+        <Route path="/technician/earnings" element={<TechnicianEarnings />} />
       </Route>
-      <Route path="/technician/*" element={<PageNotFound userName={user} userRole="technician" />}/>
+      <Route
+        path="/technician/*"
+        element={<PageNotFound userName={user} userRole="technician" />}
+      />
     </Routes>
   );
 };

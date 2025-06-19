@@ -18,6 +18,7 @@ import { UserBooking } from "../pages/User/userpages/UserBooking";
 import { UserBookingSuccess } from "../pages/User/userpages/UserBookingSuccess";
 import UserBookingsList from "../pages/User/userpages/UserBookingsList";
 import { BookingDetailsPage } from "../pages/User/userpages/UserBookingDetail";
+import { UserWallet } from "../pages/User/userpages/UserWallet";
 
 export const UserRoutes: React.FC = () => {
   const user = useAppSelector((state) => state.user.userData);
@@ -46,7 +47,11 @@ export const UserRoutes: React.FC = () => {
         <Route path="/user/booking" element={<UserBooking />} />
         <Route path="/user/bookingsuccess" element={<UserBookingSuccess />} />
         <Route path="/user/bookinglist" element={<UserBookingsList />} />
-        <Route path="/user/bookingdetails/:bookingId" element={<BookingDetailsPage />} />
+        <Route
+          path="/user/bookingdetails/:bookingId"
+          element={<BookingDetailsPage />}
+        />
+        <Route path="/user/wallet" element={<UserWallet />} />
       </Route>
 
       {/* page not found */}

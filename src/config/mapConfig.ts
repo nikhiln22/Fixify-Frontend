@@ -1,7 +1,6 @@
 export const MAP_CONFIG = {
   defaultZoom: 15,
   defaultCenter: {
-    // Default to Bengaluru coordinates
     latitude: 12.9716,
     longitude: 77.5946,
   },
@@ -9,8 +8,6 @@ export const MAP_CONFIG = {
     draggable: true,
   },
   mapOptions: {
-    // Remove the problematic attributionControl or set it correctly
-    // attributionControl can be false or an object with options
     doubleClickZoom: true,
     dragPan: true,
     dragRotate: false,

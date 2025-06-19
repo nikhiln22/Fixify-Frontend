@@ -8,7 +8,7 @@ const Banner: React.FC<BannerProps> = ({
   children,
   backgroundImage,
   backgroundColor = "#f4f4f4",
-  height = "300px",
+  height = "300px", 
 }) => {
   return (
     <div

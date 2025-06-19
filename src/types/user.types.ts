@@ -50,15 +50,18 @@ export interface CreateBookingRequest {
   serviceId: string;
   addressId: string;
   timeSlotId: string;
-  date: string;
   totalAmount: number;
-  paymentMethod: "Cash" | "online" | "Wallet";
+  paymentMethod: "Online" | "Wallet";
+  bookingStatus?: "Pending" | "Booked" | "Cancelled" | "Completed";
 }
-
 
 export interface BookServiceResponse {
   success: boolean;
   message: string;
-  data?: IBooking;
-  error?: string;
+  data?: IBooking & {
+    checkoutUrl?: string;
+    stripeCheckoutSessionId?: string;
+    requiresPayment?: boolean;
+  };
+  status?: number;
 }

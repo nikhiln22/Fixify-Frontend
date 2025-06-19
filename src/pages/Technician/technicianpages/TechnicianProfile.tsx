@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MapPin } from "lucide-react";
 import TechnicianLayout from "../../../layouts/TechnicianLayout";
 import { TechnicianProfileSidebar } from "../../../components/technician/TechnicianProfileSidebar";
-import ProfileCard from "../../../components/common/ProfileCard";
+import {ProfileCard} from "../../../components/common/ProfileCard";
 import { TechnicianAboutSection } from "../../../components/technician/AboutSection";
 import { TechnicianCertificatesSection } from "../../../components/technician/CertificateSection";
 import { getTechnicianProfile } from "../../../services/common.services";
@@ -174,7 +174,6 @@ export const TechnicianProfile: React.FC = () => {
               <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
             </div>
 
-            {/* Profile Card */}
             <ProfileCard
               name={technicianData.username}
               email={technicianData.email}
@@ -187,21 +186,18 @@ export const TechnicianProfile: React.FC = () => {
               onSave={handleProfileSave}
             />
 
-            {/* About Section */}
             <TechnicianAboutSection
               initialAbout={technicianData.About}
               onSave={handleAboutSave}
               isLoading={isLoading}
             />
 
-            {/* Certificates Section */}
             <TechnicianCertificatesSection
               certificates={technicianData.certificates}
               onCertificatesUpdate={handleCertificatesUpdate}
               isLoading={isLoading}
             />
 
-            {/* Work Location Section */}
             {technicianData.address && (
               <div className="bg-white rounded-3xl shadow-md p-8">
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">

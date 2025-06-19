@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import UserLayout from "../../../layouts/UserLayout";
 import { UserProfileSidebar } from "../../../components/user/UserProfileSidebar";
-import ProfileCard from "../../../components/common/ProfileCard";
+import { ProfileCard } from "../../../components/common/ProfileCard";
 import { AddressManager } from "../../../components/user/AddressManager";
 import { getUserProfile, editProfile } from "../../../services/user.services";
 import {
@@ -46,7 +46,7 @@ export const UserProfile: React.FC = () => {
     try {
       const addresses = await getUserAddresses();
       console.log("address fetched in the userprofile component:", addresses);
-      
+
       setUserAddresses(addresses.data || []);
     } catch (error) {
       console.error("Error fetching addresses:", error);
@@ -100,8 +100,8 @@ export const UserProfile: React.FC = () => {
 
   const handleAddressSave = async (addressData: Partial<IAddress>) => {
     try {
-      console.log('UserProfile - handleAddressSave called with:', addressData);
-      
+      console.log("UserProfile - handleAddressSave called with:", addressData);
+
       const dataToSend = {
         addressType: addressData.addressType || "Home",
         fullAddress: addressData.fullAddress || "",
@@ -111,19 +111,19 @@ export const UserProfile: React.FC = () => {
         landmark: addressData.landmark,
       };
 
-      console.log('Data being sent to API:', dataToSend);
+      console.log("Data being sent to API:", dataToSend);
 
       if (addressData._id) {
         const response = await updateAddress(addressData._id, dataToSend);
         if (response.success) {
-          setUserAddresses(prev => 
-            prev.map(addr => 
-              addr._id === addressData._id 
-                ? { ...addr, ...response.data } as IAddress
+          setUserAddresses((prev) =>
+            prev.map((addr) =>
+              addr._id === addressData._id
+                ? ({ ...addr, ...response.data } as IAddress)
                 : addr
             )
           );
-          
+
           showToast({
             message: "Address updated successfully",
             type: "success",
@@ -135,9 +135,9 @@ export const UserProfile: React.FC = () => {
         const response = await addAddress(dataToSend);
         if (response.success) {
           if (response.data) {
-            setUserAddresses(prev => [...prev, response.data as IAddress]);
+            setUserAddresses((prev) => [...prev, response.data as IAddress]);
           }
-          
+
           showToast({
             message: "Address added successfully",
             type: "success",
@@ -159,8 +159,10 @@ export const UserProfile: React.FC = () => {
     try {
       const response = await deleteAddress(addressId);
       if (response.success) {
-        setUserAddresses(prev => prev.filter(addr => addr._id !== addressId));
-        
+        setUserAddresses((prev) =>
+          prev.filter((addr) => addr._id !== addressId)
+        );
+
         showToast({
           message: "Address deleted successfully",
           type: "success",

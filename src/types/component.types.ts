@@ -203,6 +203,12 @@ export interface AddressManagerProps {
   onAddressDelete: (addressId: string) => Promise<void>;
 }
 
+export interface AddMoneyFormProps {
+  onCancel: () => void;
+  onSubmit: (amount: number) => void;
+  isLoading?: boolean;
+}
+
 export interface TimeSlotDisplayProps {
   timeSlots: ITimeSlot[];
 }
@@ -211,6 +217,44 @@ export interface TimeSlotFormProps {
   onSubmit: (data: TimeSlotData) => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
+}
+
+type PaymentMethod = "Online" | "Wallet";
+
+export interface PaymentOption {
+  id: PaymentMethod;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+}
+
+export interface PaymentMethodSelectorProps {
+  selectedPaymentMethod: PaymentMethod | null;
+  onPaymentMethodSelect: (method: PaymentMethod) => void;
+  disabled?: boolean;
+  className?: string;
+}
+
+export interface BookingSummaryProps {
+  service: {
+    image?: string;
+    name?: string;
+    designation?: string;
+    description?: string;
+    price?: string | number;
+  };
+  onConfirmBooking: () => void;
+  isLoading?: boolean;
+  disabled?: boolean;
+  selectedPaymentMethod?: PaymentMethod | null;
+}
+
+export interface WalletBalanceProps {
+  balance: number;
+  loading?: boolean;
+  error?: string | null;
+  onAddMoney?: (amount: number) => void;
+  showAddMoney?: boolean;
 }
 
 export interface PrivateRouteProps {

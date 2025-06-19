@@ -74,7 +74,6 @@ const Card: React.FC<CardProps> = ({
           </div>
         )}
 
-        {/* Price for services */}
         {type === "service" && price !== undefined && (
           <div className="flex items-center justify-between mt-2">
             <p className="font-medium text-gray-900">

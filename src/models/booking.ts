@@ -1,4 +1,3 @@
-
 export interface IBooking {
   _id: string;
   userId: string;
@@ -6,12 +5,9 @@ export interface IBooking {
   serviceId: string;
   addressId: string;
   timeSlotId: string;
-  date: string;
   totalAmount: number;
-  paymentMethod: "Cash" | "online" | "Wallet";
-  bookingStatus: "Pending" | "cancelled" | "completed";
-  paymentStatus: "Pending" | "success" | "Failed";
-  completed: boolean;
+  bookingStatus: "Pending" | "Booked" | "Cancelled" | "Completed";
+  paymentStatus?: "Paid" | "Refunded"
   createdAt: Date;
   updatedAt: Date;
 }

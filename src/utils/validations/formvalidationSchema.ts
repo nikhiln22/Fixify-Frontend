@@ -33,7 +33,7 @@ export const addDesignationSchema = Yup.object().shape({
     .max(50, "Designation must not exceed 50 characters")
     .matches(
       /^[a-zA-Z0-9\s-]+$/,
-      "Designation can only contain letters, numbers, spaces, and hyphens",
+      "Designation can only contain letters, numbers, spaces, and hyphens"
     ),
 });
 
@@ -45,7 +45,7 @@ export const addCategorySchema = Yup.object().shape({
     .max(50, "Category name must not exceed 50 characters")
     .matches(
       /^[a-zA-Z0-9\s-]+$/,
-      "Category name can only contain letters, numbers, spaces, and hyphens",
+      "Category name can only contain letters, numbers, spaces, and hyphens"
     ),
   categoryImage: Yup.mixed()
     .required("Category image is required")
@@ -58,7 +58,7 @@ export const addCategorySchema = Yup.object().shape({
       return (
         value instanceof File &&
         ["image/jpeg", "image/png", "image/jpg", "application/pdf"].includes(
-          value.type,
+          value.type
         )
       );
     }),
@@ -72,7 +72,7 @@ export const addServiceSchema = Yup.object().shape({
     .max(50, "Service name must not exceed 50 characters")
     .matches(
       /^[a-zA-Z0-9\s-]+$/,
-      "Service name can only contain letters, numbers, spaces, and hyphens",
+      "Service name can only contain letters, numbers, spaces, and hyphens"
     ),
 
   servicePrice: Yup.number()
@@ -82,7 +82,7 @@ export const addServiceSchema = Yup.object().shape({
     .test(
       "maxDigits",
       "Price cannot exceed 6 digits",
-      (value) => !value || String(value).replace(/[.-]/g, "").length <= 6,
+      (value) => !value || String(value).replace(/[.-]/g, "").length <= 6
     ),
 
   description: Yup.string()
@@ -105,124 +105,100 @@ export const addServiceSchema = Yup.object().shape({
       return (
         value instanceof File &&
         ["image/jpeg", "image/png", "image/jpg", "application/pdf"].includes(
-          value.type,
+          value.type
         )
       );
     }),
 });
 
 
-export const timeSlotFormSchema = Yup.object().shape({
-  startDate: Yup.date()
-    .required("Start date is required")
-    .nullable()
-    .typeError("Please select a valid start date")
+export const addMoneySchema = Yup.object().shape({
+  amount: Yup.string()
+    .required("Amount is required")
+    .test("is-number", "Please enter a valid amount", (value) => {
+      if (!value) return false;
+      const numValue = parseFloat(value);
+      return !isNaN(numValue) && isFinite(numValue);
+    })
+    .test("min-amount", "Minimum amount is ₹100", (value) => {
+      if (!value) return false;
+      const numValue = parseFloat(value);
+      return numValue >= 100;
+    })
+    .test("max-amount", "Maximum amount is ₹1,000", (value) => {
+      if (!value) return false;
+      const numValue = parseFloat(value);
+      return numValue <= 100000;
+    })
     .test(
-      "is-future-date",
-      "Start date must be from tomorrow onwards",
-      function (value) {
-        if (!value) return true; 
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(0, 0, 0, 0);
-        const selectedDate = new Date(value);
-        selectedDate.setHours(0, 0, 0, 0);
-        return selectedDate >= tomorrow;
+      "decimal-places",
+      "Amount can have maximum 2 decimal places",
+      (value) => {
+        if (!value) return false;
+        const decimalPlaces = (value.split(".")[1] || "").length;
+        return decimalPlaces <= 2;
       }
     ),
+});
 
-  endDate: Yup.date()
-    .required("End date is required")
-    .nullable()
-    .typeError("Please select a valid end date")
-    .test(
-      "is-after-start-date",
-      "End date must be same as or after start date",
-      function (value) {
-        const { startDate } = this.parent;
-        if (!value || !startDate) return true; 
-        const endDateOnly = new Date(value);
-        endDateOnly.setHours(0, 0, 0, 0);
-        const startDateOnly = new Date(startDate);
-        startDateOnly.setHours(0, 0, 0, 0);
-        return endDateOnly >= startDateOnly;
-      }
-    )
-    .test(
-      "is-future-date",
-      "End date must be from tomorrow onwards",
-      function (value) {
-        if (!value) return true; 
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(0, 0, 0, 0);
-        const selectedDate = new Date(value);
-        selectedDate.setHours(0, 0, 0, 0);
-        return selectedDate >= tomorrow;
-      }
-    ),
 
-  startTime: Yup.string()
-    .required("Start time is required")
+export const profileCardSchema = Yup.object().shape({
+  name: Yup.string()
+    .trim()
+    .required("Name is required")
+    .min(2, "Name must be at least 2 characters")
+    .max(50, "Name must not exceed 50 characters")
     .matches(
-      /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
-      "Please select a valid start time"
-    )
-    .test(
-      "valid-start-time-range",
-      "Start time must be between 6:00 AM and 2:00 PM",
-      function (value) {
-        if (!value) return true; 
-        const [hours] = value.split(':').map(Number);
-        return hours >= 6 && hours <= 14;
-      }
+      /^[a-zA-Z\s]+$/,
+      "Name can only contain letters and spaces"
     ),
 
-  endTime: Yup.string()
-    .required("End time is required")
+  phone: Yup.string()
+    .required("Phone number is required")
     .matches(
-      /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
-      "Please select a valid end time"
-    )
-    .test(
-      "valid-end-time-range",
-      "End time must be between 2:00 PM and 10:00 PM",
-      function (value) {
-        if (!value) return true; 
-        const [hours] = value.split(':').map(Number);
-        return hours >= 14 && hours <= 22;
-      }
-    )
-    .test(
-      "end-time-after-start-time",
-      "End time must be after start time",
-      function (value) {
-        const { startTime } = this.parent;
-        if (!value || !startTime) return true;
-        
-        const [startHours, startMinutes] = startTime.split(':').map(Number);
-        const [endHours, endMinutes] = value.split(':').map(Number);
-        
-        const startTotalMinutes = startHours * 60 + startMinutes;
-        const endTotalMinutes = endHours * 60 + endMinutes;
-        
-        return endTotalMinutes > startTotalMinutes;
-      }
-    )
-    .test(
-      "minimum-duration",
-      "There must be at least 1 hour difference between start and end time",
-      function (value) {
-        const { startTime } = this.parent;
-        if (!value || !startTime) return true; 
-        
-        const [startHours, startMinutes] = startTime.split(':').map(Number);
-        const [endHours, endMinutes] = value.split(':').map(Number);
-        
-        const startTotalMinutes = startHours * 60 + startMinutes;
-        const endTotalMinutes = endHours * 60 + endMinutes;
-        
-        return (endTotalMinutes - startTotalMinutes) >= 60;
-      }
+      /^[0-9]{10}$/,
+      "Phone number must be exactly 10 digits"
     ),
+
+  Designation: Yup.string().when("$role", {
+    is: "technician",
+    then: (schema) =>
+      schema
+        .trim()
+        .required("Designation is required")
+        .min(2, "Designation must be at least 2 characters")
+        .max(50, "Designation must not exceed 50 characters")
+        .matches(
+          /^[a-zA-Z0-9\s-]+$/,
+          "Designation can only contain letters, numbers, spaces, and hyphens"
+        ),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+
+  yearsOfExperience: Yup.number().when("$role", {
+    is: "technician",
+    then: (schema) =>
+      schema
+        .required("Years of experience is required")
+        .typeError("Experience must be a number")
+        .integer("Experience must be a whole number")
+        .min(0, "Experience cannot be negative")
+        .max(50, "Experience cannot exceed 50 years"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+
+
+  image: Yup.mixed()
+    .nullable()
+    .test("fileSize", "File too large, max size is 5MB", (value) => {
+      if (!value || typeof value === "string") return true;
+      return value instanceof File && value.size <= 5 * 1024 * 1024;
+    })
+    .test("fileType", "Unsupported file format", (value) => {
+      if (!value || typeof value === "string") return true;
+      return (
+        value instanceof File &&
+        ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
+      );
+    }),
 });
