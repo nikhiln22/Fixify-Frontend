@@ -220,6 +220,7 @@ export const toggleCategoryStatus = async (categoryId: string) => {
     const response = await axiosInstance.patch(
       `/api/admin/blockcategory/${categoryId}`,
     );
+    
     return response.data;
   } catch (error) {
     console.error("Error toggling category status:", error);

@@ -5,6 +5,8 @@ import { Idesignation } from "../models/designation";
 import { IService } from "../models/service";
 import { Itechnician } from "../models/technician";
 import { TechnicianProfileResponse } from "../types/technicians.types";
+import { BookServiceResponse } from "../types/user.types";
+import { Role } from "../types/auth.types";
 
 export const getAllDesignations = async (
   page?: number,
@@ -219,11 +221,11 @@ export const getTechnicianProfile = async (
   }
 };
 
-
-
-export const getUserBookings = async (
+export const getBookings = async (
   page?: number,
-  role: "user" | "technician" | "admin" = "user"
+  role: "user" | "technician" | "admin" = "user",
+  search?: string,
+  filter?: string
 ): Promise<{
   data: IBooking[];
   totalPages: number;
@@ -236,6 +238,14 @@ export const getUserBookings = async (
     let queryParams = "";
     if (page !== undefined) {
       queryParams += `page=${page}&limit=6`;
+    }
+
+    if (search && search.trim() !== "") {
+      queryParams += `&search=${encodeURIComponent(search)}`;
+    }
+
+    if (filter && filter.trim() !== "") {
+      queryParams += `&filter=${encodeURIComponent(filter)}`;
     }
 
     let baseUrl = "";
@@ -273,4 +283,19 @@ export const getUserBookings = async (
       total: 0,
     };
   }
-}
+};
+
+export const bookingDetails = async (
+  bookingId: string,
+  role: Role
+): Promise<BookServiceResponse> => {
+  try {
+    const response = await axiosInstance.get(
+      `/api/${role.toLowerCase()}/bookingDetails/${bookingId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occured while booking the service by the user:", error);
+    throw error;
+  }
+};

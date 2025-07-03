@@ -12,6 +12,17 @@ export const getWalletTransactionsColumns =
       ),
     },
     {
+      key: "referenceId",
+      label: "Reference ID",
+      render: (item) => (
+        <div className="text-center font-mono text-sm">
+          {item.referenceId
+            ? `#${item.referenceId.slice(-8).toUpperCase()}`
+            : "—"}
+        </div>
+      ),
+    },
+    {
       key: "createdAt",
       label: "Date & Time",
       render: (item) => (
@@ -44,14 +55,5 @@ export const getWalletTransactionsColumns =
       key: "description",
       label: "Description",
       render: (item) => <div className="text-center">{item.description}</div>,
-    },
-    {
-      key: "referenceId",
-      label: "Reference ID",
-      render: (item) => (
-        <div className="text-center font-mono text-sm">
-          {item.referenceId ? `#${item.referenceId.slice(-8).toUpperCase()}` : "—"}
-        </div>
-      ),
     },
   ];

@@ -74,12 +74,15 @@ export const UserWallet: React.FC = () => {
               message: "Money added to wallet successfully",
               type: "success",
             });
-            setBalance(res.data.balance);
+            setBalance(res.data.wallet.balance);
             if (res.data.transaction) {
-              setTransactions((prevTransactions) => [
-                res.data.transaction,
-                ...prevTransactions,
-              ]);
+              setTransactions((prevTransactions) => {
+                const newTransactions = [
+                  res.data.transaction,
+                  ...prevTransactions,
+                ];
+                return newTransactions.slice(0, itemsPerPage);
+              });
             }
           } else {
             console.error("Verification failed:", res);
@@ -128,17 +131,19 @@ export const UserWallet: React.FC = () => {
 
   return (
     <UserLayout>
-      <div className="flex min-h-screen bg-gray-50">
-        <div className="w-64 flex-shrink-0 p-12 pl-42">
-          <UserProfileSidebar />
-        </div>
-
+      <div className="flex h-full">
+        <UserProfileSidebar />
         <div className="flex-1 p-8">
-          <div className="max-w-5xl mx-auto space-y-8">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-3xl font-bold text-gray-900">Wallet</h1>
-            </div>
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Wallet
+            </h1>
+            <p className="text-gray-600">
+              Manage your wallet balance and view transaction history
+            </p>
+          </div>
 
+          <div className="space-y-8">
             <WalletBalance
               balance={balance}
               loading={isVerifying || isLoadingBalance}
@@ -150,23 +155,49 @@ export const UserWallet: React.FC = () => {
                 Recent Wallet Transactions
               </h3>
 
-              <div className="overflow-hidden">
-                <div className="w-full" style={{ overflowX: "hidden" }}>
+              {transactionsLoading ? (
+                <div className="bg-white rounded-lg shadow">
                   <Table
-                    data={transactions || []}
+                    data={[]}
                     columns={columns}
                     currentPage={currentPage}
                     loading={transactionsLoading}
                     pageSize={itemsPerPage}
                   />
                 </div>
-              </div>
+              ) : transactions && transactions.length > 0 ? (
+                <>
+                  <div className="bg-white rounded-lg shadow">
+                    <Table
+                      data={transactions}
+                      columns={columns}
+                      currentPage={currentPage}
+                      loading={transactionsLoading}
+                      pageSize={itemsPerPage}
+                    />
+                  </div>
 
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                  />
+                </>
+              ) : (
+                <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
+                      <span className="text-gray-400 text-2xl">₹</span>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      No transactions yet
+                    </h3>
+                    <p className="text-gray-500">
+                      Your wallet transactions will appear here
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

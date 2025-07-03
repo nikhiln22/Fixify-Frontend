@@ -178,20 +178,6 @@ export const verifyPaymentSession = async (sessionId: string) => {
   }
 };
 
-export const bookingDetails = async (
-  bookingId: string
-): Promise<BookServiceResponse> => {
-  try {
-    const response = await axiosInstance.get(
-      `/api/user/bookingDetails/${bookingId}`
-    );
-    return response.data;
-  } catch (error) {
-    console.log("error occured while booking the service by the user:", error);
-    throw error;
-  }
-};
-
 export const addMoney = async (amount: number) => {
   try {
     const response = await axiosInstance.post("/api/user/addmoney", { amount });
@@ -255,5 +241,42 @@ export const getWalletTransactions = async (
       currentPage: page || 1,
       total: 0,
     };
+  }
+};
+
+export const cancelBooking = async (
+  bookingId: string,
+  cancellationReason: string
+) => {
+  try {
+    const response = await axiosInstance.put(
+      `/api/user/cancelbooking/${bookingId}`,
+      {
+        cancellationReason,
+      }
+    );
+
+    console.log("Cancel booking response:", response);
+    return response.data;
+  } catch (error) {
+    console.error("Error cancelling booking:", error);
+    throw error;
+  }
+};
+
+export const rateService = async (
+  bookingId: string,
+  rating: number,
+  review: string
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/api/user/rateservice/${bookingId}`,
+      { rating, review }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occured while rating the service");
+    throw error;
   }
 };

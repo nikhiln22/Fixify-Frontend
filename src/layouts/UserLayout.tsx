@@ -4,7 +4,7 @@ import { UserFooter } from "../components/user/UserFooter";
 
 const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <UserNavbar />
       <main className="flex-grow">{children}</main>
       <UserFooter />

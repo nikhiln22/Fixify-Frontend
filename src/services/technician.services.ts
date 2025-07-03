@@ -1,4 +1,5 @@
 import axiosInstance from "../config/axios.config";
+import { IWalletTransaction } from "../models/walletTransaction";
 import {
   CreateTimeSlotsResponse,
   GetTimeSlotResponse,
@@ -78,5 +79,89 @@ export const blockTimeSlot = async (slotId: string) => {
       error
     );
     throw error;
+  }
+};
+
+export const generateCompletionOtp = async (bookingId: string) => {
+  try {
+    const response = await axiosInstance.post(
+      `/api/technician/generatecompletionotp/${bookingId}`
+    );
+    return response;
+  } catch (error) {
+    console.log("error occured while genertaing the completion otp:", error);
+    throw error;
+  }
+};
+
+export const verifyCompletionOtp = async (bookingId: string, otp: string) => {
+  try {
+    const response = await axiosInstance.post(
+      `/api/technician/verifycompletionotp/${bookingId}`,
+      { otp }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occured while veryfying the completion otp:", error);
+    throw error;
+  }
+};
+
+export const walletBalance = async () => {
+  try {
+    const response = await axiosInstance.get("/api/technician/walletbalance");
+    console.log("response in the wallet balance checking api", response);
+    return response.data;
+  } catch (error) {
+    console.log("error occured while fetching the user balance:", error);
+    throw error;
+  }
+};
+
+export const getWalletTransactions = async (
+  page?: number
+): Promise<{
+  data: IWalletTransaction[];
+  totalPages: number;
+  currentPage: number;
+  total: number;
+}> => {
+  try {
+    const url = `/api/technician/wallettransactions?page=${page}&limit=6`;
+    const response = await axiosInstance.get(url);
+    console.log("response in the fetching wallet transactions api:", response);
+    return {
+      data: response.data.data?.transactions || [],
+      totalPages: response.data.data?.pagination?.pages || 1,
+      currentPage: response.data.data?.pagination?.page || page,
+      total: response.data.data?.pagination?.total || 0,
+    };
+  } catch (error) {
+    console.error("Error fetching the wallet transactions:", error);
+    return {
+      data: [],
+      totalPages: 0,
+      currentPage: page || 1,
+      total: 0,
+    };
+  }
+};
+
+export const cancelBooking = async (
+  bookingId: string,
+  cancellationReason: string
+) => {
+  try {
+    const response = await axiosInstance.put(
+      `/api/technician/cancelbooking/${bookingId}`,
+      {
+        cancellationReason,
+      }
+    );
+
+    console.log("Cancel booking response:", response);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error cancelling booking:", error);
   }
 };

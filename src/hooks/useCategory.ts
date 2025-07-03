@@ -1,8 +1,6 @@
 import { useState } from "react";
-import {
-  getAllCategories,
-  toggleCategoryStatus,
-} from "../services/admin.services";
+import { toggleCategoryStatus } from "../services/admin.services";
+import { getAllCategories } from "../services/common.services";
 import { usePaginatedList } from "./usePaginatedList";
 import { Icategory } from "../models/category";
 
@@ -18,7 +16,7 @@ const useCategories = () => {
   } = usePaginatedList<Icategory>(getAllCategories);
 
   const [statusUpdateLoading, setStatusUpdateLoading] = useState<string | null>(
-    null,
+    null
   );
 
   const handleStatusToggle = async (categoryId: string) => {
@@ -30,8 +28,8 @@ const useCategories = () => {
           prevCategories.map((category) =>
             category._id === categoryId
               ? result.data || { ...category, status: !category.status }
-              : category,
-          ),
+              : category
+          )
         );
       }
     } catch (error) {

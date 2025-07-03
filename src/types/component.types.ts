@@ -36,6 +36,7 @@ export interface ModalProps {
   confirmButtonColor?: "red" | "green" | "blue";
   fullContent?: boolean;
   className?: string;
+  disabled?: boolean;
 }
 
 export interface OTPInputProps {

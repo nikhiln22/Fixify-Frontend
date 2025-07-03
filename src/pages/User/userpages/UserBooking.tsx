@@ -92,7 +92,7 @@ export const UserBooking: React.FC = () => {
         serviceId: service._id,
         addressId: address._id,
         timeSlotId: selectedSlot._id,
-        totalAmount: service.price,
+        bookingAmount: service.price,
         paymentMethod: selectedPaymentMethod,
       };
 

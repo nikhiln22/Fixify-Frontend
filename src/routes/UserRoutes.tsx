@@ -16,7 +16,7 @@ import { PageNotFound } from "../components/common/PageNotFound";
 import { useAppSelector } from "../hooks/useRedux";
 import { UserBooking } from "../pages/User/userpages/UserBooking";
 import { UserBookingSuccess } from "../pages/User/userpages/UserBookingSuccess";
-import UserBookingsList from "../pages/User/userpages/UserBookingsList";
+import { UserBookingsList } from "../pages/User/userpages/UserBookingsList";
 import { BookingDetailsPage } from "../pages/User/userpages/UserBookingDetail";
 import { UserWallet } from "../pages/User/userpages/UserWallet";
 

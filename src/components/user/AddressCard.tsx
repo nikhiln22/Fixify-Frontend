@@ -82,11 +82,19 @@ export const AddressCard: React.FC<AddressCardProps> = ({
 
         <p className="text-gray-600 leading-relaxed">{address.fullAddress}</p>
 
-        {address.houseNumber && (
-          <p className="text-sm text-gray-500 mt-1">
-            House/Flat: {address.houseNumber}
-          </p>
-        )}
+        <div className="mt-1 space-y-1">
+          {address.houseNumber && (
+            <p className="text-sm text-gray-500">
+              House/Flat: {address.houseNumber}
+            </p>
+          )}
+
+          {address.landmark && (
+            <p className="text-sm text-gray-500">
+              Landmark: {address.landmark}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

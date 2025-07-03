@@ -61,7 +61,7 @@ export const TechnicianAvailability: React.FC = () => {
   };
 
   const handleBlockSlot = (slotId: string, currentStatus: boolean) => {
-    const slot = timeSlots.find(s => s._id === slotId);
+    const slot = timeSlots.find((s) => s._id === slotId);
     if (slot) {
       setSelectedSlotForBlock({
         id: slotId,
@@ -78,17 +78,19 @@ export const TechnicianAvailability: React.FC = () => {
     setIsBlockingSlot(true);
     try {
       const response = await blockTimeSlot(selectedSlotForBlock.id);
-      
+
       if (response.success) {
-        setTimeSlots(prevSlots => 
-          prevSlots.map(slot => 
-            slot._id === selectedSlotForBlock.id 
+        setTimeSlots((prevSlots) =>
+          prevSlots.map((slot) =>
+            slot._id === selectedSlotForBlock.id
               ? { ...slot, isAvailable: !selectedSlotForBlock.currentStatus }
               : slot
           )
         );
 
-        const action = selectedSlotForBlock.currentStatus ? "blocked" : "unblocked";
+        const action = selectedSlotForBlock.currentStatus
+          ? "blocked"
+          : "unblocked";
         showToast({
           message: `Time slot ${action} successfully!`,
           type: "success",
@@ -124,8 +126,8 @@ export const TechnicianAvailability: React.FC = () => {
 
   const createLocalDateString = (date: Date): string => {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${day}-${month}-${year}`;
   };
 
@@ -144,14 +146,14 @@ export const TechnicianAvailability: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const formattedSlots = dateTimeSlots.map(slot => ({
+      const formattedSlots = dateTimeSlots.map((slot) => ({
         date: createLocalDateString(slot.date),
         startTime: slot.startTime,
-        endTime: slot.endTime
+        endTime: slot.endTime,
       }));
 
       console.log("Data being sent to backend:", {
-        dateTimeSlots: formattedSlots
+        dateTimeSlots: formattedSlots,
       });
 
       const timeSlotData: TimeSlotData = {
@@ -203,13 +205,10 @@ export const TechnicianAvailability: React.FC = () => {
 
   return (
     <TechnicianLayout>
-      <div className="flex min-h-screen bg-gray-50">
-        <div className="w-64 flex-shrink-0 p-6">
-          <TechnicianProfileSidebar />
-        </div>
-
-        <div className="flex-1 p-8">
-          <div className="max-w-5xl mx-auto space-y-8">
+      <div className="flex h-full">
+        <TechnicianProfileSidebar />
+        <div className="flex-1 p-6">
+          <div className="space-y-8">
             <div className="flex justify-between items-center">
               <h1 className="text-3xl font-bold text-gray-900">
                 Availability & Schedule
@@ -264,8 +263,8 @@ export const TechnicianAvailability: React.FC = () => {
                       </button>
                     </div>
 
-                    <TimeSlotDisplay 
-                      timeSlots={timeSlots} 
+                    <TimeSlotDisplay
+                      timeSlots={timeSlots}
                       onBlockSlot={handleBlockSlot}
                     />
                   </>
@@ -313,19 +312,30 @@ export const TechnicianAvailability: React.FC = () => {
       <Modal
         isOpen={showBlockModal}
         onClose={() => setShowBlockModal(false)}
-        title={selectedSlotForBlock?.currentStatus ? "Block Time Slot" : "Unblock Time Slot"}
-        confirmText={isBlockingSlot ? "Processing..." : (selectedSlotForBlock?.currentStatus ? "Block Slot" : "Unblock Slot")}
+        title={
+          selectedSlotForBlock?.currentStatus
+            ? "Block Time Slot"
+            : "Unblock Time Slot"
+        }
+        confirmText={
+          isBlockingSlot
+            ? "Processing..."
+            : selectedSlotForBlock?.currentStatus
+              ? "Block Slot"
+              : "Unblock Slot"
+        }
         cancelText="Cancel"
         onConfirm={confirmBlockSlot}
-        confirmButtonColor={selectedSlotForBlock?.currentStatus ? "red" : "green"}
+        confirmButtonColor={
+          selectedSlotForBlock?.currentStatus ? "red" : "green"
+        }
       >
         <p>
           Are you sure you want to{" "}
           <strong>
             {selectedSlotForBlock?.currentStatus ? "block" : "unblock"}
           </strong>{" "}
-          the time slot{" "}
-          <strong>{selectedSlotForBlock?.timeRange}</strong>?
+          the time slot <strong>{selectedSlotForBlock?.timeRange}</strong>?
         </p>
         {selectedSlotForBlock?.currentStatus ? (
           <p className="mt-2 text-sm text-gray-600">

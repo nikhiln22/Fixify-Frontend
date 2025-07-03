@@ -101,7 +101,7 @@ export const WalletBalance: React.FC<WalletBalanceProps> = ({
           <AddMoneyForm
             onSubmit={handleAddMoneySubmit}
             onCancel={handleModalClose}
-            loading={isProcessing}
+            isLoading={isProcessing}
           />
         </Modal>
       )}

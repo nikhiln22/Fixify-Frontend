@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { User, Calendar, Wallet, Settings, HelpCircle } from "lucide-react";
+import { User, Settings, Calendar, Wallet, HelpCircle } from "lucide-react";
 
 export const UserProfileSidebar: React.FC = () => {
   const location = useLocation();
@@ -52,8 +52,8 @@ export const UserProfileSidebar: React.FC = () => {
                   to={item.path}
                   className={`w-full flex items-center gap-3 py-3 px-4 rounded transition-colors ${
                     isActive
-                      ? "bg-white text-gray-800 shadow-sm font-medium"
-                      : "text-gray-700 hover:bg-white hover:shadow-sm"
+                      ? "bg-gray-50 text-gray-800 shadow-sm font-medium"
+                      : "text-gray-700 hover:bg-gray-50 hover:shadow-sm"
                   }`}
                 >
                   <Icon size={20} />

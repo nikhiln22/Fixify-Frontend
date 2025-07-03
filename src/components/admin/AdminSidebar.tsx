@@ -8,6 +8,7 @@ import {
   Briefcase,
   Grid3x3,
   Wrench,
+  ClipboardList,
 } from "lucide-react";
 
 const AdminSidebar: React.FC = () => {
@@ -118,6 +119,21 @@ const AdminSidebar: React.FC = () => {
             >
               <Wrench size={20} />
               <span>Services</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/admin/bookings"
+              className={({ isActive }) =>
+                `flex items-center gap-3 py-3 px-4 rounded transition-colors ${
+                  isActive
+                    ? "bg-white text-gray-800 shadow-sm font-medium"
+                    : "text-gray-700 hover:bg-white hover:shadow-sm"
+                }`
+              }
+            >
+              <ClipboardList size={20} />
+              <span>Bookings</span>
             </NavLink>
           </li>
         </ul>

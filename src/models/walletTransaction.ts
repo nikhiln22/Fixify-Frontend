@@ -1,7 +1,8 @@
 export interface IWalletTransaction {
   _id: string;
-  userId: string;
+  ownerId: string;
   walletId: string;
+  ownerType: "user" | "technician";
   type: "Credit" | "Debit";
   description: string;
   amount: number;

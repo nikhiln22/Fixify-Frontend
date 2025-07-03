@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import UserLayout from "../../../layouts/UserLayout";
-import { UserProfileSidebar } from "../../../components/user/UserProfileSidebar";
+import { TechnicianProfileSidebar } from "../../../components/technician/TechnicianProfileSidebar";
+import TechnicianLayout from "../../../layouts/TechnicianLayout";
 import Button from "../../../components/common/Button";
+import { AddressCard } from "../../../components/user/AddressCard";
+import { ScheduleInfoCard } from "../../../components/common/ScheduledInfoCard";
+import { ServiceDetailsCard } from "../../../components/common/ServiceDetailsCard";
+import { BookingStatusCard } from "../../../components/common/BookingStatusCard";
+import { CustomerInfoCard } from "../../../components/technician/CustomerInfoCard";
+import { BookingHeader } from "../../../components/common/BookingHeader";
 import { bookingDetails } from "../../../services/common.services";
 import { showToast } from "../../../utils/toast";
 import { IBooking } from "../../../models/booking";
-import { BookingHeader } from "../../../components/common/BookingHeader";
-import { BookingStatusCard } from "../../../components/common/BookingStatusCard";
-import { ServiceDetailsCard } from "../../../components/common/ServiceDetailsCard";
-import TechnicianCard from "../../../components/user/TechncianCard";
-import { AddressCard } from "../../../components/user/AddressCard";
-import { ScheduleInfoCard } from "../../../components/common/ScheduledInfoCard";
-import { CancellationCard } from "../../../components/common/CancellationCard"; // Add this import
+import { CancellationCard } from "../../../components/common/CancellationCard";
 
-export const BookingDetailsPage: React.FC = () => {
+export const TechnicianBookingDetail: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<IBooking | null>(null);
@@ -30,7 +30,7 @@ export const BookingDetailsPage: React.FC = () => {
   const fetchBookingDetails = async () => {
     try {
       setLoading(true);
-      const response = await bookingDetails(bookingId!, 'USER');
+      const response = await bookingDetails(bookingId!, "TECHNICIAN");
 
       if (response.success) {
         setBooking(response.data);
@@ -54,15 +54,15 @@ export const BookingDetailsPage: React.FC = () => {
   };
 
   const handleBackClick = () => {
-    navigate("/user/bookinglist");
+    navigate("/technician/jobs");
   };
 
   if (loading) {
     return (
-      <UserLayout>
+      <TechnicianLayout>
         <div className="flex h-full">
-          <UserProfileSidebar />
-          <div className="flex-1 p-8">
+          <TechnicianProfileSidebar />
+          <div className="flex-1 p-6">
             <div className="animate-pulse">
               <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
               <div className="space-y-6">
@@ -73,16 +73,16 @@ export const BookingDetailsPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </UserLayout>
+      </TechnicianLayout>
     );
   }
 
   if (error || !booking) {
     return (
-      <UserLayout>
+      <TechnicianLayout>
         <div className="flex h-full">
-          <UserProfileSidebar />
-          <div className="flex-1 p-8">
+          <TechnicianProfileSidebar />
+          <div className="flex-1 p-6">
             <div className="text-center py-12">
               <h1 className="text-2xl font-bold text-gray-900 mb-4">
                 {error || "Booking not found"}
@@ -93,35 +93,31 @@ export const BookingDetailsPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </UserLayout>
+      </TechnicianLayout>
     );
   }
 
-  const technicianData = booking.technicianId
+  const customerData = booking.userId
     ? {
-        id: booking.technicianId._id || "",
-        name: booking.technicianId.username || "N/A",
-        experience: Number(booking.technicianId.yearsOfExperience) || 0,
-        designation: booking.technicianId.Designation?.designation || "Not specified",
-        profileImage: booking.technicianId.image || "/default-avatar.png",
-        verified: booking.technicianId.is_verified || false,
+        name: booking.userId.username || "N/A",
+        phone: booking.userId.phone || "N/A",
+        email: booking.userId.email || "N/A",
       }
     : null;
 
   return (
-    <UserLayout>
+    <TechnicianLayout>
       <div className="flex h-full">
-        <UserProfileSidebar />
-        <div className="flex-1 p-8">
+        <TechnicianProfileSidebar />
+        <div className="flex-1 p-6">
           <div className="space-y-6">
             <BookingHeader onBackClick={handleBackClick} />
 
             <BookingStatusCard
               bookingDate={booking.createdAt}
-              paymentMethod={booking.paymentId?.paymentMethod}
               status={booking.bookingStatus}
               bookingId={booking._id}
-              paymentStatus={booking.paymentId.paymentStatus}
+              userType="technician"
             />
 
             {booking.bookingStatus === "Cancelled" && (
@@ -129,9 +125,6 @@ export const BookingDetailsPage: React.FC = () => {
                 bookingStatus={booking.bookingStatus}
                 cancellationDate={booking.cancellationDate}
                 cancellationReason={booking.cancellationReason}
-                refundStatus={booking.paymentId?.refundStatus}
-                refundDate={booking.paymentId?.refundDate}
-                refundAmount={booking.paymentId?.refundAmount}
                 originalAmount={booking.bookingAmount}
               />
             )}
@@ -150,17 +143,22 @@ export const BookingDetailsPage: React.FC = () => {
               <div className="bg-white rounded-lg shadow">
                 <div className="p-6 border-b border-gray-200">
                   <h2 className="text-xl font-semibold text-gray-900">
-                    Technician Details
+                    Customer Details
                   </h2>
                 </div>
-                {technicianData ? (
-                  <TechnicianCard
-                    technician={technicianData}
-                    showBookButton={false}
-                  />
+                {customerData ? (
+                  <div className="p-6">
+                    <CustomerInfoCard
+                      name={customerData.name}
+                      phone={customerData.phone}
+                      email={customerData.email}
+                    />
+                  </div>
                 ) : (
                   <div className="p-6">
-                    <p className="text-gray-500">No technician assigned yet</p>
+                    <p className="text-gray-500">
+                      No customer information available
+                    </p>
                   </div>
                 )}
               </div>
@@ -190,11 +188,11 @@ export const BookingDetailsPage: React.FC = () => {
                   <AddressCard
                     address={{
                       _id: booking.addressId._id,
-                      fullAddress: booking.addressId.fullAddress,
-                      landmark: booking.addressId.landmark,
                       addressType: booking.addressId.addressType as
                         | "Home"
                         | "Work",
+                      fullAddress: booking.addressId.fullAddress,
+                      landmark: booking.addressId.landmark,
                     }}
                     showActions={false}
                   />
@@ -204,6 +202,6 @@ export const BookingDetailsPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </UserLayout>
+    </TechnicianLayout>
   );
 };

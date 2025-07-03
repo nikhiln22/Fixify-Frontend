@@ -34,7 +34,7 @@ export const getTechniciansColumns = (
     key: "Designation",
     label: "Designation",
     render: (item) => (
-      <div className="text-center">{item.Designation || "N/A"}</div>
+      <div className="text-center">{item.Designation?.designation || "N/A"}</div>
     ),
   },
   {

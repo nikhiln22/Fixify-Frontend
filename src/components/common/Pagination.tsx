@@ -12,7 +12,7 @@ const Pagination = ({
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 disabled:opacity-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0F2942] transition-colors duration-150"
+        className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 disabled:opacity-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-150"
       >
         Previous
       </button>
@@ -23,7 +23,7 @@ const Pagination = ({
             onClick={() => onPageChange(page)}
             className={`w-8 h-8 flex items-center justify-center rounded-md text-base font-medium transition-colors duration-150 ${
               currentPage === page
-                ? "bg-[#0F2942] text-white shadow-md"
+                ? "bg-black text-white shadow-md"
                 : "text-gray-700 border border-gray-300 hover:bg-gray-100"
             }`}
           >
@@ -34,7 +34,7 @@ const Pagination = ({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 disabled:opacity-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0F2942] transition-colors duration-150"
+        className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 disabled:opacity-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-150"
       >
         Next
       </button>

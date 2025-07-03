@@ -6,7 +6,10 @@ export interface Itechnician {
   status?: string;
   is_verified: boolean;
   yearsOfExperience?: number;
-  Designation?: string;
+  Designation?: {
+    _id: string;
+    designation: string;
+  };
   About?: string;
   image?: string;
   certificates?: string[];

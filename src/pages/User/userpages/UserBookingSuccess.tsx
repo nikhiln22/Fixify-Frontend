@@ -5,12 +5,16 @@ import Button from "../../../components/common/Button";
 import Banner from "../../../components/common/Banner";
 import { verifyPaymentSession } from "../../../services/user.services";
 import { showToast } from "../../../utils/toast";
-import { IBooking } from "../../../models/booking";
 import dayjs from "dayjs";
+import { IBooking } from "../../../models/booking";
 
 export const UserBookingSuccess: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const data = location.state?.booking || null;
+  console.log("data:", data);
+
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
 
@@ -20,8 +24,8 @@ export const UserBookingSuccess: React.FC = () => {
 
   useEffect(() => {
     const verify = async () => {
-      if (location.state?.booking) {
-        setBooking(location.state.booking);
+      if (data) {
+        setBooking(data);
         setIsLoading(false);
         return;
       }
@@ -29,7 +33,6 @@ export const UserBookingSuccess: React.FC = () => {
       if (sessionId && !hasVerified.current) {
         hasVerified.current = true;
         try {
-          console.log("Verifying payment session:", sessionId);
           const res = await verifyPaymentSession(sessionId);
           if (res.success && res.data) {
             setBooking(res.data);
@@ -47,9 +50,9 @@ export const UserBookingSuccess: React.FC = () => {
         setIsLoading(false);
       }
     };
-    
+
     verify();
-  }, [sessionId, location.state]);
+  }, [sessionId, data]);
 
   if (isLoading) {
     return (
@@ -67,7 +70,14 @@ export const UserBookingSuccess: React.FC = () => {
       <UserLayout>
         <Banner title="Booking Confirmation" height="400px" />
         <div className="text-center py-10 text-red-500 text-lg">
-          Booking not found or verification failed.
+          <p className="mb-4">Booking not found or verification failed.</p>
+          <Button
+            onClick={() => navigate("/user/bookinglist")}
+            variant="primary"
+            className="px-6 py-2"
+          >
+            View My Bookings
+          </Button>
         </div>
       </UserLayout>
     );
@@ -103,28 +113,32 @@ export const UserBookingSuccess: React.FC = () => {
           </p>
 
           <div className="text-left mb-6 space-y-2">
-            <div className="flex justify-between">
+            {/* <div className="flex justify-between">
               <span className="text-gray-500">Payment Method</span>
               <span className="text-gray-900 font-medium">
-                {location.state?.paymentMethod || booking.paymentMethod || "Online"}
+                {booking.paymentId.paymentMethod}
               </span>
-            </div>
+            </div> */}
             <div className="flex justify-between">
               <span className="text-gray-500">Total Amount</span>
               <span className="text-gray-900 font-medium">
-                ₹{booking.totalAmount}
+                ₹{booking.bookingAmount}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Date</span>
               <span className="text-gray-900 font-medium">
-                {dayjs(booking.updatedAt || booking.createdAt).format("MMM DD, YYYY")}
+                {dayjs(booking.updatedAt || booking.createdAt).format(
+                  "MMM DD, YYYY"
+                )}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Time</span>
               <span className="text-gray-900 font-medium">
-                {dayjs(booking.updatedAt || booking.createdAt).format("hh:mm A")}
+                {dayjs(booking.updatedAt || booking.createdAt).format(
+                  "hh:mm A"
+                )}
               </span>
             </div>
           </div>
@@ -132,7 +146,7 @@ export const UserBookingSuccess: React.FC = () => {
           <div className="border-t pt-4 mb-6">
             <p className="text-lg font-semibold text-gray-900">Total Amount</p>
             <p className="text-2xl font-bold text-gray-900">
-              ₹{booking.totalAmount}
+              ₹{booking.bookingAmount}
             </p>
           </div>
 

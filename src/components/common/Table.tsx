@@ -9,7 +9,7 @@ const Table = <T extends object>({
     <div className="overflow-x-auto w-full">
       {
         <table className="min-w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
-          <thead className="bg-[#0F2942]">
+          <thead className="bg-[#000000]">
             <tr>
               {columns.map((col, index) => (
                 <th

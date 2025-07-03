@@ -12,6 +12,8 @@ import { CategoryListPage } from "../pages/Admin/adminpages/CategoryListPage";
 import { ServiceListPage } from "../pages/Admin/adminpages/ServiceListPage";
 import { TechnicianListPage } from "../pages/Admin/adminpages/TechnicianListPage";
 import { PageNotFound } from "../components/common/PageNotFound";
+import { BookingsListPage } from "../pages/Admin/adminpages/BookingsListPage";
+import { BookingDetailPage } from "../pages/Admin/adminpages/BookingDetailPage";
 
 export const AdminRoutes: React.FC = () => {
   const user: string = "Admin";
@@ -38,8 +40,16 @@ export const AdminRoutes: React.FC = () => {
         />
         <Route path="/admin/categories" element={<CategoryListPage />} />
         <Route path="/admin/services" element={<ServiceListPage />} />
+        <Route path="/admin/bookings" element={<BookingsListPage />} />
+        <Route
+          path="/admin/bookingdetails/:bookingId"
+          element={<BookingDetailPage />}
+        />
       </Route>
-      <Route path="/admin/*" element={<PageNotFound userName={user} userRole="admin" />} />
+      <Route
+        path="/admin/*"
+        element={<PageNotFound userName={user} userRole="admin" />}
+      />
     </Routes>
   );
 };
