@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import UserLayout from "../../../layouts/UserLayout";
 import { UserProfileSidebar } from "../../../components/user/UserProfileSidebar";
 import { getBookingsColumns } from "../../../constants/tablecolumns/BookingsColumn";
@@ -12,6 +12,19 @@ import { ChatModal } from "../../../components/common/ChatModal";
 import { cancelBooking, rateService } from "../../../services/user.services";
 import { showToast } from "../../../utils/toast";
 import { Rating } from "../../../components/user/Rating";
+import {
+  connectSocket,
+  joinChat,
+  leaveChat,
+  sendMessage,
+  listenForMessages,
+  stopListening,
+} from "../../../utils/socket/socket";
+import { IChat } from "../../../models/chat";
+import {
+  getChatMessages,
+  sendChatMessage,
+} from "../../../services/common.services";
 
 export const UserBookingsList: React.FC = () => {
   const itemsPerPage = 6;
@@ -24,6 +37,9 @@ export const UserBookingsList: React.FC = () => {
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [selectedChatBooking, setSelectedChatBooking] =
     useState<IBooking | null>(null);
+  const [messages, setMessages] = useState<IChat[]>([]);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
   const [selectedRatingBooking, setSelectedRatingBooking] =
@@ -43,6 +59,29 @@ export const UserBookingsList: React.FC = () => {
     handleViewDetails,
   } = useBookings("user");
 
+  useEffect(() => {
+    connectSocket();
+
+    listenForMessages((newMessage: IChat) => {
+      console.log("Received new message:", newMessage);
+
+      if (newMessage.senderType !== "user") {
+        setMessages((prev) => [...prev, newMessage]);
+
+        if (!isChatModalOpen) {
+          showToast({
+            message: "New message received",
+            type: "info",
+          });
+        }
+      }
+    });
+
+    return () => {
+      stopListening();
+    };
+  }, [isChatModalOpen]);
+
   const handleCancelBooking = (bookingId: string) => {
     const booking = bookings.find((b) => b._id === bookingId);
     if (booking) {
@@ -51,11 +90,90 @@ export const UserBookingsList: React.FC = () => {
     }
   };
 
+  const fetchChatMessages = async (bookingId: string) => {
+    setChatLoading(true);
+    try {
+      const response = await getChatMessages(bookingId, "user");
+      if (response.success) {
+        setMessages(response.data || []);
+      } else {
+        showToast({
+          message: response.message || "Failed to load messages",
+          type: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      showToast({
+        message: "Failed to load messages",
+        type: "error",
+      });
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
   const handleChatWithTechnician = (bookingId: string) => {
     const booking = bookings.find((b) => b._id === bookingId);
     if (booking) {
       setSelectedChatBooking(booking);
       setIsChatModalOpen(true);
+
+      joinChat(bookingId);
+
+      fetchChatMessages(bookingId);
+    }
+  };
+
+  const handleSendMessage = async (messageText: string) => {
+    if (!selectedChatBooking || sending) return;
+
+    setSending(true);
+
+    try {
+      const technicianId =
+        typeof selectedChatBooking.technicianId === "string"
+          ? selectedChatBooking.technicianId
+          : selectedChatBooking.technicianId?._id;
+
+      if (!technicianId) {
+        showToast({
+          message: "Technician ID not found",
+          type: "error",
+        });
+        return;
+      }
+
+      const response = await sendChatMessage(
+        selectedChatBooking._id,
+        messageText,
+        technicianId,
+        "user"
+      );
+
+      if (response.success && response.data) {
+        setMessages((prev) => [...prev, response.data!]);
+
+        sendMessage(selectedChatBooking._id, messageText, "user");
+
+        console.log("Message sent successfully:", response.data);
+      } else {
+        showToast({
+          message: response.message || "Failed to send message",
+          type: "error",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error sending message:", error);
+
+      sendMessage(selectedChatBooking._id, messageText, "user");
+
+      showToast({
+        message: error?.response?.data?.message || "Failed to send message",
+        type: "error",
+      });
+    } finally {
+      setSending(false);
     }
   };
 
@@ -64,7 +182,7 @@ export const UserBookingsList: React.FC = () => {
     if (booking) {
       setSelectedRatingBooking(booking);
       setRating(0);
-      setReview(""); 
+      setReview("");
       setIsRatingModalOpen(true);
     }
   };
@@ -181,8 +299,13 @@ export const UserBookingsList: React.FC = () => {
   };
 
   const handleChatModalClose = () => {
+    if (selectedChatBooking) {
+      leaveChat(selectedChatBooking._id);
+    }
+
     setIsChatModalOpen(false);
     setSelectedChatBooking(null);
+    setMessages([]);
   };
 
   const handleRatingModalClose = () => {
@@ -335,12 +458,16 @@ export const UserBookingsList: React.FC = () => {
             />
           </Modal>
 
-          {/* Chat Modal */}
           <ChatModal
             isOpen={isChatModalOpen}
             onClose={handleChatModalClose}
             booking={selectedChatBooking}
             technician={selectedChatBooking?.technicianId}
+            messages={messages}
+            loading={chatLoading}
+            onSendMessage={handleSendMessage}
+            sending={sending}
+            currentUserType="user"
           />
         </div>
       </div>

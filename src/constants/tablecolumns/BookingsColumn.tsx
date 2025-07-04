@@ -196,11 +196,10 @@ export const getBookingsColumns = (
             </button>
           )}
 
-        {/* Rating Button Logic - Show only if not rated and within 3 days */}
         {role === "user" &&
           handleRateService &&
           item.bookingStatus === "Completed" &&
-          !item.isRated && // Hide if already rated
+          !item.isRated &&
           (() => {
             const completedDate = new Date(item.updatedAt);
             const today = new Date();

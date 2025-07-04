@@ -2,14 +2,17 @@ import React, { useState, useEffect } from "react";
 import { MapPin } from "lucide-react";
 import TechnicianLayout from "../../../layouts/TechnicianLayout";
 import { TechnicianProfileSidebar } from "../../../components/technician/TechnicianProfileSidebar";
-import {ProfileCard} from "../../../components/common/ProfileCard";
+import { ProfileCard } from "../../../components/common/ProfileCard";
 import { TechnicianAboutSection } from "../../../components/technician/AboutSection";
 import { TechnicianCertificatesSection } from "../../../components/technician/CertificateSection";
 import { getTechnicianProfile } from "../../../services/common.services";
+import { getReviews } from "../../../services/technician.services";
 import { Itechnician } from "../../../models/technician";
 import { updateTechnicianData } from "../../../redux/slices/technicianslice";
 import { useDispatch } from "react-redux";
 import { showToast } from "../../../utils/toast";
+import { ReviewSection } from "../../../components/technician/ReviewSection";
+import { IRating } from "../../../models/IRating";
 
 export const TechnicianProfile: React.FC = () => {
   const dispatch = useDispatch();
@@ -18,15 +21,51 @@ export const TechnicianProfile: React.FC = () => {
   );
   const [isLoading, setIsLoading] = useState(false);
 
+  const [reviews, setReviews] = useState<IRating[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [reviewsError, setReviewsError] = useState<string | null>(null);
+  const [averageRating, setAverageRating] = useState<number | undefined>(
+    undefined
+  );
+  const [totalReviews, setTotalReviews] = useState<number | undefined>(
+    undefined
+  );
+
   useEffect(() => {
     fetchTechnicianProfile();
+    fetchTechnicianReviews();
   }, []);
+
+  const fetchTechnicianReviews = async () => {
+    try {
+      setReviewsLoading(true);
+      setReviewsError(null);
+
+      const response = await getReviews();
+      console.log("response for reviews:", response);
+
+      if (response.success) {
+        setReviews(response.reviews || []);
+        setAverageRating(response.averageRating);
+        setTotalReviews(response.totalReviews);
+      } else {
+        setReviewsError(response.message || "Failed to load reviews");
+      }
+    } catch (err: any) {
+      console.error("Error fetching reviews:", err);
+      setReviewsError(
+        err?.response?.data?.message || err?.message || "Error fetching reviews"
+      );
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
 
   const fetchTechnicianProfile = async () => {
     try {
       const response = await getTechnicianProfile();
       console.log(
-        "techncian profile response in the technician profile page:",
+        "technician profile response in the technician profile page:",
         response
       );
       if (response) {
@@ -193,6 +232,14 @@ export const TechnicianProfile: React.FC = () => {
               certificates={technicianData.certificates}
               onCertificatesUpdate={handleCertificatesUpdate}
               isLoading={isLoading}
+            />
+
+            <ReviewSection
+              reviews={reviews}
+              loading={reviewsLoading}
+              error={reviewsError}
+              averageRating={averageRating}
+              totalReviews={totalReviews}
             />
 
             {technicianData.address && (

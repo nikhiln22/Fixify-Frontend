@@ -7,6 +7,7 @@ import { Itechnician } from "../models/technician";
 import { TechnicianProfileResponse } from "../types/technicians.types";
 import { BookServiceResponse } from "../types/user.types";
 import { Role } from "../types/auth.types";
+import { IChat } from "../models/chat";
 
 export const getAllDesignations = async (
   page?: number,
@@ -296,6 +297,83 @@ export const bookingDetails = async (
     return response.data;
   } catch (error) {
     console.log("error occured while booking the service by the user:", error);
+    throw error;
+  }
+};
+
+export const getChatMessages = async (
+  bookingId: string,
+  role: "user" | "technician" = "user"
+): Promise<{
+  data: IChat[];
+  success: boolean;
+  message?: string;
+}> => {
+  try {
+    console.log(`fetching chat messages for ${role}`);
+
+    const baseUrl =
+      role === "user"
+        ? `/api/user/chatmessages/${bookingId}`
+        : `/api/technician/chatmessages/${bookingId}`;
+
+    const response = await axiosInstance.get(baseUrl);
+    console.log("chat messages response:", response);
+
+    return {
+      data: response.data.data || [],
+      success: response.data.success || true,
+      message: response.data.message,
+    };
+  } catch (error) {
+    console.error(`error fetching chat messages for ${role}:`, error);
+    return {
+      data: [],
+      success: false,
+      message: "Failed to fetch messages",
+    };
+  }
+};
+
+export const sendChatMessage = async (
+  bookingId: string,
+  messageText: string,
+  recipientId: string,
+  role: "user" | "technician" = "user"
+): Promise<{
+  data?: IChat;
+  success: boolean;
+  message?: string;
+}> => {
+  try {
+    console.log(`sending chat message for ${role}`);
+
+    const baseUrl =
+      role === "user"
+        ? `/api/user/sendchatmessages/${bookingId}`
+        : `/api/technician/sendchatmessages/${bookingId}`;
+
+    const requestBody = {
+      messageText,
+      senderType: role,
+      ...(role === "user"
+        ? { technicianId: recipientId }
+        : { userId: recipientId }),
+    };
+
+    console.log("Request body:", requestBody); // ✅ Add logging
+
+    const response = await axiosInstance.post(baseUrl, requestBody);
+
+    console.log("send message response:", response);
+
+    return {
+      data: response.data.data,
+      success: response.data.success || true,
+      message: response.data.message,
+    };
+  } catch (error) {
+    console.error(`error sending chat message for ${role}:`, error);
     throw error;
   }
 };

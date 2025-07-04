@@ -165,3 +165,13 @@ export const cancelBooking = async (
     console.error("Error cancelling booking:", error);
   }
 };
+
+export const getReviews = async () => {
+  try {
+    const response = await axiosInstance.get("/api/technician/reviews");
+    return response.data;
+  } catch (error) {
+    console.log("error occured while fetching the reviews:", error);
+    throw error;
+  }
+};
