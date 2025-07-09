@@ -111,7 +111,6 @@ export const addServiceSchema = Yup.object().shape({
     }),
 });
 
-
 export const addMoneySchema = Yup.object().shape({
   amount: Yup.string()
     .required("Amount is required")
@@ -141,24 +140,17 @@ export const addMoneySchema = Yup.object().shape({
     ),
 });
 
-
 export const profileCardSchema = Yup.object().shape({
   name: Yup.string()
     .trim()
     .required("Name is required")
     .min(2, "Name must be at least 2 characters")
     .max(50, "Name must not exceed 50 characters")
-    .matches(
-      /^[a-zA-Z\s]+$/,
-      "Name can only contain letters and spaces"
-    ),
+    .matches(/^[a-zA-Z\s]+$/, "Name can only contain letters and spaces"),
 
   phone: Yup.string()
     .required("Phone number is required")
-    .matches(
-      /^[0-9]{10}$/,
-      "Phone number must be exactly 10 digits"
-    ),
+    .matches(/^[0-9]{10}$/, "Phone number must be exactly 10 digits"),
 
   Designation: Yup.string().when("$role", {
     is: "technician",
@@ -187,7 +179,6 @@ export const profileCardSchema = Yup.object().shape({
     otherwise: (schema) => schema.notRequired(),
   }),
 
-
   image: Yup.mixed()
     .nullable()
     .test("fileSize", "File too large, max size is 5MB", (value) => {
@@ -201,4 +192,86 @@ export const profileCardSchema = Yup.object().shape({
         ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
       );
     }),
+});
+
+export const addOfferSchema = Yup.object({
+  title: Yup.string()
+    .required("Offer title is required")
+    .min(3, "Title must be at least 3 characters"),
+
+  description: Yup.string()
+    .required("Description is required")
+    .min(10, "Description must be at least 10 characters"),
+
+  offer_type: Yup.string()
+    .required("Offer type is required")
+    .oneOf(
+      ["global", "service_category", "first_time_user"],
+      "Invalid offer type"
+    ),
+
+  discount_type: Yup.string()
+    .required("Discount type is required")
+    .oneOf(["percentage", "flat_amount"], "Invalid discount type"),
+
+  discount_value: Yup.number()
+    .required("Discount value is required")
+    .positive("Discount value must be positive")
+    .when("discount_type", {
+      is: "percentage",
+      then: (schema) => schema.max(100, "Percentage cannot exceed 100%"),
+    }),
+
+  max_discount: Yup.number()
+    .positive("Maximum discount must be positive")
+    .nullable(),
+
+  min_booking_amount: Yup.number()
+    .positive("Minimum booking amount must be positive")
+    .nullable(),
+
+  valid_until: Yup.date()
+    .required("Valid until date is required")
+    .min(new Date(), "Valid until date must be in the future"),
+
+  service_id: Yup.string().when("offer_type", {
+    is: "service_category",
+    then: (schema) =>
+      schema.required(
+        "Service selection is required for service category offers"
+      ),
+  }),
+});
+
+export const addCouponSchema = Yup.object().shape({
+  code: Yup.string()
+    .required("Coupon code is required")
+    .min(3, "Coupon code must be at least 3 characters")
+    .max(20, "Coupon code must be at most 20 characters"),
+  title: Yup.string()
+    .required("Coupon title is required")
+    .min(3, "Coupon title must be at least 3 characters"),
+  description: Yup.string()
+    .required("Description is required")
+    .min(10, "Description must be at least 10 characters"),
+  discount_type: Yup.string()
+    .required("Discount type is required")
+    .oneOf(["percentage", "flat_amount"], "Invalid discount type"),
+  discount_value: Yup.number()
+    .required("Discount value is required")
+    .positive("Discount value must be positive"),
+  max_discount: Yup.number()
+    .positive("Maximum discount must be positive")
+    .when("discount_type", {
+      is: "percentage",
+      then: (schema) =>
+        schema.required("Maximum discount is required for percentage discount"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+  min_booking_amount: Yup.number().positive(
+    "Minimum booking amount must be positive"
+  ),
+  valid_until: Yup.date()
+    .required("Valid until date is required")
+    .min(new Date(), "Valid until date must be in the future"),
 });

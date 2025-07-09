@@ -15,7 +15,7 @@ export const UserRegister: React.FC = () => {
     try {
       const response = (await authService.register(
         values,
-        "USER",
+        "USER"
       )) as UserTempRegisterResponse;
 
       if (response.success) {
@@ -42,9 +42,5 @@ export const UserRegister: React.FC = () => {
     }
   };
 
-  return (
-    <div>
-      <Register role="USER" onSubmit={handleSubmit} />
-    </div>
-  );
+  return <Register role="USER" onSubmit={handleSubmit} />;
 };

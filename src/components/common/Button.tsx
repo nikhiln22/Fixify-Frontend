@@ -13,11 +13,23 @@ const Button: React.FC<ButtonProps> = ({
   const getVariantClasses = () => {
     switch (variant) {
       case "primary":
-        return `bg-black text-white hover:bg-gray-800 ${disabled || isLoading ? "bg-gray-500 cursor-not-allowed" : ""}`;
+        return `bg-gradient-to-r from-teal-500 to-blue-600 text-white hover:from-teal-600 hover:to-blue-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${
+          disabled || isLoading
+            ? "from-gray-400 to-gray-500 cursor-not-allowed transform-none shadow-none"
+            : ""
+        }`;
       case "outline":
-        return `border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 ${disabled || isLoading ? "bg-gray-100 text-gray-500 cursor-not-allowed" : ""}`;
+        return `border-2 border-teal-500 bg-white hover:bg-teal-50 text-teal-700 hover:border-teal-600 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 ${
+          disabled || isLoading
+            ? "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed transform-none shadow-none"
+            : ""
+        }`;
       default:
-        return `bg-black text-white hover:bg-gray-800 ${disabled || isLoading ? "bg-gray-500 cursor-not-allowed" : ""}`;
+        return `bg-gradient-to-r from-teal-500 to-blue-600 text-white hover:from-teal-600 hover:to-blue-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${
+          disabled || isLoading
+            ? "from-gray-400 to-gray-500 cursor-not-allowed transform-none shadow-none"
+            : ""
+        }`;
     }
   };
 
@@ -26,10 +38,10 @@ const Button: React.FC<ButtonProps> = ({
       type={type}
       onClick={onClick}
       disabled={disabled || isLoading}
-      className={`py-3 px-4 rounded-md text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition ${getVariantClasses()} ${className}`}
+      className={`py-3 px-6 rounded-xl text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-teal-200 transition-all duration-200 ease-in-out ${getVariantClasses()} ${className}`}
     >
       {isLoading ? (
-        <div className="flex items-center">
+        <div className="flex items-center justify-center">
           <svg
             className="animate-spin -ml-1 mr-2 h-4 w-4 text-current"
             xmlns="http://www.w3.org/2000/svg"

@@ -14,6 +14,8 @@ import { TechnicianListPage } from "../pages/Admin/adminpages/TechnicianListPage
 import { PageNotFound } from "../components/common/PageNotFound";
 import { BookingsListPage } from "../pages/Admin/adminpages/BookingsListPage";
 import { BookingDetailPage } from "../pages/Admin/adminpages/BookingDetailPage";
+import OfferListPage from "../pages/Admin/adminpages/OfferListPage";
+import { CouponListPage } from "../pages/Admin/adminpages/CouponListPage";
 
 export const AdminRoutes: React.FC = () => {
   const user: string = "Admin";
@@ -45,6 +47,8 @@ export const AdminRoutes: React.FC = () => {
           path="/admin/bookingdetails/:bookingId"
           element={<BookingDetailPage />}
         />
+        <Route path="/admin/offers" element={<OfferListPage />} />
+        <Route path="/admin/coupons" element={<CouponListPage />} />
       </Route>
       <Route
         path="/admin/*"

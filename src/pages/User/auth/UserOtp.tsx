@@ -12,7 +12,7 @@ export const UserOtp: React.FC = () => {
     values: { otp: string },
     email: string,
     purpose: OtpPurpose,
-    tempId?: string,
+    tempId?: string
   ) => {
     try {
       let data: OTPVerification;
@@ -98,12 +98,10 @@ export const UserOtp: React.FC = () => {
   };
 
   return (
-    <div>
-      <Otp
-        role="USER"
-        onVerifyOtp={handleVerifyOtp}
-        onResendOtp={handleResendOtp}
-      />
-    </div>
+    <Otp
+      role="USER"
+      onVerifyOtp={handleVerifyOtp}
+      onResendOtp={handleResendOtp}
+    />
   );
 };

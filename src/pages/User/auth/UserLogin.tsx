@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Login } from "../../../components/auth/Login";
@@ -12,23 +12,6 @@ import { LoginFormData } from "../../../types/auth.types";
 export const UserLogin: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [isBlocked, setIsBlocked] = useState(false);
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const blockedParam = urlParams.get("blocked");
-
-    if (blockedParam === "true") {
-      setIsBlocked(true);
-      showToast({
-        message: "Your account has been suspended. Please contact support.",
-        type: "error",
-      });
-
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, "", newUrl);
-    }
-  }, []);
 
   const handleLoginSubmit = async (values: LoginFormData) => {
     try {

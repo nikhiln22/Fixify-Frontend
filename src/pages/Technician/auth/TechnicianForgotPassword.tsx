@@ -29,9 +29,5 @@ export const TechnicianForgotPassword: React.FC = () => {
     }
   };
 
-  return (
-    <div>
-      <ForgotPassword role="TECHNICIAN" onSubmit={handleForgotPassword} />
-    </div>
-  );
+  return <ForgotPassword role="TECHNICIAN" onSubmit={handleForgotPassword} />;
 };

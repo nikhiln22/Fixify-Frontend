@@ -12,7 +12,7 @@ import { ServiceDetailsCard } from "../../../components/common/ServiceDetailsCar
 import TechnicianCard from "../../../components/user/TechncianCard";
 import { AddressCard } from "../../../components/user/AddressCard";
 import { ScheduleInfoCard } from "../../../components/common/ScheduledInfoCard";
-import { CancellationCard } from "../../../components/common/CancellationCard"; // Add this import
+import { CancellationCard } from "../../../components/common/CancellationCard";
 
 export const BookingDetailsPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
@@ -31,6 +31,7 @@ export const BookingDetailsPage: React.FC = () => {
     try {
       setLoading(true);
       const response = await bookingDetails(bookingId!, 'USER');
+      console.log("response in the userbooking details page:",response);
 
       if (response.success) {
         setBooking(response.data);

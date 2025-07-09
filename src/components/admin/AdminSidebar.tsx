@@ -9,6 +9,8 @@ import {
   Grid3x3,
   Wrench,
   ClipboardList,
+  Tag,
+  Ticket,
 } from "lucide-react";
 
 const AdminSidebar: React.FC = () => {
@@ -134,6 +136,36 @@ const AdminSidebar: React.FC = () => {
             >
               <ClipboardList size={20} />
               <span>Bookings</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/admin/offers"
+              className={({ isActive }) =>
+                `flex items-center gap-3 py-3 px-4 rounded transition-colors ${
+                  isActive
+                    ? "bg-white text-gray-800 shadow-sm font-medium"
+                    : "text-gray-700 hover:bg-white hover:shadow-sm"
+                }`
+              }
+            >
+              <Tag size={20} />
+              <span>Offers</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/admin/coupons"
+              className={({ isActive }) =>
+                `flex items-center gap-3 py-3 px-4 rounded transition-colors ${
+                  isActive
+                    ? "bg-white text-gray-800 shadow-sm font-medium"
+                    : "text-gray-700 hover:bg-white hover:shadow-sm"
+                }`
+              }
+            >
+              <Ticket size={20} />
+              <span>Coupons</span>
             </NavLink>
           </li>
         </ul>

@@ -3,6 +3,7 @@ import { Role } from "./auth.types";
 import { IAddress } from "../models/address";
 import { ITimeSlot } from "../models/timeslot";
 import { TimeSlotData } from "./technicians.types";
+import { ICoupon } from "../models/coupon";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -256,6 +257,22 @@ export interface WalletBalanceProps {
   error?: string | null;
   onAddMoney?: (amount: number) => void;
   showAddMoney?: boolean;
+}
+
+export interface AddOfferProps {
+  onCancel?: () => void;
+  onSubmit?: (data: any) => Promise<void>;
+  isLoading?: boolean;
+  initialValues?: any;
+  isEditing?: boolean;
+}
+
+export interface AddCouponProps {
+  onCancel?: () => void;
+  onSubmit?: (data: any) => Promise<void>;
+  isLoading?: boolean;
+  initialValues?: Partial<ICoupon>;
+  isEditing?: boolean;
 }
 
 export interface PrivateRouteProps {

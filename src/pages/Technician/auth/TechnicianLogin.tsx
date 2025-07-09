@@ -33,7 +33,6 @@ export const TechnicianLogin: React.FC = () => {
 
         if ("technician" in response.data) {
           const technicianData = response.data.technician as Itechnician;
-
           dispatch(setTechnicianData(technicianData));
         }
 
@@ -52,9 +51,5 @@ export const TechnicianLogin: React.FC = () => {
     }
   };
 
-  return (
-    <div>
-      <Login role="TECHNICIAN" onsubmit={handleLoginSubmit} />
-    </div>
-  );
+  return <Login role="TECHNICIAN" onsubmit={handleLoginSubmit} />;
 };

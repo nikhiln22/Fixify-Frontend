@@ -14,7 +14,7 @@ export const TechnicianResetPassword: React.FC = () => {
       const response = await authService.resetPassword(
         email,
         password,
-        "TECHNICIAN",
+        "TECHNICIAN"
       );
       showToast({
         message: response.message || "Password reset successfully!",
@@ -29,9 +29,5 @@ export const TechnicianResetPassword: React.FC = () => {
     }
   };
 
-  return (
-    <div>
-      <ResetPassword role="TECHNICIAN" onSubmit={handleResetPassword} />
-    </div>
-  );
+  return <ResetPassword role="TECHNICIAN" onSubmit={handleResetPassword} />;
 };

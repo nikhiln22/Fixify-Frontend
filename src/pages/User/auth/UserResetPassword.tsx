@@ -25,9 +25,5 @@ export const UserResetPassword: React.FC = () => {
     }
   };
 
-  return (
-    <div>
-      <ResetPassword role="USER" onSubmit={handleResetPassword} />
-    </div>
-  );
+  return <ResetPassword role="USER" onSubmit={handleResetPassword} />;
 };

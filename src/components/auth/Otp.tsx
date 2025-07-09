@@ -6,6 +6,7 @@ import Button from "../common/Button";
 import AuthLayout from "../../layouts/AuthLayout";
 import { OtpProps, OtpPurpose } from "../../types/auth.types";
 import { otpValidationSchema } from "../../utils/validations/authvalidationschema";
+import { motion } from "framer-motion";
 
 export const Otp: React.FC<OtpProps> = ({ role, onVerifyOtp, onResendOtp }) => {
   const location = useLocation();
@@ -33,7 +34,7 @@ export const Otp: React.FC<OtpProps> = ({ role, onVerifyOtp, onResendOtp }) => {
     const interval = setInterval(() => {
       const currentTime = Date.now();
       const startTime = parseInt(
-        localStorage.getItem("otpStartTime") || now.toString(),
+        localStorage.getItem("otpStartTime") || now.toString()
       );
       const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
       const remainingSeconds = Math.max(60 - elapsedSeconds, 0);
@@ -93,62 +94,166 @@ export const Otp: React.FC<OtpProps> = ({ role, onVerifyOtp, onResendOtp }) => {
     }
   };
 
+  const formatEmail = (email: string) => {
+    if (!email) return "";
+    const [username, domain] = email.split("@");
+    if (username.length <= 3) return email;
+    const maskedUsername =
+      username.slice(0, 2) +
+      "*".repeat(username.length - 3) +
+      username.slice(-1);
+    return `${maskedUsername}@${domain}`;
+  };
+
   return (
     <AuthLayout role={role}>
-      <form onSubmit={formik.handleSubmit} className="w-full space-y-6 p-8">
-        <div className="text-center">
-          <h4 className="text-3xl font-bold text-black capitalize">
+      <div className="space-y-8">
+        {/* Header with animations */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center space-y-3"
+        >
+          <h4 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
             OTP Verification
           </h4>
-          <p className="mt-2 text-base text-gray-700">
-            Enter the OTP sent to your email
+          <p className="text-lg text-gray-600 font-medium">
+            Enter the verification code
           </p>
-        </div>
+          <p className="text-teal-600 font-semibold text-lg">
+            {formatEmail(email)}
+          </p>
+        </motion.div>
 
-        <div className="space-y-2">
-          <OTPInput
-            length={4}
-            value={formik.values.otp}
-            onchange={(otp) => formik.setFieldValue("otp", otp)}
-          />
-          {formik.errors.otp && formik.touched.otp && (
-            <p className="text-red-500 text-xs text-center mt-1">
-              {formik.errors.otp}
-            </p>
-          )}
-        </div>
-
-        <Button
-          type="submit"
-          disabled={
-            loading ||
-            isOtpExpired ||
-            formik.isSubmitting ||
-            !formik.values.otp ||
-            formik.values.otp.length < 4
-          }
-          isLoading={loading || formik.isSubmitting}
-          className="w-full mt-4"
+        <motion.form
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          onSubmit={formik.handleSubmit}
+          className="space-y-8"
         >
-          Verify OTP
-        </Button>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="space-y-4"
+          >
+            <div className="flex justify-center">
+              <OTPInput
+                length={4}
+                value={formik.values.otp}
+                onchange={(otp) => formik.setFieldValue("otp", otp)}
+              />
+            </div>
+            {formik.errors.otp && formik.touched.otp && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-center space-x-1 text-red-500 text-sm"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>{formik.errors.otp}</span>
+              </motion.div>
+            )}
+          </motion.div>
 
-        {isOtpExpired ? (
-          <p className="text-center text-sm mt-3">
-            Didn't receive the code?{" "}
-            <span
-              onClick={handleResend}
-              className="text-blue-600 underline cursor-pointer"
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+          >
+            <Button
+              type="submit"
+              disabled={
+                loading ||
+                isOtpExpired ||
+                formik.isSubmitting ||
+                !formik.values.otp ||
+                formik.values.otp.length < 4
+              }
+              isLoading={loading || formik.isSubmitting}
+              className="w-full py-4 text-base font-semibold"
             >
-              Resend OTP
-            </span>
-          </p>
-        ) : (
-          <p className="text-center text-sm mt-2 text-gray-600">
-            Resend OTP in {timer}s
-          </p>
-        )}
-      </form>
+              {loading || formik.isSubmitting ? "Verifying..." : "Verify OTP"}
+            </Button>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="text-center pt-4"
+          >
+            {isOtpExpired ? (
+              <div className="space-y-3">
+                <div className="inline-flex items-center space-x-2 text-red-500 bg-red-50 px-4 py-2 rounded-lg">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span className="text-sm font-medium">
+                    Your OTP has expired
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={loading}
+                  className="font-semibold text-teal-600 hover:text-teal-700 transition-colors duration-200 relative group disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? "Sending..." : "Resend OTP"}
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal-500 transition-all duration-300 group-hover:w-full"></span>
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="inline-flex items-center space-x-2 text-teal-600 bg-teal-50 px-4 py-3 rounded-lg">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span className="text-sm font-medium">
+                    Code expires in <span className="font-bold">{timer}s</span>
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500">
+                  Didn't receive the code? You can resend after the timer
+                  expires.
+                </p>
+              </div>
+            )}
+          </motion.div>
+        </motion.form>
+      </div>
     </AuthLayout>
   );
 };
