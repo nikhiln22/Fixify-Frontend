@@ -1,11 +1,14 @@
 import React from "react";
 import { Star } from "lucide-react";
 import { IService } from "../../models/service";
+import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
 const ServiceHeader: React.FC<{ service: IService | null }> = ({ service }) => {
-  console.log("services in the service header:",service);
+  console.log("services in the service header:", service);
   if (!service) {
-    return <div className="flex items-center justify-center p-8">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center p-8">Loading...</div>
+    );
   }
 
   const dummyRating = 4.5;
@@ -19,10 +22,7 @@ const ServiceHeader: React.FC<{ service: IService | null }> = ({ service }) => {
     for (let i = 0; i < 5; i++) {
       if (i < fullStars) {
         stars.push(
-          <Star 
-            key={i} 
-            className="w-4 h-4 fill-yellow-400 text-yellow-400" 
-          />
+          <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
         );
       } else if (i === fullStars && hasHalfStar) {
         stars.push(
@@ -34,12 +34,7 @@ const ServiceHeader: React.FC<{ service: IService | null }> = ({ service }) => {
           </div>
         );
       } else {
-        stars.push(
-          <Star 
-            key={i} 
-            className="w-4 h-4 text-gray-300" 
-          />
-        );
+        stars.push(<Star key={i} className="w-4 h-4 text-gray-300" />);
       }
     }
     return stars;
@@ -51,8 +46,8 @@ const ServiceHeader: React.FC<{ service: IService | null }> = ({ service }) => {
         <div className="lg:w-1/2">
           <div className="bg-gray-100 rounded-lg overflow-hidden aspect-[4/3]">
             {service.image ? (
-              <img 
-                src={service.image} 
+              <img
+                src={buildCloudinaryUrl(service.image)}
                 alt={service.name}
                 className="w-full h-full object-cover"
               />

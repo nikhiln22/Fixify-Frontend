@@ -31,11 +31,11 @@ const useBookings = (role: "user" | "technician" | "admin" = "user") => {
           navigate(`/technician/jobdetails/${bookingId}`);
           break;
         case "admin":
-          navigate(`/admin/bookingdetails/${bookingId}`);
+          navigate(`/admin/bookings/${bookingId}`);
           break;
         case "user":
         default:
-          navigate(`/user/bookingdetails/${bookingId}`);
+          navigate(`/user/bookings/${bookingId}`); 
       }
     },
     [navigate, role]
@@ -68,8 +68,12 @@ const useBookings = (role: "user" | "technician" | "admin" = "user") => {
     loading,
     error,
     handleViewDetails,
-    handleUpdateJobStatus: role === "technician" ? handleUpdateJobStatus : undefined,
-    handleCancelBooking: (role === "user" || role === "technician") ? handleCancelBooking : undefined,
+    handleUpdateJobStatus:
+      role === "technician" ? handleUpdateJobStatus : undefined,
+    handleCancelBooking:
+      role === "user" || role === "technician"
+        ? handleCancelBooking
+        : undefined,
   };
 };
 

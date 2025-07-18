@@ -109,19 +109,25 @@ export const getBookingsColumns = (
     baseColumns.push({
       key: "paymentId",
       label: "Payment Status",
-      render: (item) => (
-        <div className="flex justify-center">
-          <span
-            className={`px-2 py-1 rounded-full text-sm font-medium ${
-              item.paymentId.paymentStatus === "Paid"
-                ? "bg-green-100 text-green-800"
-                : "bg-yellow-100 text-yellow-800"
-            }`}
-          >
-            {item.paymentId.paymentStatus}
-          </span>
-        </div>
-      ),
+      render: (item) => {
+        const paymentStatus = item.paymentId?.paymentStatus || "Pending";
+
+        return (
+          <div className="flex justify-center">
+            <span
+              className={`px-2 py-1 rounded-full text-sm font-medium ${
+                paymentStatus === "Paid"
+                  ? "bg-green-100 text-green-800"
+                  : paymentStatus === "Refunded"
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-yellow-100 text-yellow-800"
+              }`}
+            >
+              {paymentStatus}
+            </span>
+          </div>
+        );
+      },
     });
   }
 
@@ -139,7 +145,7 @@ export const getBookingsColumns = (
 
         {item.bookingStatus === "Booked" && (
           <button
-            onClick={() => handleChatWithTechnician(item._id)}
+            onClick={() => handleChatWithTechnician?.(item._id)}
             className="px-5 py-2.5 rounded bg-green-500 text-white hover:bg-green-600 transition-colors text-xs"
           >
             Chat

@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ModalProps } from "../../types/component.types";
 
@@ -64,12 +65,12 @@ const Modal: React.FC<ModalProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
           <motion.div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]"
+            className="fixed inset-0 bg-black/30 backdrop-blur-[2px] z-[9998]"
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
@@ -77,7 +78,7 @@ const Modal: React.FC<ModalProps> = ({
             onClick={onClose}
           />
 
-          <div className="fixed inset-0 z-[70] overflow-y-auto">
+          <div className="fixed inset-0 z-[9999] overflow-y-auto">
             <div className="flex min-h-full items-center justify-center p-4 text-center">
               <motion.div
                 className={`w-full transform overflow-hidden rounded-lg bg-gradient-to-b from-gray-50 to-white px-8 py-6 text-center align-middle shadow-xl border border-gray-100 ${className || "max-w-2xl"}`}
@@ -128,7 +129,8 @@ const Modal: React.FC<ModalProps> = ({
           </div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 

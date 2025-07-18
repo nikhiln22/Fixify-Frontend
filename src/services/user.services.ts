@@ -16,6 +16,7 @@ import {
 
 export const getUserProfile = async (): Promise<UserProfileResponse> => {
   try {
+    console.log("fetching the profile of the user in user service:");
     const response = await axiosInstance.get("/api/user/profile");
     return response.data;
   } catch (error) {

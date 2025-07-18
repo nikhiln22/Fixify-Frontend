@@ -1,27 +1,30 @@
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import Card from '../common/Card';
+import React, { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import Card from "../common/Card";
+import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
 interface RelatedServicesProps {
   relatedServices?: any[];
   onServiceSelect?: (service: any) => void;
 }
 
-const RelatedServices: React.FC<RelatedServicesProps> = ({  
-  relatedServices = [], 
-  onServiceSelect 
+const RelatedServices: React.FC<RelatedServicesProps> = ({
+  relatedServices = [],
+  onServiceSelect,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const cardsPerView = 3;
 
   const handlePrevious = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? Math.max(0, relatedServices.length - cardsPerView) : prevIndex - 1
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0
+        ? Math.max(0, relatedServices.length - cardsPerView)
+        : prevIndex - 1
     );
   };
 
   const handleNext = () => {
-    setCurrentIndex((prevIndex) => 
+    setCurrentIndex((prevIndex) =>
       prevIndex >= relatedServices.length - cardsPerView ? 0 : prevIndex + 1
     );
   };
@@ -43,7 +46,9 @@ const RelatedServices: React.FC<RelatedServicesProps> = ({
     <div className="py-8">
       <div className="mb-6">
         <h3 className="text-2xl font-bold text-gray-800">Related Services</h3>
-        <p className="text-gray-600 text-sm mt-1">You might also need these services</p>
+        <p className="text-gray-600 text-sm mt-1">
+          You might also need these services
+        </p>
       </div>
 
       <div className="relative">
@@ -58,22 +63,22 @@ const RelatedServices: React.FC<RelatedServicesProps> = ({
         )}
 
         <div className="overflow-hidden pb-4">
-          <div 
+          <div
             className="flex transition-transform duration-500 ease-in-out"
             style={{
-              transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`
+              transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
             }}
           >
             {relatedServices.map((service, index) => (
-              <div 
-                key={service._id || index} 
+              <div
+                key={service._id || index}
                 className="flex-shrink-0 px-3"
-                style={{ 
-                  width: `${100 / cardsPerView}%`
+                style={{
+                  width: `${100 / cardsPerView}%`,
                 }}
               >
                 <Card
-                  image={service.image}
+                  image={buildCloudinaryUrl(service.image)}
                   title={service.name}
                   price={service.price}
                   rating={service.rating || 4.5}

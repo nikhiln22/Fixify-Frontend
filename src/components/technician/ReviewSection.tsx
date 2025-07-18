@@ -8,6 +8,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { IRating } from "../../models/IRating";
+import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
 interface ReviewSectionProps {
   reviews: IRating[];
@@ -142,7 +143,9 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
                               <div className="flex-shrink-0">
                                 {review.userId.image ? (
                                   <img
-                                    src={review.userId.image}
+                                    src={buildCloudinaryUrl(
+                                      review.userId.image
+                                    )}
                                     alt={review.userId.username}
                                     className="w-10 h-10 rounded-full object-cover"
                                   />

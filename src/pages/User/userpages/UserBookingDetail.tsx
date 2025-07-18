@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import UserLayout from "../../../layouts/UserLayout";
 import { UserProfileSidebar } from "../../../components/user/UserProfileSidebar";
 import Button from "../../../components/common/Button";
-import { bookingDetails } from "../../../services/common.services";
+import { bookingDetails, getRating } from "../../../services/common.services";
 import { showToast } from "../../../utils/toast";
 import { IBooking } from "../../../models/booking";
 import { BookingHeader } from "../../../components/common/BookingHeader";
@@ -13,28 +13,35 @@ import TechnicianCard from "../../../components/user/TechncianCard";
 import { AddressCard } from "../../../components/user/AddressCard";
 import { ScheduleInfoCard } from "../../../components/common/ScheduledInfoCard";
 import { CancellationCard } from "../../../components/common/CancellationCard";
+import { IRating } from "../../../models/IRating";
+import { RatingCard } from "../../../components/common/RatingCard";
 
 export const BookingDetailsPage: React.FC = () => {
-  const { bookingId } = useParams<{ bookingId: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<IBooking | null>(null);
+  const [rating, setRating] = useState<IRating | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (bookingId) {
+    if (id) {
       fetchBookingDetails();
     }
-  }, [bookingId]);
+  }, [id]);
 
   const fetchBookingDetails = async () => {
     try {
       setLoading(true);
-      const response = await bookingDetails(bookingId!, 'USER');
-      console.log("response in the userbooking details page:",response);
+      const response = await bookingDetails(id!, "USER");
+      console.log("response in the userbooking details page:", response);
 
       if (response.success) {
         setBooking(response.data);
+
+        if (response.data.bookingStatus === "Completed") {
+          fetchRating();
+        }
       } else {
         setError(response.message);
         showToast({
@@ -54,8 +61,21 @@ export const BookingDetailsPage: React.FC = () => {
     }
   };
 
+  const fetchRating = async () => {
+    try {
+      const ratingResponse = await getRating(id!, "user");
+      console.log("Rating response:", ratingResponse);
+
+      if (ratingResponse.success) {
+        setRating(ratingResponse.data);
+      }
+    } catch (error) {
+      console.error("Error fetching rating:", error);
+    }
+  };
+
   const handleBackClick = () => {
-    navigate("/user/bookinglist");
+    navigate("/user/bookings");
   };
 
   if (loading) {
@@ -103,7 +123,8 @@ export const BookingDetailsPage: React.FC = () => {
         id: booking.technicianId._id || "",
         name: booking.technicianId.username || "N/A",
         experience: Number(booking.technicianId.yearsOfExperience) || 0,
-        designation: booking.technicianId.Designation?.designation || "Not specified",
+        designation:
+          booking.technicianId.Designation?.designation || "Not specified",
         profileImage: booking.technicianId.image || "/default-avatar.png",
         verified: booking.technicianId.is_verified || false,
       }
@@ -202,6 +223,9 @@ export const BookingDetailsPage: React.FC = () => {
                 </div>
               )}
             </div>
+            {booking.bookingStatus === "Completed" && (
+              <RatingCard rating={rating} />
+            )}
           </div>
         </div>
       </div>

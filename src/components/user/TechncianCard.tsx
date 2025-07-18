@@ -1,5 +1,6 @@
 import React from "react";
 import { Star, Briefcase, CheckCircle } from "lucide-react";
+import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
 interface TechnicianCardProps {
   technician: {
@@ -12,31 +13,36 @@ interface TechnicianCardProps {
     profileImage: string;
     verified: boolean;
   };
-  onSelect?: () => void; 
-  showBookButton?: boolean; 
+  onSelect?: () => void;
+  showBookButton?: boolean;
 }
 
-const TechnicianCard: React.FC<TechnicianCardProps> = ({ 
-  technician, 
-  onSelect, 
-  showBookButton = true  
+const TechnicianCard: React.FC<TechnicianCardProps> = ({
+  technician,
+  onSelect,
+  showBookButton = true,
 }) => {
-  const { id, name, rating, reviewCount, experience, designation, profileImage, verified } =
-    technician;
+  const {
+    id,
+    name,
+    rating,
+    reviewCount,
+    experience,
+    designation,
+    profileImage,
+    verified,
+  } = technician;
 
   const renderStars = (rating?: number) => {
     if (!rating) return null;
-    
+
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(
-        <Star
-          key={i}
-          className="w-4 h-4 text-yellow-400 fill-current"
-        />
+        <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
       );
     }
 
@@ -53,12 +59,7 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
 
     const emptyStars = 5 - Math.ceil(rating);
     for (let i = 0; i < emptyStars; i++) {
-      stars.push(
-        <Star
-          key={`empty-${i}`}
-          className="w-4 h-4 text-gray-300"
-        />
-      );
+      stars.push(<Star key={`empty-${i}`} className="w-4 h-4 text-gray-300" />);
     }
 
     return stars;
@@ -66,7 +67,7 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
 
   const formatExperience = (exp?: string | number) => {
     if (!exp) return "Not specified";
-    if (typeof exp === 'number') return `${exp}`;
+    if (typeof exp === "number") return `${exp}`;
     return exp;
   };
 
@@ -76,7 +77,7 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
         <div className="flex items-start space-x-4 flex-1">
           <div className="relative flex-shrink-0">
             <img
-              src={profileImage}
+              src={buildCloudinaryUrl(profileImage)}
               alt={name}
               className="w-16 h-16 rounded-full object-cover"
             />

@@ -12,6 +12,7 @@ import useLogout from "../../hooks/useLogout";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../hooks/useRedux";
 import Modal from "../common/Modal";
+import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
 export const TechnicianNavbar: React.FC = () => {
   const technicianData = useAppSelector(
@@ -219,7 +220,7 @@ export const TechnicianNavbar: React.FC = () => {
               >
                 {isVerified && technicianData?.image ? (
                   <img
-                    src={technicianData.image}
+                    src={buildCloudinaryUrl(technicianData.image)}
                     alt={technicianData.username || "Technician"}
                     className="w-full h-full object-cover rounded-full"
                   />
@@ -236,7 +237,7 @@ export const TechnicianNavbar: React.FC = () => {
                         <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden mr-3">
                           {technicianData?.image ? (
                             <img
-                              src={technicianData.image}
+                              src={buildCloudinaryUrl(technicianData.image)}
                               alt={technicianData.username || "Technician"}
                               className="w-full h-full object-cover rounded-full"
                             />

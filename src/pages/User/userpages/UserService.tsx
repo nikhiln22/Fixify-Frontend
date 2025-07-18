@@ -6,6 +6,7 @@ import { getAllServices } from "../../../services/common.services";
 import Pagination from "../../../components/common/Pagination";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { IService } from "../../../models/service";
+import { buildCloudinaryUrl } from "../../../utils/cloudinary/cloudinary";
 
 export const UserService: React.FC = () => {
   const navigate = useNavigate();
@@ -70,7 +71,11 @@ export const UserService: React.FC = () => {
                 {services.map((service) => (
                   <Card
                     key={service._id}
-                    image={service.image || "/default-service-image.jpg"}
+                    image={
+                      service.image
+                        ? buildCloudinaryUrl(service.image)
+                        : "/default-service-image.jpg"
+                    }
                     title={service.name}
                     price={
                       service.price || Math.floor(Math.random() * 2000) + 500

@@ -6,7 +6,7 @@ export interface UserProfileResponse {
   message: string;
   success: boolean;
   status: number;
-  user?: Iuser;
+  data?: Iuser;
 }
 
 export interface getAddressResponse {

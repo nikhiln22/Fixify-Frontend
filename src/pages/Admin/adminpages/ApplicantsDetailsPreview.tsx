@@ -11,10 +11,11 @@ import {
   rejectApplicant,
 } from "../../../services/admin.services";
 import { showToast } from "../../../utils/toast";
+import { buildCloudinaryUrl } from "../../../utils/cloudinary/cloudinary";
 
 export const ApplicantDetailsPreview: React.FC = () => {
   const [selectedCertificate, setSelectedCertificate] = useState<string | null>(
-    null,
+    null
   );
   const [applicant, setApplicant] = useState<Itechnician | null>(null);
 
@@ -96,7 +97,6 @@ export const ApplicantDetailsPreview: React.FC = () => {
     return null;
   }
 
-  // Determine the page title based on verification status
   const pageTitle = applicant.is_verified
     ? "Technician Details"
     : "Technician Application Details";
@@ -118,7 +118,9 @@ export const ApplicantDetailsPreview: React.FC = () => {
             phone={applicant.phone || 0}
             Designation={applicant.Designation || "N/A"}
             yearsOfExperience={applicant.yearsOfExperience || 0}
-            profilePhoto={applicant.image}
+            profilePhoto={buildCloudinaryUrl(
+              applicant.image ? applicant.image : "default/profile.jpg"
+            )}
             address={formatAddress(applicant.address || "")}
           />
         </div>
@@ -152,7 +154,7 @@ export const ApplicantDetailsPreview: React.FC = () => {
                     </div>
                     <div className="p-4 h-40 flex items-center justify-center">
                       <img
-                        src={cert}
+                        src={buildCloudinaryUrl(cert)}
                         alt={`Certificate ${index + 1}`}
                         className="max-h-full max-w-full object-contain rounded"
                         onError={(e) => {

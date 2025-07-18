@@ -12,6 +12,7 @@ import useLogout from "../../hooks/useLogout";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../hooks/useRedux";
 import Modal from "../../components/common/Modal";
+import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
 export const UserNavbar: React.FC = () => {
   const logout = useLogout();
@@ -191,7 +192,7 @@ export const UserNavbar: React.FC = () => {
                 >
                   {userData?.image ? (
                     <img
-                      src={userData.image}
+                      src={buildCloudinaryUrl(userData.image)}
                       alt={userData.username || "User"}
                       className="w-full h-full object-cover rounded-lg"
                     />
@@ -207,7 +208,7 @@ export const UserNavbar: React.FC = () => {
                         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center overflow-hidden mr-3">
                           {userData?.image ? (
                             <img
-                              src={userData.image}
+                              src={buildCloudinaryUrl(userData.image)}
                               alt={userData.username || "User"}
                               className="w-full h-full object-cover rounded-lg"
                             />

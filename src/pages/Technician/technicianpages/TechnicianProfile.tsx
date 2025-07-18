@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import { showToast } from "../../../utils/toast";
 import { ReviewSection } from "../../../components/technician/ReviewSection";
 import { IRating } from "../../../models/IRating";
+import { buildCloudinaryUrl } from "../../../utils/cloudinary/cloudinary";
 
 export const TechnicianProfile: React.FC = () => {
   const dispatch = useDispatch();
@@ -44,12 +45,12 @@ export const TechnicianProfile: React.FC = () => {
       const response = await getReviews();
       console.log("response for reviews:", response);
 
-      if (response.success) {
-        setReviews(response.reviews || []);
-        setAverageRating(response.averageRating);
-        setTotalReviews(response.totalReviews);
+      if (response.data.reviews) {
+        setReviews(response.data.reviews || []);
+        setAverageRating(response.data.averageRating);
+        setTotalReviews(response.data.totalReviews);
       } else {
-        setReviewsError(response.message || "Failed to load reviews");
+        setReviewsError(response.data.message || "Failed to load reviews");
       }
     } catch (err: any) {
       console.error("Error fetching reviews:", err);
@@ -214,7 +215,11 @@ export const TechnicianProfile: React.FC = () => {
               name={technicianData.username}
               email={technicianData.email}
               phone={technicianData.phone}
-              image={technicianData.image}
+              image={
+                technicianData.image
+                  ? buildCloudinaryUrl(technicianData.image)
+                  : "/default-profile.jpg"
+              }
               role="technician"
               Designation={technicianData.Designation}
               yearsOfExperience={technicianData.yearsOfExperience}
@@ -229,7 +234,9 @@ export const TechnicianProfile: React.FC = () => {
             />
 
             <TechnicianCertificatesSection
-              certificates={technicianData.certificates}
+              certificates={technicianData.certificates?.map((cert) =>
+                buildCloudinaryUrl(cert)
+              )}
               onCertificatesUpdate={handleCertificatesUpdate}
               isLoading={isLoading}
             />

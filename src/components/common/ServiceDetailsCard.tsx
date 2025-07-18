@@ -1,5 +1,6 @@
 import React from "react";
 import { ImageIcon } from "lucide-react";
+import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
 interface ServiceDetailsCardProps {
   serviceName?: string;
@@ -29,7 +30,7 @@ export const ServiceDetailsCard: React.FC<ServiceDetailsCardProps> = ({
           <div className="flex-shrink-0">
             <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 relative">
               <img
-                src={serviceImage}
+                src={buildCloudinaryUrl(serviceImage)}
                 alt="Service"
                 className="w-full h-full object-cover"
                 onError={(e) => {

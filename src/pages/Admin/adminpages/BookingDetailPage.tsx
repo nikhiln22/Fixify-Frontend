@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AdminLayout from "../../../layouts/AdminLayout";
 import Button from "../../../components/common/Button";
-import { bookingDetails } from "../../../services/common.services";
+import { bookingDetails, getRating } from "../../../services/common.services";
 import { showToast } from "../../../utils/toast";
 import { IBooking } from "../../../models/booking";
 import { BookingHeader } from "../../../components/common/BookingHeader";
@@ -15,27 +15,34 @@ import { CustomerInfoCard } from "../../../components/technician/CustomerInfoCar
 import { CancellationCard } from "../../../components/common/CancellationCard";
 import { RevenueDetailCard } from "../../../components/admin/RevenueDetailCard";
 import { DollarSign } from "lucide-react";
+import { RatingCard } from "../../../components/common/RatingCard";
+import { IRating } from "../../../models/IRating";
 
 export const BookingDetailPage: React.FC = () => {
-  const { bookingId } = useParams<{ bookingId: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<IBooking | null>(null);
+  const [rating, setRating] = useState<IRating | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (bookingId) {
+    if (id) {
       fetchBookingDetails();
     }
-  }, [bookingId]);
+  }, [id]);
 
   const fetchBookingDetails = async () => {
     try {
       setLoading(true);
-      const response = await bookingDetails(bookingId!, "ADMIN");
+      const response = await bookingDetails(id!, "ADMIN");
 
       if (response.success) {
         setBooking(response.data);
+
+        if (response?.data?.bookingStatus === "Completed") {
+          fetchRating();
+        }
       } else {
         setError(response.message);
         showToast({
@@ -52,6 +59,19 @@ export const BookingDetailPage: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRating = async () => {
+    try {
+      const ratingResponse = await getRating(id!, "admin");
+      console.log("Rating response:", ratingResponse);
+
+      if (ratingResponse.success) {
+        setRating(ratingResponse.data);
+      }
+    } catch (error) {
+      console.error("Error fetching rating:", error);
     }
   };
 
@@ -157,11 +177,8 @@ export const BookingDetailPage: React.FC = () => {
                 }
                 fixifyShare={booking.paymentId?.fixifyShare || 0}
                 technicianShare={booking.paymentId?.technicianShare || 0}
-                paymentMethod={booking.paymentId?.paymentMethod || "N/A"}
-                paymentStatus={booking.paymentId?.paymentStatus || "N/A"}
                 technicianPaid={booking.paymentId?.technicianPaid || false}
                 technicianPaidAt={booking.paymentId?.technicianPaidAt}
-                bookingStatus={booking.bookingStatus}
               />
             ) : (
               <div className="bg-white rounded-lg shadow">
@@ -295,12 +312,16 @@ export const BookingDetailPage: React.FC = () => {
             )}
           </div>
 
+          {booking.bookingStatus === "Completed" && (
+            <RatingCard rating={rating} />
+          )}
+
           <CancellationCard
             bookingStatus={booking.bookingStatus}
             cancellationDate={booking.cancellationDate}
             refundStatus={booking.paymentId?.refundStatus}
             refundDate={booking.paymentId?.refundDate}
-            refundAmount={booking.refundAmount}
+            refundAmount={booking.paymentId?.refundAmount}
             originalAmount={
               booking.paymentId?.amountPaid || booking.bookingAmount
             }

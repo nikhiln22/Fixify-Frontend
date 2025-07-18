@@ -211,8 +211,8 @@ export const getTechnicianProfile = async (
 
     console.log(`technician profile response for ${role}:`, response);
 
-    if (response.data.technician) {
-      return response.data.technician;
+    if (response.data.data) {
+      return response.data.data;
     } else {
       throw new Error("Technician data not found in response");
     }
@@ -267,7 +267,7 @@ export const getBookings = async (
     const url = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
 
     const response = await axiosInstance.get(url);
-    console.log("bookings response:", response);
+    console.log("bookings response in common service:", response);
 
     return {
       data: response.data.data?.bookings || [],
@@ -292,7 +292,7 @@ export const bookingDetails = async (
 ): Promise<BookServiceResponse> => {
   try {
     const response = await axiosInstance.get(
-      `/api/${role.toLowerCase()}/bookingDetails/${bookingId}`
+      `/api/${role.toLowerCase()}/bookingdetails/${bookingId}`
     );
     return response.data;
   } catch (error) {
@@ -361,7 +361,7 @@ export const sendChatMessage = async (
         : { userId: recipientId }),
     };
 
-    console.log("Request body:", requestBody); // ✅ Add logging
+    console.log("Request body:", requestBody);
 
     const response = await axiosInstance.post(baseUrl, requestBody);
 
@@ -374,6 +374,24 @@ export const sendChatMessage = async (
     };
   } catch (error) {
     console.error(`error sending chat message for ${role}:`, error);
+    throw error;
+  }
+};
+
+export const getRating = async (
+  bookingId: string,
+  role: "user" | "technician" | "admin"
+) => {
+  try {
+    const response = await axiosInstance.get(
+      `/api/${role}/rating/${bookingId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      `error occured while fetching the rating for ${role}:`,
+      error
+    );
     throw error;
   }
 };

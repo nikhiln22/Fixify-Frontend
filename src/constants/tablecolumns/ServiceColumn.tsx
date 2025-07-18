@@ -3,10 +3,11 @@ import { IService } from "../../models/service";
 import { Column } from "../../types/component.types";
 import Modal from "../../components/common/Modal";
 import Button from "../../components/common/Button";
+import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
 export const getServicesColumns = (
   handleStatusToggle: (id: string) => Promise<void>,
-  onEditService: (service: IService) => void,
+  onEditService: (service: IService) => void
 ): Column<IService>[] => [
   {
     key: "_id",
@@ -22,7 +23,7 @@ export const getServicesColumns = (
       <div className="flex items-center justify-center">
         {item?.image ? (
           <img
-            src={item.image}
+            src={buildCloudinaryUrl(item.image)}
             alt={item?.name || "Service"}
             className="w-12 h-12 rounded-md object-cover"
           />

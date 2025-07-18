@@ -46,11 +46,8 @@ export const UserRoutes: React.FC = () => {
         <Route path="/user/profile" element={<UserProfile />} />
         <Route path="/user/booking" element={<UserBooking />} />
         <Route path="/user/bookingsuccess" element={<UserBookingSuccess />} />
-        <Route path="/user/bookinglist" element={<UserBookingsList />} />
-        <Route
-          path="/user/bookingdetails/:bookingId"
-          element={<BookingDetailsPage />}
-        />
+        <Route path="/user/bookings" element={<UserBookingsList />} />
+        <Route path="/user/bookings/:id" element={<BookingDetailsPage />} />
         <Route path="/user/wallet" element={<UserWallet />} />
       </Route>
 

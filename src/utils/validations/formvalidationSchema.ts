@@ -275,3 +275,24 @@ export const addCouponSchema = Yup.object().shape({
     .required("Valid until date is required")
     .min(new Date(), "Valid until date must be in the future"),
 });
+
+export const subscriptionPlanSchema = Yup.object({
+  planName: Yup.string()
+    .required("Plan name is required")
+    .oneOf(["BASIC", "PRO", "ELITE"], "Plan name must be BASIC, PRO, or ELITE"),
+
+  monthlyPrice: Yup.number()
+    .when("planName", {
+      is: "BASIC",
+      then: (schema) => schema.notRequired(),
+      otherwise: (schema) => schema.required("Monthly price is required"),
+    })
+    .min(0, "Monthly price cannot be negative")
+    .max(10000, "Monthly price cannot exceed ₹10,000"),
+
+  commissionRate: Yup.number()
+    .required("Commission rate is required")
+    .min(1, "Commission rate must be at least 1%")
+    .max(50, "Commission rate cannot exceed 50%")
+    .integer("Commission rate must be a whole number"),
+});

@@ -15,6 +15,7 @@ import { IAddress } from "../../../models/address";
 import { updateUserData } from "../../../redux/slices/userSlice";
 import { useDispatch } from "react-redux";
 import { showToast } from "../../../utils/toast";
+import { buildCloudinaryUrl } from "../../../utils/cloudinary/cloudinary";
 
 export const UserProfile: React.FC = () => {
   const dispatch = useDispatch();
@@ -26,8 +27,9 @@ export const UserProfile: React.FC = () => {
     const fetchUserProfile = async () => {
       try {
         const response = await getUserProfile();
-        if (response.success && response.user) {
-          setUserData(response.user);
+        console.log("fetching the profile of the user in the page:",response);
+        if (response.success && response.data) {
+          setUserData(response.data);
           await fetchUserAddresses();
         }
       } catch (err) {
@@ -201,7 +203,11 @@ export const UserProfile: React.FC = () => {
                 name={userData.username}
                 email={userData.email}
                 phone={userData.phone}
-                image={userData.image}
+                image={
+                  userData.image
+                    ? buildCloudinaryUrl(userData.image)
+                    : "default/image"
+                }
                 role="user"
                 isEditable={true}
                 onSave={handleProfileSave}

@@ -1,14 +1,13 @@
 import { useState } from "react";
-import { Icategory } from "../../models/category";
+import { ISubscriptionPlan } from "../../models/subscriptionPlan";
 import { Column } from "../../types/component.types";
 import Modal from "../../components/common/Modal";
 import Button from "../../components/common/Button";
-import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
-export const getCategoriesColumns = (
+export const getSubscriptionPlanColumns = (
   handleStatusToggle: (id: string) => Promise<void>,
-  onEditCategory: (category: Icategory) => void
-): Column<Icategory>[] => [
+  onEditSubscriptionPlan: (subscriptionPlan: ISubscriptionPlan) => void
+): Column<ISubscriptionPlan>[] => [
   {
     key: "_id",
     label: "Sl. No",
@@ -17,29 +16,37 @@ export const getCategoriesColumns = (
     ),
   },
   {
-    key: "image",
-    label: "Category Image",
+    key: "planName",
+    label: "Plan Name",
     render: (item) => (
-      <div className="flex items-center justify-center">
-        {item?.image ? (
-          <img
-            src={buildCloudinaryUrl(item.image)}
-            alt={item?.name || "Category"}
-            className="w-12 h-12 rounded-md object-cover"
-          />
-        ) : (
-          <div className="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center text-gray-500">
-            No Image
-          </div>
-        )}
+      <div className="text-center font-medium">
+        {item?.planName || "Untitled"}
       </div>
     ),
   },
   {
-    key: "name",
-    label: "Category Name",
+    key: "monthlyPrice",
+    label: "Monthly Price",
     render: (item) => (
-      <div className="text-center">{item?.name || "Untitled"}</div>
+      <div className="text-center font-medium">{item?.monthlyPrice || 0}</div>
+    ),
+  },
+  {
+    key: "commissionRate",
+    label: "Commision Rate",
+    render: (item) => (
+      <div className="text-center font-medium">
+        {item?.commissionRate || 0} %
+      </div>
+    ),
+  },
+  {
+    key: "monthlyPrice",
+    label: "Duration",
+    render: (item) => (
+      <div className="text-center font-medium">
+        {item?.monthlyPrice === 0 ? "Lifetime" : "1 Month"}
+      </div>
     ),
   },
   {
@@ -63,10 +70,6 @@ export const getCategoriesColumns = (
     key: "action",
     label: "Action",
     render: (item) => {
-      if (!item) {
-        return <div>Loading...</div>;
-      }
-
       const ActionButton = () => {
         const [isOpen, setIsOpen] = useState(false);
         const [isProcessing, setIsProcessing] = useState(false);
@@ -91,19 +94,19 @@ export const getCategoriesColumns = (
         return (
           <div className="flex justify-center space-x-3">
             <Button
-              onClick={() => onEditCategory(item)}
-              className="px-4 py-1 text-xs min-w-[80px] bg-blue-500 hover:bg-blue-600 text-white"
+              onClick={() => onEditSubscriptionPlan(item)}
+              className="px-4 py-1 text-xs w-20 bg-blue-500 hover:bg-blue-600 text-white"
             >
               Edit
             </Button>
 
             <Button
               onClick={openModal}
-              className={`px-4 py-1 text-xs min-w-[80px] ${
+              className={`px-4 py-1 text-xs w-20 ${
                 item?.status
                   ? "bg-red-500 hover:bg-red-600"
                   : "bg-green-500 hover:bg-green-600"
-              }`}
+              } text-white`}
             >
               {item?.status ? "Block" : "Unblock"}
             </Button>
@@ -122,7 +125,8 @@ export const getCategoriesColumns = (
               ) : (
                 <p>
                   Are you sure you want to {item?.status ? "block" : "unblock"}{" "}
-                  category <strong>{item?.name || "this category"}</strong>?
+                  the Subscription Plan{" "}
+                  <strong>"{item?.planName || "this coupon"}"</strong>?
                 </p>
               )}
             </Modal>

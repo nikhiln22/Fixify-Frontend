@@ -94,6 +94,10 @@ export const UserBookingsList: React.FC = () => {
     setChatLoading(true);
     try {
       const response = await getChatMessages(bookingId, "user");
+      console.log(
+        "response in the userbooking list page for the chat:",
+        response
+      );
       if (response.success) {
         setMessages(response.data || []);
       } else {
@@ -414,7 +418,6 @@ export const UserBookingsList: React.FC = () => {
             </>
           )}
 
-          {/* Cancellation Modal */}
           <Modal
             isOpen={isModalOpen}
             onClose={handleModalClose}
@@ -439,7 +442,6 @@ export const UserBookingsList: React.FC = () => {
             )}
           </Modal>
 
-          {/* Rating Modal */}
           <Modal
             isOpen={isRatingModalOpen}
             onClose={handleRatingModalClose}
@@ -462,7 +464,6 @@ export const UserBookingsList: React.FC = () => {
             isOpen={isChatModalOpen}
             onClose={handleChatModalClose}
             booking={selectedChatBooking}
-            technician={selectedChatBooking?.technicianId}
             messages={messages}
             loading={chatLoading}
             onSendMessage={handleSendMessage}

@@ -6,6 +6,7 @@ import { getAllCategories } from "../../../services/common.services";
 import Pagination from "../../../components/common/Pagination";
 import { useNavigate } from "react-router-dom";
 import { Icategory } from "../../../models/category";
+import { buildCloudinaryUrl } from "../../../utils/cloudinary/cloudinary";
 
 export const UserCategory: React.FC = () => {
   const navigate = useNavigate();
@@ -70,7 +71,11 @@ export const UserCategory: React.FC = () => {
                 {categories.map((category) => (
                   <Card
                     key={category._id}
-                    image={category.image || "/default-category-image.jpg"}
+                    image={
+                      category.image
+                        ? buildCloudinaryUrl(category.image)
+                        : "/default-category-image.jpg"
+                    }
                     title={category.name}
                     type="category"
                     buttonLabel="Book Now"

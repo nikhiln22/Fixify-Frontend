@@ -9,13 +9,16 @@ import { ServiceDetailsCard } from "../../../components/common/ServiceDetailsCar
 import { BookingStatusCard } from "../../../components/common/BookingStatusCard";
 import { CustomerInfoCard } from "../../../components/technician/CustomerInfoCard";
 import { BookingHeader } from "../../../components/common/BookingHeader";
-import { bookingDetails } from "../../../services/common.services";
+import { bookingDetails, getRating } from "../../../services/common.services";
 import { showToast } from "../../../utils/toast";
 import { IBooking } from "../../../models/booking";
 import { CancellationCard } from "../../../components/common/CancellationCard";
+import { IRating } from "../../../models/IRating";
+import { RatingCard } from "../../../components/common/RatingCard";
 
 export const TechnicianBookingDetail: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
+  const [rating, setRating] = useState<IRating | null>(null);
   const navigate = useNavigate();
   const [booking, setBooking] = useState<IBooking | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,6 +37,10 @@ export const TechnicianBookingDetail: React.FC = () => {
 
       if (response.success) {
         setBooking(response.data);
+
+        if (response.data.bookingStatus === "Completed") {
+          fetchRating();
+        }
       } else {
         setError(response.message);
         showToast({
@@ -50,6 +57,19 @@ export const TechnicianBookingDetail: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRating = async () => {
+    try {
+      const ratingResponse = await getRating(bookingId!, "technician");
+      console.log("Rating response:", ratingResponse);
+
+      if (ratingResponse.success) {
+        setRating(ratingResponse.data);
+      }
+    } catch (error) {
+      console.error("Error fetching rating:", error);
     }
   };
 
@@ -199,6 +219,9 @@ export const TechnicianBookingDetail: React.FC = () => {
                 </div>
               )}
             </div>
+            {booking.bookingStatus === "Completed" && (
+              <RatingCard rating={rating} />
+            )}
           </div>
         </div>
       </div>

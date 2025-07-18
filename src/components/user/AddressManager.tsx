@@ -5,6 +5,7 @@ import { AddressCard } from "./AddressCard";
 import { AddressForm } from "./AddressForm";
 import { IAddress } from "../../models/address";
 import { AddressManagerProps } from "../../types/component.types";
+import Modal from "../common/Modal";
 
 export const AddressManager: React.FC<AddressManagerProps> = ({
   userId,
@@ -16,6 +17,10 @@ export const AddressManager: React.FC<AddressManagerProps> = ({
   const [showForm, setShowForm] = useState(false);
   const [formMode, setFormMode] = useState<"add" | "edit">("add");
   const [editingAddress, setEditingAddress] = useState<IAddress | undefined>();
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState<IAddress | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (onAddressChange) {
@@ -35,14 +40,33 @@ export const AddressManager: React.FC<AddressManagerProps> = ({
     setShowForm(true);
   };
 
-  const handleDeleteAddress = async (addressId: string) => {
+  const handleDeleteAddress = (address: IAddress) => {
+    setAddressToDelete(address);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteAddress = async () => {
+    if (!addressToDelete) return;
+
+    setIsDeleting(true);
     try {
       if (onAddressDelete) {
-        await onAddressDelete(addressId);
+        await onAddressDelete(addressToDelete._id);
       }
       console.log("Address deleted successfully");
     } catch (err) {
       console.error("Error deleting address:", err);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+      setAddressToDelete(null);
+    }
+  };
+
+  const handleCloseDeleteModal = () => {
+    if (!isDeleting) {
+      setShowDeleteModal(false);
+      setAddressToDelete(null);
     }
   };
 
@@ -111,7 +135,6 @@ export const AddressManager: React.FC<AddressManagerProps> = ({
       </div>
 
       <div className="p-6">
-
         {!showForm && (
           <div className="mb-6">
             <h4 className="text-lg font-semibold text-gray-900 mb-4">
@@ -121,7 +144,9 @@ export const AddressManager: React.FC<AddressManagerProps> = ({
             {addresses.length === 0 ? (
               <div className="text-center py-8">
                 <MapPin className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 mb-4">Add your home and work addresses for faster service bookings</p>
+                <p className="text-gray-500 mb-4">
+                  Add your home and work addresses for faster service bookings
+                </p>
                 <Button
                   variant="primary"
                   onClick={handleAddAddress}
@@ -137,7 +162,7 @@ export const AddressManager: React.FC<AddressManagerProps> = ({
                     key={address._id}
                     address={address}
                     onEdit={handleEditAddress}
-                    onDelete={handleDeleteAddress}
+                    onDelete={() => handleDeleteAddress(address)}
                   />
                 ))}
               </div>
@@ -155,6 +180,21 @@ export const AddressManager: React.FC<AddressManagerProps> = ({
           />
         )}
       </div>
+
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={handleCloseDeleteModal}
+        title="Delete Address"
+        confirmText={isDeleting ? "Deleting..." : "Delete"}
+        cancelText="Cancel"
+        onConfirm={confirmDeleteAddress}
+        confirmButtonColor="red"
+      >
+        <p>
+          Are you sure you want to delete this address? This action cannot be
+          undone.
+        </p>
+      </Modal>
     </div>
   );
 };

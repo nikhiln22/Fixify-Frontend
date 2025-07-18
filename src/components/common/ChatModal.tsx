@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle, Send } from "lucide-react";
+import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
 interface ChatModalProps {
   isOpen: boolean;
   onClose: () => void;
   booking: any;
-  technician?: any;
-  user?: any;
   messages: any[];
   loading: boolean;
   onSendMessage: (message: string) => void;
@@ -18,8 +18,6 @@ export const ChatModal: React.FC<ChatModalProps> = ({
   isOpen,
   onClose,
   booking,
-  technician,
-  user,
   messages,
   loading,
   onSendMessage,
@@ -30,37 +28,24 @@ export const ChatModal: React.FC<ChatModalProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const currentUserRole = currentUserType;
-  
-  // Debug: Log the booking and technician/user props
-  console.log("Booking object:", booking);
-  console.log("Technician prop:", technician);
-  console.log("User prop:", user);
-  
-  const chatPartner = technician || user;
-  console.log("Chat Partner Object in chat modal:", chatPartner);
-  
-  // Try to get partner details from booking if technician/user are just IDs
+
   let partnerDetails = null;
-  if (typeof chatPartner === 'string') {
-    // If chatPartner is just an ID, try to get details from booking object
-    if (currentUserType === 'user' && booking?.technicianId && typeof booking.technicianId === 'object') {
-      partnerDetails = booking.technicianId;
-    } else if (currentUserType === 'technician' && booking?.userId && typeof booking.userId === 'object') {
-      partnerDetails = booking.userId;
-    }
+  if (currentUserType === "user") {
+    partnerDetails =
+      typeof booking?.technicianId === "object" ? booking.technicianId : null;
   } else {
-    partnerDetails = chatPartner;
+    partnerDetails =
+      typeof booking?.userId === "object" ? booking.userId : null;
   }
-  
-  console.log("Partner details:", partnerDetails);
-  
-  const chatPartnerName = partnerDetails?.username || partnerDetails?.name || "User";
-  const chatPartnerPhoto = partnerDetails?.profilePicture || 
-                          partnerDetails?.avatar || 
-                          partnerDetails?.photo || 
-                          partnerDetails?.profileImage ||
-                          partnerDetails?.userImage ||
-                          partnerDetails?.image;
+
+  const chatPartnerName = partnerDetails?.username || "User";
+  const chatPartnerPhoto = partnerDetails?.image || null;
+
+  const bookingId = booking?._id?.slice(-8).toUpperCase() || "N/A";
+  const serviceName =
+    typeof booking?.serviceId === "object"
+      ? booking.serviceId?.name
+      : "Service";
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -141,29 +126,27 @@ export const ChatModal: React.FC<ChatModalProps> = ({
           <div className="fixed inset-0 z-[70] pointer-events-none">
             <div className="flex h-full items-end justify-end p-4">
               <motion.div
-                className="bg-white rounded-lg w-full max-w-md h-[600px] flex flex-col shadow-xl pointer-events-auto"
+                className="bg-white rounded-lg w-full max-w-md h-[620px] flex flex-col shadow-xl pointer-events-auto"
                 variants={modalVariants}
                 initial="hidden"
                 animate="visible"
                 exit="exit"
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Header with Recipient Info */}
+
                 <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
                   <div className="flex items-center space-x-3">
                     {chatPartnerPhoto ? (
                       <div>
                         <img
-                          src={chatPartnerPhoto}
+                          src={buildCloudinaryUrl(chatPartnerPhoto)}
                           alt={chatPartnerName}
                           className="w-10 h-10 rounded-full object-cover"
-                          onError={(e) => {
-                            console.log("Image failed to load:", chatPartnerPhoto);
-                            e.currentTarget.style.display = 'none';
-                            e.currentTarget.nextElementSibling.style.display = 'flex';
-                          }}
                         />
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-medium" style={{display: 'none'}}>
+                        <div
+                          className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-medium"
+                          style={{ display: "none" }}
+                        >
                           {chatPartnerName.charAt(0).toUpperCase()}
                         </div>
                       </div>
@@ -172,9 +155,11 @@ export const ChatModal: React.FC<ChatModalProps> = ({
                         {chatPartnerName.charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <h3 className="font-medium text-lg text-gray-800">
-                      {chatPartnerName}
-                    </h3>
+                    <div>
+                      <h3 className="font-medium text-lg text-gray-800">
+                        {chatPartnerName}
+                      </h3>
+                    </div>
                   </div>
                   <button
                     onClick={onClose}
@@ -184,7 +169,32 @@ export const ChatModal: React.FC<ChatModalProps> = ({
                   </button>
                 </div>
 
-                {/* Messages Area */}
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="w-4 h-4 text-blue-500" />
+                      <span className="text-xs font-medium text-gray-600">
+                        Booking ID:
+                      </span>
+                      <span className="text-xs font-bold text-blue-700 bg-white px-3 py-1 rounded-full shadow-sm border border-blue-200">
+                        #{bookingId}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="w-4 h-4 text-blue-500" />
+                      <span className="text-xs font-medium text-gray-600">
+                        Service:
+                      </span>
+                      <span
+                        className="text-sm font-semibold text-gray-800 truncate max-w-[180px]"
+                        title={serviceName}
+                      >
+                        {serviceName}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex-1 p-4 overflow-y-auto bg-gray-50 space-y-3">
                   {loading ? (
                     <div className="flex justify-center items-center h-full">
@@ -205,7 +215,6 @@ export const ChatModal: React.FC<ChatModalProps> = ({
                         }`}
                       >
                         <div className="max-w-[80%]">
-                          {/* Message Bubble */}
                           <div
                             className={`rounded-lg px-4 py-2 ${
                               message.senderType === currentUserRole
@@ -214,12 +223,16 @@ export const ChatModal: React.FC<ChatModalProps> = ({
                             }`}
                           >
                             <div className="flex items-end justify-between gap-3">
-                              <p className="text-sm flex-1">{message.messageText}</p>
-                              <span className={`text-xs flex-shrink-0 ${
-                                message.senderType === currentUserRole
-                                  ? "text-blue-100"
-                                  : "text-gray-500"
-                              }`}>
+                              <p className="text-sm flex-1">
+                                {message.messageText}
+                              </p>
+                              <span
+                                className={`text-xs flex-shrink-0 ${
+                                  message.senderType === currentUserRole
+                                    ? "text-blue-100"
+                                    : "text-gray-500"
+                                }`}
+                              >
                                 {formatTimestamp(message.createdAt)}
                               </span>
                             </div>
@@ -231,7 +244,6 @@ export const ChatModal: React.FC<ChatModalProps> = ({
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Input Area */}
                 <div className="p-4 border-t border-gray-200 bg-white">
                   <form
                     onSubmit={handleSendMessage}
@@ -248,24 +260,12 @@ export const ChatModal: React.FC<ChatModalProps> = ({
                     <button
                       type="submit"
                       disabled={!newMessage.trim() || sending}
-                      className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {sending ? (
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                       ) : (
-                        <svg
-                          className="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                          />
-                        </svg>
+                        <Send className="w-5 h-5" />
                       )}
                     </button>
                   </form>

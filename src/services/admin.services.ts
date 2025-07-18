@@ -2,6 +2,7 @@ import axiosInstance from "../config/axios.config";
 import { ICoupon } from "../models/coupon";
 import { Idesignation } from "../models/designation";
 import { IOffer } from "../models/offer";
+import { ISubscriptionPlan } from "../models/subscriptionPlan";
 import { Itechnician } from "../models/technician";
 import { Iuser } from "../models/user";
 
@@ -447,15 +448,113 @@ export const addCoupon = async (formData: FormData) => {
   }
 };
 
-export const updateCoupon = async (offerId: string, formData: FormData) => {
+export const updateCoupon = async (couponId: string, formData: FormData) => {
   try {
     const response = await axiosInstance.put(
-      `/api/admin/updatecoupon/${offerId}`,
+      `/api/admin/updatecoupon/${couponId}`,
       formData
     );
     return response.data;
   } catch (error) {
     console.log("Error occured while updating the added offer:", error);
+    throw error;
+  }
+};
+
+export const addSubscriptionPlan = async (subscriptionPlanData: {
+  planName: string;
+  monthlyPrice: number;
+  commissionRate: number;
+}) => {
+  const response = await axiosInstance.post(
+    "/api/admin/addsubscriptionplan",
+    subscriptionPlanData
+  );
+  return response.data;
+};
+
+export const getAllSubscriptionPlans = async (
+  page?: number,
+  search?: string,
+  filterStatus?: string
+): Promise<{
+  data: ISubscriptionPlan[];
+  totalPages: number;
+  currentPage: number;
+  total: number;
+}> => {
+  try {
+    console.log("fetching the subscription plans for the admin");
+
+    const baseUrl = "/api/admin/subscriptionplans";
+    let queryParams = "";
+
+    if (page !== undefined) {
+      queryParams += `page=${page}&limit=6`;
+
+      if (search && search.trim() !== "") {
+        queryParams += `&search=${encodeURIComponent(search)}`;
+      }
+
+      if (filterStatus && filterStatus.trim() !== "") {
+        queryParams += `&filterStatus=${encodeURIComponent(filterStatus)}`;
+      }
+    }
+
+    const url = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
+
+    const response = await axiosInstance.get(url);
+    console.log(
+      "response in the fetchning all the subscription plans:",
+      response
+    );
+    return {
+      data: response.data.data?.subscriptionPlans || [],
+      totalPages: response.data.data?.pagination?.pages || 1,
+      currentPage: response.data.data?.pagination?.page || page || 1,
+      total: response.data.data?.pagination?.total || 0,
+    };
+  } catch (error) {
+    console.log("Error occurred while fetching subscription plans:", error);
+    return {
+      data: [],
+      totalPages: 0,
+      currentPage: page || 1,
+      total: 0,
+    };
+  }
+};
+
+export const toggleSubscriptionPlanStatus = async (
+  subscriptionPlanId: string
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/api/admin/blocksubscriptionplan/${subscriptionPlanId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("Error occured while blocking the subscription plan:", error);
+    throw error;
+  }
+};
+
+export const updateSubscriptionPlan = async (
+  subscriptionPlanId: string,
+  subscriptionPlanData: {
+    planName: string;
+    monthlyPrice: number;
+    commissionRate: number;
+  }
+) => {
+  try {
+    const response = await axiosInstance.put(
+      `/api/admin/updatesubscriptionplan/${subscriptionPlanId}`,
+      subscriptionPlanData
+    );
+    return response.data;
+  } catch (error) {
+    console.log("Error occurred while updating the subscription plan:", error);
     throw error;
   }
 };

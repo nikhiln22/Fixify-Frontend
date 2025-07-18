@@ -9,31 +9,30 @@ interface TechnicianCertificatesSectionProps {
   isLoading: boolean;
 }
 
-export const TechnicianCertificatesSection: React.FC<TechnicianCertificatesSectionProps> = ({
-  certificates = [],
-  onCertificatesUpdate,
-  isLoading
-}) => {
-  const [selectedCertificate, setSelectedCertificate] = useState<string | null>(null);
+export const TechnicianCertificatesSection: React.FC<
+  TechnicianCertificatesSectionProps
+> = ({ certificates = [], onCertificatesUpdate, isLoading }) => {
+  const [selectedCertificate, setSelectedCertificate] = useState<string | null>(
+    null
+  );
   const [isAddingCertificates, setIsAddingCertificates] = useState(false);
   const [newCertificates, setNewCertificates] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
 
-  // File validation
   const validateFile = (file: File): boolean => {
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    
+    const maxSize = 5 * 1024 * 1024;
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
     if (file.size > maxSize) {
       alert(`File ${file.name} is too large. Maximum size is 5MB.`);
       return false;
     }
-    
+
     if (!allowedTypes.includes(file.type)) {
       alert(`File ${file.name} is not a supported image format.`);
       return false;
     }
-    
+
     return true;
   };
 
@@ -41,7 +40,7 @@ export const TechnicianCertificatesSection: React.FC<TechnicianCertificatesSecti
     if (e.target.files) {
       const files = Array.from(e.target.files);
       const validFiles = files.filter(validateFile);
-      setNewCertificates(prev => [...prev, ...validFiles]);
+      setNewCertificates((prev) => [...prev, ...validFiles]);
     }
   };
 
@@ -49,11 +48,11 @@ export const TechnicianCertificatesSection: React.FC<TechnicianCertificatesSecti
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files) {
       const files = Array.from(e.dataTransfer.files);
       const validFiles = files.filter(validateFile);
-      setNewCertificates(prev => [...prev, ...validFiles]);
+      setNewCertificates((prev) => [...prev, ...validFiles]);
     }
   };
 
@@ -68,7 +67,7 @@ export const TechnicianCertificatesSection: React.FC<TechnicianCertificatesSecti
   };
 
   const removeCertificateFile = (index: number) => {
-    setNewCertificates(prev => prev.filter((_, i) => i !== index));
+    setNewCertificates((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSave = async () => {
@@ -96,11 +95,11 @@ export const TechnicianCertificatesSection: React.FC<TechnicianCertificatesSecti
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB'];
+    const sizes = ["Bytes", "KB", "MB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   return (
@@ -108,7 +107,9 @@ export const TechnicianCertificatesSection: React.FC<TechnicianCertificatesSecti
       <div className="bg-white rounded-3xl shadow-md">
         <div className="p-8 border-b border-gray-200 flex justify-between items-center">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Certificates</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Certificates
+            </h2>
           </div>
           <button
             onClick={() => setIsAddingCertificates(true)}
@@ -119,7 +120,7 @@ export const TechnicianCertificatesSection: React.FC<TechnicianCertificatesSecti
             Add Certificates
           </button>
         </div>
-        
+
         <div className="p-8">
           {certificates.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -150,8 +151,12 @@ export const TechnicianCertificatesSection: React.FC<TechnicianCertificatesSecti
           ) : (
             <div className="text-center py-12">
               <Camera className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No certificates uploaded yet</h3>
-              <p className="text-gray-500 mb-6">Add your professional certificates to build credibility</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No certificates uploaded yet
+              </h3>
+              <p className="text-gray-500 mb-6">
+                Add your professional certificates to build credibility
+              </p>
               <button
                 onClick={() => setIsAddingCertificates(true)}
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
@@ -194,9 +199,9 @@ export const TechnicianCertificatesSection: React.FC<TechnicianCertificatesSecti
         <div className="space-y-6">
           <div
             className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
-              dragActive 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-300 hover:border-blue-400'
+              dragActive
+                ? "border-blue-500 bg-blue-50"
+                : "border-gray-300 hover:border-blue-400"
             }`}
             onDrop={handleDrop}
             onDragOver={handleDrag}
@@ -239,7 +244,10 @@ export const TechnicianCertificatesSection: React.FC<TechnicianCertificatesSecti
               </div>
               <div className="space-y-2 max-h-40 overflow-y-auto">
                 {newCertificates.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <FileImage className="w-4 h-4 text-gray-500" />
                       <div>
@@ -269,7 +277,9 @@ export const TechnicianCertificatesSection: React.FC<TechnicianCertificatesSecti
               disabled={isLoading || newCertificates.length === 0}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex-1"
             >
-              {isLoading ? "Uploading..." : `Upload ${newCertificates.length} Certificate${newCertificates.length !== 1 ? 's' : ''}`}
+              {isLoading
+                ? "Uploading..."
+                : `Upload ${newCertificates.length} Certificate${newCertificates.length !== 1 ? "s" : ""}`}
             </Button>
             <Button
               onClick={handleCancel}

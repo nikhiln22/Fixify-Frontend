@@ -20,7 +20,7 @@ export interface TechnicianProfileResponse {
   message: string;
   success: boolean;
   status: number;
-  technician?: Itechnician;
+  data?: Itechnician;
 }
 
 export interface TimeSlotData {

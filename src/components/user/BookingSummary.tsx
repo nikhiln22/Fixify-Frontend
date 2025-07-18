@@ -1,17 +1,18 @@
 import React from "react";
 import Button from "../common/Button";
 import { BookingSummaryProps } from "../../types/component.types";
-
+import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
 export const BookingSummary: React.FC<BookingSummaryProps> = ({
   service,
   onConfirmBooking,
   isLoading = false,
-  disabled = false
+  disabled = false,
 }) => {
-  const serviceCharge = typeof service.price === 'number' 
-    ? service.price 
-    : parseInt(service.price || '450');
+  const serviceCharge =
+    typeof service.price === "number"
+      ? service.price
+      : parseInt(service.price || "450");
 
   const totalAmount = serviceCharge;
 
@@ -20,12 +21,12 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
       <h2 className="text-xl font-semibold text-gray-900 mb-6">
         Booking Summary
       </h2>
-      
+
       <div className="space-y-4 mb-6">
         <div className="flex items-start gap-3">
           {service.image && (
-            <img 
-              src={service.image} 
+            <img
+              src={buildCloudinaryUrl(service.image)}
               alt={service.name || service.designation}
               className="w-16 h-16 rounded-lg object-cover"
             />
@@ -44,13 +45,13 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
       </div>
 
       <hr className="my-4" />
-      
+
       <div className="space-y-3 mb-6">
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Service Charge:</span>
           <span className="font-medium">₹{serviceCharge}</span>
         </div>
-        
+
         <hr className="my-2" />
         <div className="flex justify-between text-lg font-semibold">
           <span>Total Amount:</span>
@@ -59,14 +60,14 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
       </div>
 
       <div className="space-y-3">
-        <Button 
+        <Button
           onClick={onConfirmBooking}
           variant="primary"
           className="w-full"
           isLoading={isLoading}
           disabled={disabled || isLoading}
         >
-          {isLoading ? 'Processing...' : 'Confirm Booking'}
+          {isLoading ? "Processing..." : "Confirm Booking"}
         </Button>
       </div>
     </div>

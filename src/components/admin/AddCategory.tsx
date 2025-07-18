@@ -4,6 +4,7 @@ import Button from "../../components/common/Button";
 import InputField from "../../components/common/InputField";
 import { AddCategoryProps } from "../../types/component.types";
 import { addCategorySchema } from "../../utils/validations/formvalidationSchema";
+import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 import { Upload, X } from "lucide-react";
 
 export const AddCategory: React.FC<AddCategoryProps> = ({
@@ -46,7 +47,7 @@ export const AddCategory: React.FC<AddCategoryProps> = ({
   const removeImage = () => {
     formik.setFieldValue("categoryImage", null);
     const fileInput = document.getElementById(
-      "category-image",
+      "category-image"
     ) as HTMLInputElement;
     if (fileInput) {
       fileInput.value = "";
@@ -56,7 +57,7 @@ export const AddCategory: React.FC<AddCategoryProps> = ({
   const imagePreview = formik.values.categoryImage
     ? formik.values.categoryImage instanceof File
       ? URL.createObjectURL(formik.values.categoryImage)
-      : formik.values.categoryImage
+      : buildCloudinaryUrl(formik.values.categoryImage as string)
     : undefined;
 
   return (

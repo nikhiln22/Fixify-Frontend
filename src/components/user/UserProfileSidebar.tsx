@@ -16,27 +16,35 @@ export const UserProfileSidebar: React.FC = () => {
       id: "bookings",
       label: "My Bookings",
       icon: Calendar,
-      path: "/user/bookinglist",
+      path: "/user/bookings",
     },
     {
       id: "wallet",
       label: "Wallet & Payments",
       icon: Wallet,
-      path: "/user/wallet", 
+      path: "/user/wallet",
     },
     {
       id: "settings",
       label: "Account Settings",
       icon: Settings,
-      path: "/user/settings", 
+      path: "/user/settings",
     },
     {
       id: "support",
       label: "Help & Support",
       icon: HelpCircle,
-      path: "/user/support", 
+      path: "/user/support",
     },
   ];
+
+  const isItemActive = (item: any) => {
+    if (item.id === "bookings") {
+      return location.pathname.startsWith("/user/bookings");
+    }
+
+    return location.pathname === item.path;
+  };
 
   return (
     <aside className="w-72 bg-gray-50 h-full border-r border-gray-100">
@@ -44,7 +52,7 @@ export const UserProfileSidebar: React.FC = () => {
         <ul className="space-y-2">
           {sidebarItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+            const isActive = isItemActive(item);
 
             return (
               <li key={item.id}>

@@ -10,6 +10,7 @@ import {
   getAllCategories,
   getAllDesignations,
 } from "../../services/common.services";
+import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
 export const AddService: React.FC<AddServiceProps> = ({
   onCancel,
@@ -231,7 +232,6 @@ export const AddService: React.FC<AddServiceProps> = ({
           )}
       </div>
 
-      {/* Job Designation Select Field */}
       <div className="mb-6 text-left">
         <SelectField
           label="Select Job Designation"
@@ -281,7 +281,7 @@ export const AddService: React.FC<AddServiceProps> = ({
           {imagePreview ? (
             <div className="mb-2 relative">
               <img
-                src={imagePreview}
+                src={buildCloudinaryUrl(imagePreview)}
                 alt="Service preview"
                 className="h-32 object-contain mx-auto"
               />
