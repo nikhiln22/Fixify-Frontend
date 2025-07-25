@@ -31,7 +31,6 @@ export const Login: React.FC<LoginProps> = ({ role, onsubmit }) => {
   return (
     <AuthLayout role={role || "USER"}>
       <div className="space-y-8">
-        {/* Header with animations */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -46,7 +45,6 @@ export const Login: React.FC<LoginProps> = ({ role, onsubmit }) => {
           </p>
         </motion.div>
 
-        {/* Form with improved styling */}
         <motion.form
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

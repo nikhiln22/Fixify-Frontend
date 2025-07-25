@@ -21,7 +21,7 @@ export interface OtpProps {
     values: { otp: string },
     email: string,
     purpose: OtpPurpose,
-    tempId?: string,
+    tempId?: string
   ) => Promise<void>;
   onResendOtp: (email: string) => Promise<void>;
 }
@@ -52,7 +52,12 @@ export interface LoginFormData {
 
 export interface LoginResponse {
   success: boolean;
-  data: Iadmin | Iuser | Itechnician;
+  data: {
+    admin: Iadmin;
+    user: Iuser;
+    technician: Itechnician;
+    access_token: string;
+  };
   message: string;
   status?: number;
 }
@@ -140,13 +145,13 @@ export interface ResetPasswordResponse {
 }
 
 export function isUserOTPVerification(
-  payload: OTPVerification,
+  payload: OTPVerification
 ): payload is UserOTPVerification {
   return "tempUserId" in payload;
 }
 
 export function isTechnicianOTPVerification(
-  payload: OTPVerification,
+  payload: OTPVerification
 ): payload is TechnicianOTPVerification {
   return "tempTechnicianId" in payload;
 }

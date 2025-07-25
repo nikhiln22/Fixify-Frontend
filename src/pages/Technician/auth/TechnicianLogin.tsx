@@ -19,22 +19,15 @@ export const TechnicianLogin: React.FC = () => {
       console.log("response from the technician login page:", response);
 
       if (response.success) {
-        const serverRole = response.data.role || "TECHNICIAN";
-
         showToast({
           message: "Login successful!",
           type: "success",
         });
 
-        Cookies.set(
-          `${serverRole.toLowerCase()}_access_token`,
-          response.data.access_token,
-        );
+        Cookies.set("access_token", response.data.access_token);
 
-        if ("technician" in response.data) {
-          const technicianData = response.data.technician as Itechnician;
-          dispatch(setTechnicianData(technicianData));
-        }
+        const technicianData = response.data.technician as Itechnician;
+        dispatch(setTechnicianData(technicianData));
 
         navigate("/technician/portal");
       } else {

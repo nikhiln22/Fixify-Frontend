@@ -8,6 +8,7 @@ import { TechnicianProfileResponse } from "../types/technicians.types";
 import { BookServiceResponse } from "../types/user.types";
 import { Role } from "../types/auth.types";
 import { IChat } from "../models/chat";
+import { TECHNICIAN_API, ADMIN_API, USER_API } from "../constants/apiRoutes";
 
 export const getAllDesignations = async (
   page?: number,
@@ -37,8 +38,8 @@ export const getAllDesignations = async (
 
     const baseUrl =
       role === "admin"
-        ? "/api/admin/jobdesignations"
-        : "/api/technician/jobdesignations";
+        ? `${ADMIN_API}/jobdesignations`
+        : `${TECHNICIAN_API}/jobdesignations`;
 
     const url = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
     const response = await axiosInstance.get(url);
@@ -107,7 +108,7 @@ export const getAllCategories = async (
     }
 
     const baseUrl =
-      role === "admin" ? "/api/admin/categories" : "/api/user/categories";
+      role === "admin" ? `${ADMIN_API}/categories` : `${USER_API}/categories`;
 
     const url = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
 
@@ -164,7 +165,7 @@ export const getAllServices = async (
     }
 
     const baseUrl =
-      role === "admin" ? "/api/admin/services" : "/api/user/services";
+      role === "admin" ? `${ADMIN_API}/services` : `${USER_API}/services`;
     const url = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
 
     const response = await axiosInstance.get(url);
@@ -197,12 +198,12 @@ export const getTechnicianProfile = async (
     let url: string;
 
     if (role === "technician") {
-      url = "/api/technician/profile";
+      url = `${TECHNICIAN_API}/profile`;
     } else if (role === "admin") {
       if (!technicianId) {
         throw new Error("Technician ID is required for admin access");
       }
-      url = `/api/admin/technicianprofile/${technicianId}`;
+      url = `${ADMIN_API}/technicianprofile/${technicianId}`;
     } else {
       throw new Error("Invalid role specified");
     }
@@ -252,16 +253,16 @@ export const getBookings = async (
     let baseUrl = "";
     switch (role) {
       case "user":
-        baseUrl = "/api/user/bookings";
+        baseUrl = `${USER_API}/bookings`;
         break;
       case "technician":
-        baseUrl = "/api/technician/bookings";
+        baseUrl = `${TECHNICIAN_API}/bookings`;
         break;
       case "admin":
-        baseUrl = "/api/admin/bookings";
+        baseUrl = `${ADMIN_API}/bookings`;
         break;
       default:
-        baseUrl = "/api/user/bookings";
+        baseUrl = `${USER_API}/bookings`;
     }
 
     const url = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
@@ -314,8 +315,8 @@ export const getChatMessages = async (
 
     const baseUrl =
       role === "user"
-        ? `/api/user/chatmessages/${bookingId}`
-        : `/api/technician/chatmessages/${bookingId}`;
+        ? `${USER_API}/chatmessages/${bookingId}`
+        : `${TECHNICIAN_API}/chatmessages/${bookingId}`;
 
     const response = await axiosInstance.get(baseUrl);
     console.log("chat messages response:", response);
@@ -350,8 +351,8 @@ export const sendChatMessage = async (
 
     const baseUrl =
       role === "user"
-        ? `/api/user/sendchatmessages/${bookingId}`
-        : `/api/technician/sendchatmessages/${bookingId}`;
+        ? `${USER_API}/sendchatmessages/${bookingId}`
+        : `${TECHNICIAN_API}/sendchatmessages/${bookingId}`;
 
     const requestBody = {
       messageText,

@@ -19,30 +19,23 @@ export const UserLogin: React.FC = () => {
       console.log("response from the user login page:", response);
 
       if (response.success) {
-        const serverRole = response.data.role || "USER";
-
         showToast({
           message: "Login successful!",
           type: "success",
         });
 
-        Cookies.set(
-          `${serverRole.toLowerCase()}_access_token`,
-          response.data.access_token
-        );
+        Cookies.set("access_token", response.data.access_token);
 
-        if ("user" in response.data) {
-          const userData = response.data.user as Iuser;
-          console.log("username:", userData.username);
-          const userInfo = {
-            username: userData.username,
-            email: userData.email,
-            phone: userData.phone,
-            image: userData.image,
-          };
-          console.log("before dispatching the user details to the state");
-          dispatch(setUserData(userInfo));
-        }
+        const userData = response.data.user as Iuser;
+        console.log("username:", userData.username);
+        const userInfo = {
+          username: userData.username,
+          email: userData.email,
+          phone: userData.phone,
+          image: userData.image,
+        };
+        console.log("before dispatching the user details to the state");
+        dispatch(setUserData(userInfo));
 
         navigate("/user/home");
       } else {

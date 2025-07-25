@@ -6,6 +6,7 @@ import {
   SubmitTechnicianQualificationResponse,
   TimeSlotData,
 } from "../types/technicians.types";
+import { TECHNICIAN_API } from "../constants/apiRoutes";
 
 export const submitTechnicianQualification = async (
   formdata: FormData
@@ -13,7 +14,7 @@ export const submitTechnicianQualification = async (
   try {
     const response =
       await axiosInstance.patch<SubmitTechnicianQualificationResponse>(
-        "/api/technician/qualifications",
+        `${TECHNICIAN_API}/qualifications`,
         formdata,
         {
           headers: {
@@ -33,7 +34,7 @@ export const createTimeSlots = async (
 ): Promise<CreateTimeSlotsResponse> => {
   try {
     const response = await axiosInstance.post<CreateTimeSlotsResponse>(
-      "/api/technician/addtimeslot",
+      `${TECHNICIAN_API}/addtimeslot`,
       timeSlotData,
       {
         headers: {
@@ -57,7 +58,7 @@ export const getTimeSlots = async (options?: {
   }
   try {
     const response = await axiosInstance.get<GetTimeSlotResponse>(
-      "/api/technician/timeslot",
+      `${TECHNICIAN_API}/timeslot`,
       { params }
     );
     return response.data;
@@ -70,7 +71,7 @@ export const getTimeSlots = async (options?: {
 export const blockTimeSlot = async (slotId: string) => {
   try {
     const response = await axiosInstance.patch(
-      `/api/technician/blockslot/${slotId}`
+      `${TECHNICIAN_API}/blockslot/${slotId}`
     );
     return response.data;
   } catch (error) {
@@ -85,7 +86,7 @@ export const blockTimeSlot = async (slotId: string) => {
 export const generateCompletionOtp = async (bookingId: string) => {
   try {
     const response = await axiosInstance.post(
-      `/api/technician/generatecompletionotp/${bookingId}`
+      `${TECHNICIAN_API}/generatecompletionotp/${bookingId}`
     );
     return response;
   } catch (error) {
@@ -97,7 +98,7 @@ export const generateCompletionOtp = async (bookingId: string) => {
 export const verifyCompletionOtp = async (bookingId: string, otp: string) => {
   try {
     const response = await axiosInstance.post(
-      `/api/technician/verifycompletionotp/${bookingId}`,
+      `${TECHNICIAN_API}/verifycompletionotp/${bookingId}`,
       { otp }
     );
     return response.data;
@@ -109,7 +110,7 @@ export const verifyCompletionOtp = async (bookingId: string, otp: string) => {
 
 export const walletBalance = async () => {
   try {
-    const response = await axiosInstance.get("/api/technician/walletbalance");
+    const response = await axiosInstance.get(`${TECHNICIAN_API}/walletbalance`);
     console.log("response in the wallet balance checking api", response);
     return response.data;
   } catch (error) {
@@ -127,7 +128,7 @@ export const getWalletTransactions = async (
   total: number;
 }> => {
   try {
-    const url = `/api/technician/wallettransactions?page=${page}&limit=6`;
+    const url = `${TECHNICIAN_API}/wallettransactions?page=${page}&limit=6`;
     const response = await axiosInstance.get(url);
     console.log("response in the fetching wallet transactions api:", response);
     return {
@@ -153,7 +154,7 @@ export const cancelBooking = async (
 ) => {
   try {
     const response = await axiosInstance.put(
-      `/api/technician/cancelbooking/${bookingId}`,
+      `${TECHNICIAN_API}/cancelbooking/${bookingId}`,
       {
         cancellationReason,
       }
@@ -168,10 +169,20 @@ export const cancelBooking = async (
 
 export const getReviews = async () => {
   try {
-    const response = await axiosInstance.get("/api/technician/reviews");
+    const response = await axiosInstance.get(`${TECHNICIAN_API}/reviews`);
     return response.data;
   } catch (error) {
     console.log("error occured while fetching the reviews:", error);
+    throw error;
+  }
+};
+
+export const getActiveSubscriptionPlan = async () => {
+  try {
+    const response = await axiosInstance.get(`${TECHNICIAN_API}/subscription`);
+    return response.data;
+  } catch (error) {
+    console.log("error occured while fetching the active subscription:", error);
     throw error;
   }
 };

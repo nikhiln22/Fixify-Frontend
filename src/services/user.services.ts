@@ -13,11 +13,12 @@ import {
   CreateBookingRequest,
   BookServiceResponse,
 } from "../types/user.types";
+import { USER_API } from "../constants/apiRoutes";
 
 export const getUserProfile = async (): Promise<UserProfileResponse> => {
   try {
     console.log("fetching the profile of the user in user service:");
-    const response = await axiosInstance.get("/api/user/profile");
+    const response = await axiosInstance.get(`${USER_API}/profile`);
     return response.data;
   } catch (error) {
     console.log("error occured while fetching the user profile:", error);
@@ -28,7 +29,7 @@ export const getUserProfile = async (): Promise<UserProfileResponse> => {
 export const editProfile = async (formData: FormData): Promise<Iuser> => {
   try {
     const response = await axiosInstance.put(
-      "/api/user/updateprofile",
+      `${USER_API}/updateprofile`,
       formData,
       {
         headers: {
@@ -48,7 +49,7 @@ export const addAddress = async (
 ): Promise<AddAddressResponse> => {
   try {
     const response = await axiosInstance.post(
-      "/api/user/addaddress",
+      `${USER_API}/addaddress`,
       addressData
     );
     return response.data;
@@ -60,7 +61,7 @@ export const addAddress = async (
 
 export const getUserAddresses = async (): Promise<getAddressResponse> => {
   try {
-    const response = await axiosInstance.get("/api/user/address");
+    const response = await axiosInstance.get(`${USER_API}/address`);
     return response.data;
   } catch (error) {
     console.log("error occurred while fetching addresses:", error);
@@ -74,7 +75,7 @@ export const updateAddress = async (
 ): Promise<UpdateAddressResponse> => {
   try {
     const response = await axiosInstance.put(
-      `/api/user/updateaddress/${addressId}`,
+      `${USER_API}/updateaddress/${addressId}`,
       addressData
     );
     return response.data;
@@ -89,7 +90,7 @@ export const deleteAddress = async (
 ): Promise<DeleteAddressResponse> => {
   try {
     const response = await axiosInstance.delete(
-      `/api/user/deleteaddress/${addressId}`
+      `${USER_API}/deleteaddress/${addressId}`
     );
     return response.data;
   } catch (error) {
@@ -101,7 +102,7 @@ export const deleteAddress = async (
 export const getServiceDetails = async (serviceId: string) => {
   try {
     const response = await axiosInstance.get(
-      `/api/user/servicedetails/${serviceId}`
+      `${USER_API}/servicedetails/${serviceId}`
     );
     return response.data.data;
   } catch (error) {
@@ -117,7 +118,7 @@ export const getNearbyTechnicians = async (
   radius: number = 10
 ): Promise<Itechnician[]> => {
   try {
-    const response = await axiosInstance.get("/api/user/technicians", {
+    const response = await axiosInstance.get(`${USER_API}/technicians`, {
       params: {
         designationId,
         latitude,
@@ -138,7 +139,7 @@ export const getTimeSlots = async (
 ): Promise<GetTimeSlotResponse> => {
   try {
     const response = await axiosInstance.get(
-      `api/user/timeslots/${technicinaId}`,
+      `${USER_API}/timeslots/${technicinaId}`,
       {
         params: {
           includePast: includePast,
@@ -157,7 +158,7 @@ export const bookService = async (
 ): Promise<BookServiceResponse> => {
   try {
     const response = await axiosInstance.post(
-      "/api/user/bookservice",
+      `${USER_API}/bookservice`,
       bookingData
     );
     return response.data;
@@ -170,7 +171,7 @@ export const bookService = async (
 export const verifyPaymentSession = async (sessionId: string) => {
   try {
     const response = await axiosInstance.get(
-      `/api/user/verifypayment/${sessionId}`
+      `${USER_API}/verifypayment/${sessionId}`
     );
     return response.data;
   } catch (error) {
@@ -181,7 +182,9 @@ export const verifyPaymentSession = async (sessionId: string) => {
 
 export const addMoney = async (amount: number) => {
   try {
-    const response = await axiosInstance.post("/api/user/addmoney", { amount });
+    const response = await axiosInstance.post(`${USER_API}/addmoney`, {
+      amount,
+    });
     console.log("response in the add money to wallet api call:", response);
     return response.data;
   } catch (error) {
@@ -193,7 +196,7 @@ export const addMoney = async (amount: number) => {
 export const verifyWalletSession = async (sessionId: string) => {
   try {
     const response = await axiosInstance.get(
-      `/api/user/verifywalletsession/${sessionId}`
+      `${USER_API}/verifywalletsession/${sessionId}`
     );
     console.log("response in the verifyWalletSession api call:", response);
     return response.data;
@@ -207,7 +210,7 @@ export const verifyWalletSession = async (sessionId: string) => {
 
 export const walletBalance = async () => {
   try {
-    const response = await axiosInstance.get("/api/user/walletbalance");
+    const response = await axiosInstance.get(`${USER_API}/walletbalance`);
     console.log("response in the wallet balance checking api", response);
     return response.data;
   } catch (error) {
@@ -225,7 +228,7 @@ export const getWalletTransactions = async (
   total: number;
 }> => {
   try {
-    const url = `/api/user/wallettransactions?page=${page}&limit=6`;
+    const url = `${USER_API}/wallettransactions?page=${page}&limit=6`;
     const response = await axiosInstance.get(url);
     console.log("response in the fetching wallet transactions api:", response);
     return {
@@ -251,7 +254,7 @@ export const cancelBooking = async (
 ) => {
   try {
     const response = await axiosInstance.put(
-      `/api/user/cancelbooking/${bookingId}`,
+      `${USER_API}/cancelbooking/${bookingId}`,
       {
         cancellationReason,
       }
@@ -272,7 +275,7 @@ export const rateService = async (
 ) => {
   try {
     const response = await axiosInstance.post(
-      `/api/user/rateservice/${bookingId}`,
+      `${USER_API}/rateservice/${bookingId}`,
       { rating, review }
     );
     return response.data;

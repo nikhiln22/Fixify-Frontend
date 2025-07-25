@@ -279,20 +279,57 @@ export const addCouponSchema = Yup.object().shape({
 export const subscriptionPlanSchema = Yup.object({
   planName: Yup.string()
     .required("Plan name is required")
-    .oneOf(["BASIC", "PRO", "ELITE"], "Plan name must be BASIC, PRO, or ELITE"),
+    .min(2, "Plan name must be at least 2 characters")
+    .max(50, "Plan name cannot exceed 50 characters")
+    .matches(
+      /^[A-Z0-9\s_-]+$/,
+      "Plan name can only contain uppercase letters, numbers, spaces, hyphens, and underscores"
+    )
+    .trim(),
 
-  monthlyPrice: Yup.number()
-    .when("planName", {
-      is: "BASIC",
-      then: (schema) => schema.notRequired(),
-      otherwise: (schema) => schema.required("Monthly price is required"),
-    })
+  price: Yup.number()
+    .required("Monthly price is required")
     .min(0, "Monthly price cannot be negative")
-    .max(10000, "Monthly price cannot exceed ₹10,000"),
+    .max(100000, "Monthly price cannot exceed ₹1,00,000")
+    .test(
+      "decimal-places",
+      "Monthly price can have at most 2 decimal places",
+      (value) => {
+        if (value === undefined || value === null) return true;
+        return Number.isInteger(value * 100);
+      }
+    ),
 
   commissionRate: Yup.number()
     .required("Commission rate is required")
-    .min(1, "Commission rate must be at least 1%")
-    .max(50, "Commission rate cannot exceed 50%")
-    .integer("Commission rate must be a whole number"),
+    .min(0, "Commission rate cannot be negative")
+    .max(100, "Commission rate cannot exceed 100%")
+    .test(
+      "decimal-places",
+      "Commission rate can have at most 2 decimal places",
+      (value) => {
+        if (value === undefined || value === null) return true;
+        return Number.isInteger(value * 100);
+      }
+    ),
+
+  WalletCreditDelay: Yup.number()
+    .required("Wallet credit delay is required")
+    .min(0, "Wallet credit delay cannot be negative")
+    .max(365, "Wallet credit delay cannot exceed 365 days")
+    .integer("Wallet credit delay must be a whole number"),
+
+  profileBoost: Yup.string()
+    .required("Profile boost selection is required")
+    .oneOf(["true", "false"], "Invalid profile boost selection"),
+
+  durationInMonths: Yup.number()
+    .required("Duration is required")
+    .min(0, "Duration must be at least 1 month")
+    .max(60, "Duration cannot exceed 60 months")
+    .integer("Duration must be a whole number"),
+
+  description: Yup.string()
+    .max(500, "Description cannot exceed 500 characters")
+    .trim(),
 });

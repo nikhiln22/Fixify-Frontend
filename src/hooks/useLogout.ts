@@ -36,7 +36,7 @@ const useLogout = () => {
           message: response.message || "Logged out successfully",
         });
 
-        Cookies.remove(`${currentInterface.toLowerCase()}_access_token`);
+        Cookies.remove("access_token");
 
         switch (currentInterface) {
           case "USER":
