@@ -1,6 +1,13 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { User, Settings, Clock, Briefcase, DollarSign } from "lucide-react";
+import {
+  User,
+  Settings,
+  Clock,
+  Briefcase,
+  DollarSign,
+  CreditCard,
+} from "lucide-react";
 
 export const TechnicianProfileSidebar: React.FC = () => {
   const location = useLocation();
@@ -29,6 +36,12 @@ export const TechnicianProfileSidebar: React.FC = () => {
       label: "Earnings & Payments",
       icon: DollarSign,
       path: "/technician/earnings",
+    },
+    {
+      id: "subscription",
+      label: "My Subscription",
+      icon: CreditCard,
+      path: "/technician/subscription",
     },
     {
       id: "settings",

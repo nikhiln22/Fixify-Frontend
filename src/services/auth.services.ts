@@ -45,17 +45,18 @@ export const refreshToken = async (role: Role) => {
     const response = await axios.post(
       `${envConfig.apiUrl}/api/refreshtoken`,
       { role: role.toLowerCase() },
-      { withCredentials: true },
+      { withCredentials: true }
     );
 
     console.log("Response data:", response.data);
 
     if (response.data.success) {
-      const newAccessToken = response.data.access_token;
+      const newAccessToken = response.data.data.access_token;
 
-      Cookies.set(`${role.toLowerCase()}_access_token`, newAccessToken, {
+      Cookies.set(`access_token`, newAccessToken, {
         path: "/",
       });
+
       axiosInstance.defaults.headers.common["Authorization"] =
         `Bearer ${newAccessToken}`;
 
@@ -79,6 +80,7 @@ export const refreshToken = async (role: Role) => {
   }
 };
 
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -91,18 +93,15 @@ axiosInstance.interceptors.response.use(
     ) {
       console.log("Account is blocked, redirecting to login...");
 
-      Cookies.remove(`${role.toLowerCase()}_access_token`);
-
+      Cookies.remove(`access_token`);
       delete axiosInstance.defaults.headers.common["Authorization"];
 
       window.location.href = `/${role.toLowerCase()}/login?blocked=true`;
-
       return Promise.reject(error);
     }
 
     if (
-      error.response &&
-      error.response.status === 401 &&
+      error.response?.status === 401 &&
       !error.config.url.includes("/api/refreshtoken")
     ) {
       try {
@@ -120,73 +119,21 @@ axiosInstance.interceptors.response.use(
         }
       } catch (refreshError) {
         console.error("Could not refresh token, logging out...");
-        Cookies.remove(`${role.toLowerCase()}_access_token`);
-        window.location.href = `/${role.toLowerCase()}/login`;
-        return Promise.reject(refreshError);
-      }
-    }
-    return Promise.reject(error);
-  },
-);
-
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !error.config.url.includes("/api/refreshtoken")
-    ) {
-      const urlpath = error.config.url || "";
-      let role: Role;
-
-      if (urlpath.includes("/api/technician/")) {
-        role = "TECHNICIAN";
-      } else if (urlpath.includes("/api/admin/")) {
-        role = "ADMIN";
-      } else {
-        role = "USER";
-      }
-
-      try {
-        const newAccessToken = await refreshToken(role);
-        if (newAccessToken) {
-          const newConfig = { ...error.config };
-          if (!newConfig.headers) {
-            newConfig.headers = {};
-          }
-          newConfig.headers["Authorization"] = `Bearer ${newAccessToken}`;
-
-          return axios(newConfig);
-        } else {
-          throw new Error("Could not get a new token");
-        }
-      } catch (refreshError) {
-        console.error("Could not refresh token, logging out...");
-        Cookies.remove(`${role.toLowerCase()}_access_token`);
+        Cookies.remove(`access_token`);
         window.location.href = `/${role.toLowerCase()}/login`;
         return Promise.reject(refreshError);
       }
     }
 
     return Promise.reject(error);
-  },
+  }
 );
+
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const urlpath = config.url || "";
-    let role = "user";
-
-    if (urlpath.includes("/api/technician/")) {
-      role = "technician";
-    } else if (urlpath.includes("/api/admin/")) {
-      role = "admin";
-    } else {
-      role = "user";
-    }
-
-    const accessToken = Cookies.get(`${role}_access_token`);
+    console.log("config in adding the token to the request:", config);
+    const accessToken = Cookies.get(`access_token`);
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
@@ -196,14 +143,14 @@ axiosInstance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  },
+  }
 );
 
 const login = async (formData: LoginFormData, role: Role) => {
   const response = await axiosInstance.post<LoginResponse>(
     getAuthUrl(role, "login"),
     formData,
-    { withCredentials: true },
+    { withCredentials: true }
   );
   return response.data;
 };
@@ -211,7 +158,7 @@ const login = async (formData: LoginFormData, role: Role) => {
 const register = async (formData: RegisterFormData, role: UserLikeRoles) => {
   const response = await axiosInstance.post<TempRegisterResponse>(
     getAuthUrl(role, "register"),
-    formData,
+    formData
   );
   return response.data;
 };
@@ -219,7 +166,7 @@ const register = async (formData: RegisterFormData, role: UserLikeRoles) => {
 const verifyOtp = async (
   data: OTPVerification,
   role: UserLikeRoles,
-  purpose: "REGISTRATION" | "PASSWORD_RESET" = "REGISTRATION",
+  purpose: "REGISTRATION" | "PASSWORD_RESET" = "REGISTRATION"
 ) => {
   let payload;
   if (role.toLowerCase() === "technician") {
@@ -245,7 +192,7 @@ const resendOtp = async (email: string, role: UserLikeRoles) => {
 const forgotPassword = async (email: string, role: UserLikeRoles) => {
   const response = await axiosInstance.post(
     getAuthUrl(role, "forgotpassword"),
-    { email },
+    { email }
   );
   return response.data;
 };
@@ -253,7 +200,7 @@ const forgotPassword = async (email: string, role: UserLikeRoles) => {
 const resetPassword = async (
   email: string,
   password: string,
-  role: UserLikeRoles,
+  role: UserLikeRoles
 ): Promise<{ message: string }> => {
   const response = await axiosInstance.post(getAuthUrl(role, "resetpassword"), {
     email,
@@ -263,14 +210,7 @@ const resetPassword = async (
 };
 
 const logOut = async (role: Role) => {
-  const accessToken = Cookies.get(`${role.toLowerCase()}_access_token`);
-
-  const response = await axiosInstance.get(getAuthUrl(role, "logout"), {
-    withCredentials: true,
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  const response = await axiosInstance.get(getAuthUrl(role, "logout"));
   return response.data;
 };
 

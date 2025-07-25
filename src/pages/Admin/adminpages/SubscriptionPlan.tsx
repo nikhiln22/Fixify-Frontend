@@ -28,6 +28,12 @@ export const SubscriptionPlan: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
 
+  const [overviewData, setOverviewData] = useState({
+    activeTechnicians: 0,
+    paidSubscribers: 0,
+    monthlyRevenue: 0,
+  });
+
   const itemsPerPage = 6;
 
   const statusOptions = [
@@ -44,7 +50,17 @@ export const SubscriptionPlan: React.FC = () => {
         filterStatus,
       });
 
-      return await getAllSubscriptionPlans(page, searchQuery, filterStatus);
+      const result = await getAllSubscriptionPlans(
+        page,
+        searchQuery,
+        filterStatus
+      );
+
+      if (result.overview) {
+        setOverviewData(result.overview);
+      }
+
+      return result;
     },
     [searchQuery, filterStatus]
   );
@@ -191,7 +207,7 @@ export const SubscriptionPlan: React.FC = () => {
     <AdminLayout>
       <div className="p-4">
         <h1 className="text-3xl font-semibold mb-4">Subscription Plans</h1>
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-6">
           <div className="w-full md:w-1/3 relative">
             <input
               type="text"
@@ -228,6 +244,36 @@ export const SubscriptionPlan: React.FC = () => {
             >
               Add Subscription Plan
             </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+            <h3 className="text-lg font-semibold text-blue-800 mb-2">
+              Active Technicians
+            </h3>
+            <p className="text-3xl font-bold text-blue-600">
+              {overviewData.activeTechnicians}
+            </p>
+          </div>
+
+          <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+            <h3 className="text-lg font-semibold text-green-800 mb-2">
+              Paid Subscribers
+            </h3>
+            <p className="text-3xl font-bold text-green-600">
+              {overviewData.paidSubscribers}
+            </p>
+          </div>
+
+          <div className="bg-pink-50 border border-pink-200 rounded-lg p-6 text-center">
+            <h3 className="text-lg font-semibold text-pink-800 mb-2">
+              Monthly Revenue
+            </h3>
+            <p className="text-2xl font-bold text-pink-600">
+              {" "}
+              ₹ {overviewData.monthlyRevenue.toLocaleString("en-IN")}/-
+            </p>
           </div>
         </div>
       </div>
@@ -267,8 +313,12 @@ export const SubscriptionPlan: React.FC = () => {
                 ? ({
                     _id: selectedSubscriptionPlan._id,
                     planName: selectedSubscriptionPlan.planName,
-                    monthlyPrice: selectedSubscriptionPlan.monthlyPrice,
+                    price: selectedSubscriptionPlan.price,
                     commissionRate: selectedSubscriptionPlan.commissionRate,
+                    WalletCreditDelay:
+                      selectedSubscriptionPlan.WalletCreditDelay,
+                    durationInMonths: selectedSubscriptionPlan.durationInMonths,
+                    description: selectedSubscriptionPlan.description,
                   } as Partial<ISubscriptionPlan>)
                 : undefined
             }

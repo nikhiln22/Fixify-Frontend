@@ -15,17 +15,12 @@ export const AdminLogin: React.FC = () => {
       console.log("response from the admin login page:", response);
 
       if (response.success) {
-        const serverRole = response.data.role || "ADMIN";
-
         showToast({
           message: "Login successful!",
           type: "success",
         });
 
-        Cookies.set(
-          `${serverRole.toLowerCase()}_access_token`,
-          response.data.access_token,
-        );
+        Cookies.set("access_token", response.data.access_token);
 
         navigate("/admin/dashboard");
       } else {

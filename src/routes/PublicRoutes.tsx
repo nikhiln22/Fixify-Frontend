@@ -1,10 +1,12 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { getAccessToken } from "../utils/authUtils";
 import { PublicRouteProps } from "../types/component.types";
+import cookie from "js-cookie";
 
-const PublicRoute: React.FC<PublicRouteProps> = ({ role, redirectTo }) => {
-  const token = getAccessToken(role);
+const PublicRoute: React.FC<PublicRouteProps> = ({ redirectTo }) => {
+  const token = cookie.get("access_token");
+
+  console.log("token in the public route:", token);
 
   if (token) {
     return <Navigate to={redirectTo} />;
@@ -13,7 +15,6 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ role, redirectTo }) => {
   return <Outlet />;
 };
 
-// Export specific public routes
 export const UserPublicRoute: React.FC = () => {
   return <PublicRoute role="USER" redirectTo="/user/home" />;
 };

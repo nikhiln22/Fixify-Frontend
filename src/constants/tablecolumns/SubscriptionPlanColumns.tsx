@@ -25,29 +25,42 @@ export const getSubscriptionPlanColumns = (
     ),
   },
   {
-    key: "monthlyPrice",
-    label: "Monthly Price",
+    key: "price",
+    label: "Price",
     render: (item) => (
-      <div className="text-center font-medium">{item?.monthlyPrice || 0}</div>
+      <div className="text-center font-medium">₹{item?.price || 0}</div>
     ),
   },
   {
     key: "commissionRate",
-    label: "Commision Rate",
+    label: "Commission Rate",
     render: (item) => (
       <div className="text-center font-medium">
-        {item?.commissionRate || 0} %
+        {item?.commissionRate || 0}%
       </div>
     ),
   },
   {
-    key: "monthlyPrice",
-    label: "Duration",
+    key: "WalletCreditDelay",
+    label: "Credit Delay",
     render: (item) => (
       <div className="text-center font-medium">
-        {item?.monthlyPrice === 0 ? "Lifetime" : "1 Month"}
+        {item?.WalletCreditDelay || 0} Days
       </div>
     ),
+  },
+  {
+    key: "durationInMonths",
+    label: "Duration",
+    render: (item) => {
+      const duration = item?.durationInMonths || 0;
+      const displayText =
+        duration === 0
+          ? "Lifetime"
+          : `${duration} Month${duration === 1 ? "" : "s"}`;
+
+      return <div className="text-center font-medium">{displayText}</div>;
+    },
   },
   {
     key: "status",
@@ -126,7 +139,7 @@ export const getSubscriptionPlanColumns = (
                 <p>
                   Are you sure you want to {item?.status ? "block" : "unblock"}{" "}
                   the Subscription Plan{" "}
-                  <strong>"{item?.planName || "this coupon"}"</strong>?
+                  <strong>"{item?.planName || "this plan"}"</strong>?
                 </p>
               )}
             </Modal>

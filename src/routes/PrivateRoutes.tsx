@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { getAccessToken } from "../utils/authUtils";
 import authService from "../services/auth.services";
 import { PrivateRouteProps } from "../types/component.types";
+import cookie from "js-cookie";
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ role }) => {
   const [isChecking, setIsChecking] = useState(true);
@@ -13,7 +13,8 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ role }) => {
   }, []);
 
   const checkAuth = async () => {
-    const token = getAccessToken(role);
+    const token = cookie.get("access_token");
+    console.log("token in the private route:", token);
 
     if (token) {
       setIsAuthenticated(true);
