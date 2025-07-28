@@ -7,6 +7,7 @@ import {
   TimeSlotData,
 } from "../types/technicians.types";
 import { TECHNICIAN_API } from "../constants/apiRoutes";
+import { ISubscriptionPlanHistory } from "../models/subscriptionPlanHistory";
 
 export const submitTechnicianQualification = async (
   formdata: FormData
@@ -183,6 +184,75 @@ export const getActiveSubscriptionPlan = async () => {
     return response.data;
   } catch (error) {
     console.log("error occured while fetching the active subscription:", error);
+    throw error;
+  }
+};
+
+export const getSubscriptionHistory = async (
+  page?: number
+): Promise<{
+  data: ISubscriptionPlanHistory[];
+  totalPages: number;
+  currentPage: number;
+  total: number;
+}> => {
+  try {
+    const url = `${TECHNICIAN_API}/subscriptionhistory?page=${page}&limit=6`;
+    const response = await axiosInstance.get(url);
+    console.log(
+      "response in the fetching subscription history for technician:",
+      response
+    );
+    return {
+      data: response.data.data?.subscriptionPlanHistory || [],
+      totalPages: response.data.data?.pagination?.pages || 1,
+      currentPage: response.data.data?.pagination?.page || page,
+      total: response.data.data?.pagination?.total || 0,
+    };
+  } catch (error) {
+    console.error("Error fetching the subscription history:", error);
+    return {
+      data: [],
+      totalPages: 0,
+      currentPage: page || 1,
+      total: 0,
+    };
+  }
+};
+
+export const getAllSubscriptionPlans = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `${TECHNICIAN_API}/subscriptionplans`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occured while fetching the subscription plans:", error);
+    throw error;
+  }
+};
+
+export const purchaseSubscription = async (planId: string) => {
+  try {
+    const response = await axiosInstance.post(
+      `${TECHNICIAN_API}/purchaseplan`,
+      { planId }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occured while purchasing the plan:", error);
+    throw error;
+  }
+};
+
+export const verifyPurchase = async (sessionId: string) => {
+  try {
+    const response = await axiosInstance.post(
+      `${TECHNICIAN_API}/verifypurchase/${sessionId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occurred while verifying the purchase");
     throw error;
   }
 };

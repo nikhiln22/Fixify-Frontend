@@ -20,7 +20,13 @@ export const AdminLogin: React.FC = () => {
           type: "success",
         });
 
-        Cookies.set("access_token", response.data.access_token);
+        const expiresIn15Minutes = new Date(
+          new Date().getTime() + 15 * 60 * 1000
+        );
+
+        Cookies.set("access_token", response.data.access_token, {
+          expires: expiresIn15Minutes,
+        });
 
         navigate("/admin/dashboard");
       } else {

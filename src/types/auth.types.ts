@@ -104,28 +104,38 @@ export interface TechnicianRegisterResponse {
   status: number;
 }
 
+export interface TempRegisterResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    tempTechnicianId?: string;
+    tempUserId?: string;
+    email?: string;
+  };
+}
+
 export type RegisterResponse =
   | UserRegisterResponse
   | TechnicianRegisterResponse;
 
-export interface BaseTempRegisterResponse {
-  success: boolean;
-  email: string;
-  message: string;
-}
+// export interface BaseTempRegisterResponse {
+//   success: boolean;
+//   email: string;
+//   message: string;
+// }
 
-export interface UserTempRegisterResponse extends BaseTempRegisterResponse {
-  tempUserId: string;
-}
+// export interface UserTempRegisterResponse extends BaseTempRegisterResponse {
+//   tempUserId: string;
+// }
 
-export interface TechnicianTempRegisterResponse
-  extends BaseTempRegisterResponse {
-  tempTechnicianId: string;
-}
+// export interface TechnicianTempRegisterResponse
+//   extends BaseTempRegisterResponse {
+//   tempTechnicianId: string;
+// }
 
-export type TempRegisterResponse =
-  | UserTempRegisterResponse
-  | TechnicianTempRegisterResponse;
+// export type TempRegisterResponse =
+//   | UserTempRegisterResponse
+//   | TechnicianTempRegisterResponse;
 
 export interface ResetPasswordData {
   email: string;

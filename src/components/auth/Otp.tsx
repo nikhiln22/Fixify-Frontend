@@ -16,6 +16,11 @@ export const Otp: React.FC<OtpProps> = ({ role, onVerifyOtp, onResendOtp }) => {
   const tempTechnicianId = location.state?.tempTechnicianId || "";
   const actionFromState = location.state?.action || "register";
 
+  console.log("email in the otp component:", email);
+  console.log("tempUserId in the otp component:", tempUserId);
+  console.log("tempTechnicianId in the otp component:", tempTechnicianId);
+  console.log("actionFromState in the otp component:", actionFromState);
+
   const otpPurpose: OtpPurpose =
     actionFromState === "forgot" ? "PASSWORD_RESET" : "REGISTRATION";
 
@@ -94,21 +99,9 @@ export const Otp: React.FC<OtpProps> = ({ role, onVerifyOtp, onResendOtp }) => {
     }
   };
 
-  const formatEmail = (email: string) => {
-    if (!email) return "";
-    const [username, domain] = email.split("@");
-    if (username.length <= 3) return email;
-    const maskedUsername =
-      username.slice(0, 2) +
-      "*".repeat(username.length - 3) +
-      username.slice(-1);
-    return `${maskedUsername}@${domain}`;
-  };
-
   return (
     <AuthLayout role={role}>
       <div className="space-y-8">
-        {/* Header with animations */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -120,9 +113,6 @@ export const Otp: React.FC<OtpProps> = ({ role, onVerifyOtp, onResendOtp }) => {
           </h4>
           <p className="text-lg text-gray-600 font-medium">
             Enter the verification code
-          </p>
-          <p className="text-teal-600 font-semibold text-lg">
-            {formatEmail(email)}
           </p>
         </motion.div>
 

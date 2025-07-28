@@ -1,16 +1,23 @@
 import { ISubscriptionPlanHistory } from "../../models/subscriptionPlanHistory";
 import { Column } from "../../types/component.types";
 
-export const getSubscriptionPlanHistoryColumns =
-  (): Column<ISubscriptionPlanHistory>[] => [
-    {
-      key: "_id",
-      label: "Sl. No",
-      render: (_, index) => (
-        <div className="flex items-center justify-center">{index + 1}</div>
-      ),
-    },
-    {
+export const getSubscriptionPlanHistoryColumns = (options?: {
+  showTechnicianName?: boolean;
+}): Column<ISubscriptionPlanHistory>[] => {
+  const { showTechnicianName = true } = options || {};
+
+  const columns: Column<ISubscriptionPlanHistory>[] = [];
+
+  columns.push({
+    key: "_id",
+    label: "Sl. No",
+    render: (_, index) => (
+      <div className="flex items-center justify-center">{index + 1}</div>
+    ),
+  });
+
+  if (showTechnicianName) {
+    columns.push({
       key: "technicianId",
       label: "Technician Name",
       render: (item) => (
@@ -18,7 +25,9 @@ export const getSubscriptionPlanHistoryColumns =
           {item?.technicianId.username || "Untitled"}
         </div>
       ),
-    },
+    });
+  }
+  columns.push(
     {
       key: "subscriptionPlanId",
       label: "Plan Name",
@@ -33,6 +42,15 @@ export const getSubscriptionPlanHistoryColumns =
       label: "Amount paid",
       render: (item) => (
         <div className="text-center font-medium">₹{item?.amount || 0}</div>
+      ),
+    },
+    {
+      key: "subscriptionPlanId",
+      label: "Commission Rate",
+      render: (item) => (
+        <div className="text-center font-medium">
+          {item?.subscriptionPlanId.commissionRate || "N/A"}
+        </div>
       ),
     },
     {
@@ -84,5 +102,8 @@ export const getSubscriptionPlanHistoryColumns =
           </span>
         </div>
       ),
-    },
-  ];
+    }
+  );
+
+  return columns;
+};

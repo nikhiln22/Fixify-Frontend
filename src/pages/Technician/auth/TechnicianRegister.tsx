@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Register } from "../../../components/auth/Register";
 import {
   RegisterFormData,
-  TechnicianTempRegisterResponse,
+  // TechnicianTempRegisterResponse,
 } from "../../../types/auth.types";
 import authService from "../../../services/auth.services";
 import { showToast } from "../../../utils/toast";
@@ -13,10 +13,13 @@ export const TechnicianRegister: React.FC = () => {
 
   const handleSubmit = async (values: RegisterFormData) => {
     try {
-      const response = (await authService.register(
-        values,
-        "TECHNICIAN"
-      )) as TechnicianTempRegisterResponse;
+      console.log(
+        "values in the technican register page sending to the backend:",
+        values
+      );
+      const response = await authService.register(values, "TECHNICIAN");
+
+      console.log("response in the technician register page:", response);
 
       if (response.success) {
         showToast({
@@ -25,11 +28,16 @@ export const TechnicianRegister: React.FC = () => {
         });
 
         const stateData = {
-          email: response.email,
+          email: response?.data?.email,
           action: "register",
           role: "TECHNICIAN",
-          tempTechnicianId: response.tempTechnicianId,
+          tempTechnicianId: response?.data?.tempTechnicianId,
         };
+
+        console.log(
+          "stateData in the technician register component:",
+          stateData
+        );
 
         navigate(`/technician/otp`, { state: stateData });
       }

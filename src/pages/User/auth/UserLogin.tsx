@@ -24,7 +24,13 @@ export const UserLogin: React.FC = () => {
           type: "success",
         });
 
-        Cookies.set("access_token", response.data.access_token);
+        const expiresIn15Minutes = new Date(
+          new Date().getTime() + 15 * 60 * 1000
+        );
+
+        Cookies.set("access_token", response.data.access_token, {
+          expires: expiresIn15Minutes,
+        });
 
         const userData = response.data.user as Iuser;
         console.log("username:", userData.username);

@@ -34,7 +34,6 @@ export const Register: React.FC<RegisterProps> = ({ role, onSubmit }) => {
   return (
     <AuthLayout role={role}>
       <div className="space-y-8">
-        {/* Header with animations */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -51,7 +50,6 @@ export const Register: React.FC<RegisterProps> = ({ role, onSubmit }) => {
           </p>
         </motion.div>
 
-        {/* Form with improved styling */}
         <motion.form
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

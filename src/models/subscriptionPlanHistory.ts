@@ -8,6 +8,7 @@ export interface ISubscriptionPlanHistory {
     _id: string;
     planName: string;
     durationInMonths: number;
+    commissionRate: number;
   };
   amount: number;
   status: "Active" | "Expired";

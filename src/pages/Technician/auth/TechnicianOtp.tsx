@@ -32,6 +32,8 @@ export const TechnicianOtp: React.FC = () => {
         };
       }
 
+      console.log("data in the technician otp page:", data);
+
       const response = await authService.verifyOtp(data, "TECHNICIAN", purpose);
 
       if (response.success) {
