@@ -143,7 +143,7 @@ export const getBookingsColumns = (
           View
         </button>
 
-        {item.bookingStatus === "Booked" && (
+        {item.bookingStatus === "Booked" && role !== "admin" && (
           <button
             onClick={() => handleChatWithTechnician?.(item._id)}
             className="px-5 py-2.5 rounded bg-green-500 text-white hover:bg-green-600 transition-colors text-xs"

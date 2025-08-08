@@ -28,7 +28,7 @@ const technicianSlice = createSlice({
     },
     updateTechnicianData: (
       state,
-      action: PayloadAction<Partial<TechnicianReduxData>>,
+      action: PayloadAction<Partial<TechnicianReduxData>>
     ) => {
       if (state.technicianData) {
         state.technicianData = {
@@ -37,10 +37,13 @@ const technicianSlice = createSlice({
         };
       }
     },
+    clearTechnicianData: (state) => {
+      state.technicianData = null;
+    },
   },
 });
 
-export const { setTechnicianData, updateTechnicianData } =
+export const { setTechnicianData, updateTechnicianData, clearTechnicianData } =
   technicianSlice.actions;
 
 export default technicianSlice.reducer;

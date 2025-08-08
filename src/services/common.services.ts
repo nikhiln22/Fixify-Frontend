@@ -5,7 +5,9 @@ import { Idesignation } from "../models/designation";
 import { IService } from "../models/service";
 import { Itechnician } from "../models/technician";
 import { TechnicianProfileResponse } from "../types/technicians.types";
-import { BookServiceResponse } from "../types/user.types";
+import {
+  BookingDetailsResponse,
+} from "../types/user.types";
 import { Role } from "../types/auth.types";
 import { IChat } from "../models/chat";
 import { TECHNICIAN_API, ADMIN_API, USER_API } from "../constants/apiRoutes";
@@ -290,7 +292,7 @@ export const getBookings = async (
 export const bookingDetails = async (
   bookingId: string,
   role: Role
-): Promise<BookServiceResponse> => {
+): Promise<BookingDetailsResponse> => {
   try {
     const response = await axiosInstance.get(
       `/api/${role.toLowerCase()}/bookingdetails/${bookingId}`

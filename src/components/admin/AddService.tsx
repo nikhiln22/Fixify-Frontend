@@ -48,22 +48,29 @@ export const AddService: React.FC<AddServiceProps> = ({
           "response from the add category form component:",
           categoriesResponse
         );
-        const categoryOptions = categoriesResponse.data.map(
-          (category: any) => ({
-            value: category._id,
-            label: category.name,
-          })
-        );
+
+        const categoriesData = Array.isArray(categoriesResponse)
+          ? categoriesResponse
+          : categoriesResponse.data || [];
+
+        const categoryOptions = categoriesData.map((category: any) => ({
+          value: category._id,
+          label: category.name,
+        }));
         setCategoryOptions(categoryOptions);
 
         console.log("Job designations response:", designationsResponse);
-        const designationOptions = designationsResponse.data.map(
-          (designation: any) => ({
-            value: designation._id,
-            label: designation.designation,
-          })
-        );
+
+        const designationsData = Array.isArray(designationsResponse)
+          ? designationsResponse
+          : designationsResponse.data || [];
+
+        const designationOptions = designationsData.map((designation: any) => ({
+          value: designation._id,
+          label: designation.designation,
+        }));
         setDesignationOptions(designationOptions);
+        
       } catch (error) {
         console.error("Error fetching data:", error);
         setCategoryError("Failed to load categories. Please try again later.");
@@ -130,11 +137,14 @@ export const AddService: React.FC<AddServiceProps> = ({
     }
   };
 
-  const imagePreview = formik.values.serviceImage
-    ? formik.values.serviceImage instanceof File
-      ? URL.createObjectURL(formik.values.serviceImage)
-      : formik.values.serviceImage
-    : undefined;
+  const getImageSrc = () => {
+    if (!formik.values.serviceImage) return undefined;
+
+    if (formik.values.serviceImage instanceof File) {
+      return URL.createObjectURL(formik.values.serviceImage);
+    }
+    return buildCloudinaryUrl(formik.values.serviceImage);
+  };
 
   return (
     <form
@@ -278,10 +288,10 @@ export const AddService: React.FC<AddServiceProps> = ({
               : "border-gray-300"
           } rounded-md p-3`}
         >
-          {imagePreview ? (
+          {getImageSrc() && (
             <div className="mb-2 relative">
               <img
-                src={buildCloudinaryUrl(imagePreview)}
+                src={getImageSrc()}
                 alt="Service preview"
                 className="h-32 object-contain mx-auto"
               />
@@ -294,7 +304,9 @@ export const AddService: React.FC<AddServiceProps> = ({
                 <X className="h-4 w-4" />
               </button>
             </div>
-          ) : (
+          )}
+
+          {!getImageSrc() && (
             <div className="flex flex-col items-center justify-center py-5">
               <div className="rounded-full bg-gray-100 p-2 mb-2">
                 <Upload className="h-6 w-6 text-gray-500" />

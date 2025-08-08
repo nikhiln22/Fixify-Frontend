@@ -25,7 +25,7 @@ import {
   leaveChat,
   sendMessage,
   listenForMessages,
-  stopListening,
+  stopListeningForMessages,
 } from "../../../utils/socket/socket";
 import { IChat } from "../../../models/chat";
 import {
@@ -106,7 +106,7 @@ export const TechnicianJobListing: React.FC = () => {
     });
 
     return () => {
-      stopListening();
+      stopListeningForMessages();
     };
   }, [isChatModalOpen]);
 
@@ -139,8 +139,6 @@ export const TechnicianJobListing: React.FC = () => {
       }
     }
   };
-
-
 
   // Verify OTP and complete booking
   const handleVerifyOtp = async () => {

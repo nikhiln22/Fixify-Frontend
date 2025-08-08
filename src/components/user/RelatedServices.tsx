@@ -81,7 +81,6 @@ const RelatedServices: React.FC<RelatedServicesProps> = ({
                   image={buildCloudinaryUrl(service.image)}
                   title={service.name}
                   price={service.price}
-                  rating={service.rating || 4.5}
                   type="service"
                   onClick={() => handleServiceClick(service)}
                   buttonLabel="Book Now"

@@ -41,7 +41,7 @@ const JobDesignationPage: React.FC = () => {
       });
       return await getAllDesignations(page, searchQuery, "admin", filterStatus);
     },
-    [searchQuery, filterStatus],
+    [searchQuery, filterStatus]
   );
 
   const {
@@ -63,12 +63,12 @@ const JobDesignationPage: React.FC = () => {
           prevDesignations.map((designation) =>
             designation._id === designationId
               ? result.data || { ...designation, status: !designation.status }
-              : designation,
-          ),
+              : designation
+          )
         );
 
         const designation = designations.find(
-          (des) => des._id === designationId,
+          (des) => des._id === designationId
         );
         const statusLabel = designation?.status ? "blocked" : "unblocked";
         showToast({
@@ -115,6 +115,11 @@ const JobDesignationPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       const newDesignation = await addJobDesignation(designation);
+
+      console.log(
+        "added new designation in the job designation listing page:",
+        newDesignation
+      );
 
       const firstPageItems = [
         newDesignation,

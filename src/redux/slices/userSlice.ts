@@ -3,7 +3,6 @@ import { Iuser } from "../../models/user";
 
 type UserReduxData = Omit<
   Iuser,
-  | "_id"
   | "status"
   | "role"
   | "createdAt"
@@ -35,9 +34,12 @@ const userSlice = createSlice({
         };
       }
     },
+    clearUserData: (state) => {
+      state.userData = null;
+    },
   },
 });
 
-export const { setUserData, updateUserData } = userSlice.actions;
+export const { setUserData, updateUserData, clearUserData } = userSlice.actions;
 
 export default userSlice.reducer;

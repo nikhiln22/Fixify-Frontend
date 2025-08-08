@@ -35,6 +35,7 @@ export const UserLogin: React.FC = () => {
         const userData = response.data.user as Iuser;
         console.log("username:", userData.username);
         const userInfo = {
+          _id: userData._id,
           username: userData.username,
           email: userData.email,
           phone: userData.phone,

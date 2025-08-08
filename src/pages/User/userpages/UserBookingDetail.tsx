@@ -36,7 +36,7 @@ export const BookingDetailsPage: React.FC = () => {
       const response = await bookingDetails(id!, "USER");
       console.log("response in the userbooking details page:", response);
 
-      if (response.success) {
+      if (response.success && response.data) {
         setBooking(response.data);
 
         if (response.data.bookingStatus === "Completed") {
@@ -120,13 +120,11 @@ export const BookingDetailsPage: React.FC = () => {
 
   const technicianData = booking.technicianId
     ? {
-        id: booking.technicianId._id || "",
-        name: booking.technicianId.username || "N/A",
-        experience: Number(booking.technicianId.yearsOfExperience) || 0,
-        designation:
-          booking.technicianId.Designation?.designation || "Not specified",
-        profileImage: booking.technicianId.image || "/default-avatar.png",
-        verified: booking.technicianId.is_verified || false,
+        _id: booking.technicianId._id || "",
+        username: booking.technicianId.username || "N/A",
+        averageRating: 0,
+        yearsOfExperience: Number(booking.technicianId.yearsOfExperience) || 0,
+        image: booking.technicianId.image || "/default-avatar.png",
       }
     : null;
 
@@ -143,7 +141,7 @@ export const BookingDetailsPage: React.FC = () => {
               paymentMethod={booking.paymentId?.paymentMethod}
               status={booking.bookingStatus}
               bookingId={booking._id}
-              paymentStatus={booking.paymentId.paymentStatus}
+              paymentStatus={booking.paymentId?.paymentStatus}
             />
 
             {booking.bookingStatus === "Cancelled" && (
@@ -166,7 +164,7 @@ export const BookingDetailsPage: React.FC = () => {
                 totalAmount={
                   booking.paymentId?.amountPaid || booking.bookingAmount
                 }
-                serviceImage={booking.serviceId.image}
+                serviceImage={booking.serviceId?.image}
               />
 
               <div className="bg-white rounded-lg shadow">

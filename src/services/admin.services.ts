@@ -19,7 +19,7 @@ export const addJobDesignation = async (
         designation,
       }
     );
-    return response.data.designation;
+    return response.data.data;
   } catch (error) {
     console.error("Error adding job designation:", error);
     throw error;
@@ -316,7 +316,6 @@ export const addOffer = async (formData: FormData) => {
 export const getAllOffers = async (
   page?: number,
   search?: string,
-  // userType?: string,
   filterStatus?: string
 ): Promise<{
   data: IOffer[];
@@ -642,5 +641,47 @@ export const getAllSubscriptionPlansHistory = async (
       currentPage: page || 1,
       total: 0,
     };
+  }
+};
+
+export const getDashboardStats = async () => {
+  try {
+    const response = await axiosInstance.get(`${ADMIN_API}/dashboardstats`);
+    return response.data;
+  } catch (error) {
+    console.log("error occured while fetching the dashboard stats:", error);
+    throw error;
+  }
+};
+
+export const getBookingStatusDistribution = async () => {
+  try {
+    const response = await axiosInstance.get(`${ADMIN_API}/bookingsstats`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getRevenueTrends = async (days: number = 30) => {
+  try {
+    const response = await axiosInstance.get(
+      `${ADMIN_API}/revenuetrends?days=${days}`
+    );
+    return response.data;
+  } catch (error) {}
+};
+
+export const getServiceCategoryPerformance = async (
+  limit: number = 10,
+  days: number = 30
+) => {
+  try {
+    const response = await axiosInstance.get(
+      `${ADMIN_API}/servicecategoryperformance?limit=${limit}&days=${days}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
   }
 };

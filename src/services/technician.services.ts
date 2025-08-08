@@ -256,3 +256,103 @@ export const verifyPurchase = async (sessionId: string) => {
     throw error;
   }
 };
+
+export const getAllNotifications = async () => {
+  try {
+    const response = await axiosInstance.get(`${TECHNICIAN_API}/notifications`);
+    return response.data;
+  } catch (error) {
+    console.log("error occured while fetching the notifications:", error);
+  }
+};
+
+export const getUnreadNotificationsCount = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `${TECHNICIAN_API}/unreadnotifications`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(
+      "error occured while getting unread notification count:",
+      error
+    );
+  }
+};
+
+export const markNotificationRead = async (notificationId: string) => {
+  try {
+    const response = await axiosInstance.patch(
+      `${TECHNICIAN_API}/${notificationId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occured while marking the notification as read");
+  }
+};
+
+export const getTechnicianDashBoardStats = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `${TECHNICIAN_API}/dashboardstats`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occured while fetching the technician dashboard stats");
+    throw error;
+  }
+};
+
+export const getTechnicianEarnings = async (
+  period: "daily" | "weekly" | "monthly" | "yearly" = "daily"
+) => {
+  try {
+    const response = await axiosInstance.get(
+      `${TECHNICIAN_API}/technicianearnings?period=${period}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occurred while fetching the technician earnings");
+    throw error;
+  }
+};
+
+export const getTechnicianServiceCategories = async (
+  startDate?: string,
+  endDate?: string
+) => {
+  try {
+    const params = new URLSearchParams();
+    if (startDate) params.append("startDate", startDate);
+    if (endDate) params.append("endDate", endDate);
+
+    const response = await axiosInstance.get(
+      `${TECHNICIAN_API}/servicecategoryrevenue?${params.toString()}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(
+      "error occurred while fetching the technician service categories"
+    );
+    throw error;
+  }
+};
+
+export const getTechnicianBookingStatus = async (
+  startDate?: string,
+  endDate?: string
+) => {
+  try {
+    const params = new URLSearchParams();
+    if (startDate) params.append("startDate", startDate);
+    if (endDate) params.append("endDate", endDate);
+
+    const response = await axiosInstance.get(
+      `${TECHNICIAN_API}/bookingstatusdistribution?${params.toString()}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occurred while fetching the technician booking status");
+    throw error;
+  }
+};

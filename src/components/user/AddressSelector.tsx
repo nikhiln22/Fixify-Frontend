@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { MapPin, Plus, Check } from 'lucide-react';
-import {IAddress} from "../../models/address"
+import React, { useState, useEffect } from "react";
+import { MapPin, Plus } from "lucide-react";
+import { IAddress } from "../../models/address";
 
 interface AddressSelectorProps {
   onAddressSelect: (address: IAddress) => void;
-  selectedAddress:IAddress | null;
-  addresses:IAddress[];
+  selectedAddress: IAddress | null;
+  addresses: IAddress[];
 }
 
-const AddressSelector: React.FC<AddressSelectorProps> = ({ 
-  onAddressSelect, 
-  selectedAddress, 
-  addresses = [] 
+const AddressSelector: React.FC<AddressSelectorProps> = ({
+  onAddressSelect,
+  selectedAddress,
+  addresses = [],
 }) => {
   const [selected, setSelected] = useState<IAddress | null>(selectedAddress);
 
@@ -47,7 +47,7 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
         </h3>
         <button
           onClick={() => {
-            console.log('Add new address clicked');
+            console.log("Add new address clicked");
           }}
           className="text-gray-600 hover:text-black flex items-center gap-1 text-sm font-medium transition-colors"
         >
@@ -62,8 +62,8 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
             key={address._id}
             className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
               selected?._id === address._id
-                ? 'border-gray-400 bg-gray-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? "border-gray-400 bg-gray-50"
+                : "border-gray-200 hover:border-gray-300"
             }`}
             onClick={() => setSelected(address)}
           >
@@ -74,23 +74,17 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
                     {address.addressType}
                   </span>
                 </div>
-                <p className="text-black font-medium mb-1">{address.fullAddress}</p>
+                <p className="text-black font-medium mb-1">
+                  {address.fullAddress}
+                </p>
                 {address.landmark && (
                   <p className="text-gray-600 text-sm">
-                    <span className="font-medium">Landmark:</span> {address.landmark}
+                    <span className="font-medium">Landmark:</span>{" "}
+                    {address.landmark}
                   </p>
                 )}
               </div>
             </div>
-            
-            {selected?._id === address._id && (
-              <div className="mt-2 pt-2 border-t border-gray-300">
-                <div className="flex items-center text-gray-600 text-sm">
-                  <Check size={16} className="mr-1" />
-                  Selected
-                </div>
-              </div>
-            )}
           </div>
         ))}
       </div>

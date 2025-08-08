@@ -284,3 +284,98 @@ export const rateService = async (
     throw error;
   }
 };
+
+export const getMostBookedServices = async () => {
+  try {
+    const response = await axiosInstance.get(`${USER_API}/mostbooked`, {
+      params: {
+        limit: 6,
+        days: 30,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching most booked services:", error);
+    throw error;
+  }
+};
+
+export const getAllOffers = async () => {
+  try {
+    const response = await axiosInstance.get(`${USER_API}/offers`);
+    return response.data;
+  } catch (error) {
+    console.log("error occured while fetching all the offers:", error);
+  }
+};
+
+export const applyBestOffer = async (
+  serviceId: string,
+  totalAmount: number
+) => {
+  try {
+    const response = await axiosInstance.post(`${USER_API}/applybestoffer`, {
+      serviceId,
+      totalAmount,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("error occured while applying the best offer:", error);
+  }
+};
+
+export const getEligibleCoupons = async (serviceId: string) => {
+  try {
+    const response = await axiosInstance.get(`${USER_API}/coupons`, {
+      params: {
+        serviceId: serviceId,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log("error fetching while fetching the coupons:", error);
+  }
+};
+
+export const applyCoupon = async (serviceId: string, couponId: string) => {
+  try {
+    const response = await axiosInstance.post(`${USER_API}/applycoupon`, {
+      serviceId,
+      couponId,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("error occured while applying the coupons:", error);
+  }
+};
+
+export const getAllNotifications = async () => {
+  try {
+    const response = await axiosInstance.get(`${USER_API}/notifications`);
+    return response.data;
+  } catch (error) {
+    console.log("error occured while fetching the notifications:", error);
+  }
+};
+
+export const getUnreadNotificationsCount = async () => {
+  try {
+    const response = await axiosInstance.get(`${USER_API}/unreadnotifications`);
+    return response.data;
+  } catch (error) {
+    console.log(
+      "error occured while getting unread notification count:",
+      error
+    );
+  }
+};
+
+export const markNotificationRead = async (notificationId: string) => {
+  try {
+    const response = await axiosInstance.patch(`${USER_API}/${notificationId}`);
+    return response.data;
+  } catch (error) {
+    console.log("error occured while marking the notification as read");
+  }
+};

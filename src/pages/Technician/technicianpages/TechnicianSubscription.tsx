@@ -31,7 +31,7 @@ interface TechnicianSubscriptionData {
 
 const TechnicianSubscription: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const [subscriptionData, setSubscriptionData] =
     useState<TechnicianSubscriptionData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,39 +55,82 @@ const TechnicianSubscription: React.FC = () => {
     showTechnicianName: false,
   });
 
+  // ✅ Helper function to calculate expiry date
+  const calculateExpiryDate = (
+    startDate: Date,
+    durationInMonths: number
+  ): Date | null => {
+    // If it's BASIC plan (usually lifetime), return null
+    if (durationInMonths === 0) {
+      return null;
+    }
+
+    const expiryDate = new Date(startDate);
+    expiryDate.setMonth(expiryDate.getMonth() + durationInMonths);
+    return expiryDate;
+  };
 
   useEffect(() => {
-    const success = searchParams.get('success');
-    const sessionId = searchParams.get('session_id');
+    const success = searchParams.get("success");
+    const sessionId = searchParams.get("session_id");
 
-    if (success === 'true' && sessionId) {
+    if (success === "true" && sessionId) {
       const handleStripeSuccess = async () => {
         try {
           setLoading(true);
-          
+
           const verifyResponse = await verifyPurchase(sessionId);
-          
+
           if (verifyResponse.success) {
-            setSuccessMessage("🎉 Subscription plan activated successfully!");
-            
-            if (verifyResponse.data?.currentSubscription) {
-              setSubscriptionData(verifyResponse.data.currentSubscription);
+            setSuccessMessage("Subscription plan activated successfully!");
+
+            // ✅ Updated: Properly format the subscription data
+            if (
+              verifyResponse.data?.currentSubscription &&
+              verifyResponse.data?.newHistoryEntry
+            ) {
+              const startDate = new Date();
+              const expiryDate = calculateExpiryDate(
+                startDate,
+                verifyResponse.data.currentSubscription.durationInMonths
+              );
+
+              const newSubscriptionData: TechnicianSubscriptionData = {
+                planName: verifyResponse.data.currentSubscription.planName,
+                status: "Active",
+                commissionRate:
+                  verifyResponse.data.currentSubscription.commissionRate,
+                walletCreditDelay:
+                  verifyResponse.data.currentSubscription.WalletCreditDelay,
+                profileBoost:
+                  verifyResponse.data.currentSubscription.profileBoost,
+                durationInMonths:
+                  verifyResponse.data.currentSubscription.durationInMonths,
+                startDate: startDate.toISOString(),
+                expiresAt: expiryDate ? expiryDate.toISOString() : undefined,
+                amount: verifyResponse.data.newHistoryEntry.amount,
+              };
+
+              setSubscriptionData(newSubscriptionData);
             }
-            
+
             if (verifyResponse.data?.newHistoryEntry) {
-              setHistoryData(prevHistory => [
+              setHistoryData((prevHistory) => [
                 verifyResponse.data.newHistoryEntry,
-                ...prevHistory.map(item => 
-                  item.status === 'Active' ? { ...item, status: 'Expired' } : item
-                )
+                ...prevHistory.map((item) =>
+                  item.status === "Active"
+                    ? { ...item, status: "Expired" as const }
+                    : item
+                ),
               ]);
             }
-            
+
             setSearchParams({});
           } else {
             setError(verifyResponse.message || "Failed to verify purchase");
           }
         } catch (error: any) {
+          console.error("Error verifying purchase:", error);
           setError("Failed to verify purchase");
         } finally {
           setLoading(false);
@@ -99,9 +142,9 @@ const TechnicianSubscription: React.FC = () => {
   }, [searchParams, setSearchParams]);
 
   useEffect(() => {
-    const success = searchParams.get('success');
-    
-    if (success !== 'true') {
+    const success = searchParams.get("success");
+
+    if (success !== "true") {
       const fetchSubscriptionData = async () => {
         try {
           setLoading(true);
@@ -128,9 +171,9 @@ const TechnicianSubscription: React.FC = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    const success = searchParams.get('success');
-    
-    if (success !== 'true') {
+    const success = searchParams.get("success");
+
+    if (success !== "true") {
       fetchSubscriptionHistory(currentPage);
     }
   }, [currentPage, searchParams]);
@@ -306,15 +349,24 @@ const TechnicianSubscription: React.FC = () => {
               My Subscriptions
             </h1>
 
-            {/* Success Message */}
             {successMessage && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <svg className="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    <svg
+                      className="w-5 h-5 text-green-600 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
                     </svg>
-                    <div className="text-green-800 font-medium">{successMessage}</div>
+                    <div className="text-green-800 font-medium">
+                      {successMessage}
+                    </div>
                   </div>
                   <button
                     onClick={dismissSuccessMessage}

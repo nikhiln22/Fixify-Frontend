@@ -22,7 +22,7 @@ export const getSubscriptionPlanHistoryColumns = (options?: {
       label: "Technician Name",
       render: (item) => (
         <div className="text-center font-medium">
-          {item?.technicianId.username || "Untitled"}
+          {item?.technicianId?.username || "Untitled"}
         </div>
       ),
     });
@@ -56,11 +56,20 @@ export const getSubscriptionPlanHistoryColumns = (options?: {
     {
       key: "createdAt",
       label: "Start Date",
-      render: (item) => (
-        <div className="text-center font-medium">
-          {new Date(item.createdAt).toLocaleDateString()}
-        </div>
-      ),
+      render: (item) => {
+        if (!item?.createdAt) {
+          return <div className="text-center font-medium">N/A</div>;
+        }
+
+        const startDate = new Date(item.createdAt);
+        const formattedDate = startDate.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+
+        return <div className="text-center font-medium">{formattedDate}</div>;
+      },
     },
     {
       key: "subscriptionPlanId",
@@ -75,14 +84,22 @@ export const getSubscriptionPlanHistoryColumns = (options?: {
           return <div className="text-center font-medium">Lifetime</div>;
         }
 
+        if (!item?.createdAt) {
+          return <div className="text-center font-medium">N/A</div>;
+        }
+
         const startDate = new Date(item.createdAt);
         const expiryDate = new Date(startDate);
         expiryDate.setMonth(expiryDate.getMonth() + durationInMonths);
 
+        const formattedExpiryDate = expiryDate.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+
         return (
-          <div className="text-center font-medium">
-            {expiryDate.toLocaleDateString()}
-          </div>
+          <div className="text-center font-medium">{formattedExpiryDate}</div>
         );
       },
     },

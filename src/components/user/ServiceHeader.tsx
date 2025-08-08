@@ -1,5 +1,4 @@
 import React from "react";
-import { Star } from "lucide-react";
 import { IService } from "../../models/service";
 import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
@@ -10,35 +9,6 @@ const ServiceHeader: React.FC<{ service: IService | null }> = ({ service }) => {
       <div className="flex items-center justify-center p-8">Loading...</div>
     );
   }
-
-  const dummyRating = 4.5;
-  const dummyReviewCount = 128;
-
-  const renderStars = (rating: number) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-
-    for (let i = 0; i < 5; i++) {
-      if (i < fullStars) {
-        stars.push(
-          <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-        );
-      } else if (i === fullStars && hasHalfStar) {
-        stars.push(
-          <div key={i} className="relative">
-            <Star className="w-4 h-4 text-gray-300" />
-            <div className="absolute inset-0 overflow-hidden w-1/2">
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-            </div>
-          </div>
-        );
-      } else {
-        stars.push(<Star key={i} className="w-4 h-4 text-gray-300" />);
-      }
-    }
-    return stars;
-  };
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
@@ -63,18 +33,6 @@ const ServiceHeader: React.FC<{ service: IService | null }> = ({ service }) => {
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
             {service.name}
           </h1>
-
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex items-center gap-1">
-              {renderStars(dummyRating)}
-            </div>
-            <span className="text-lg font-semibold text-gray-900">
-              {dummyRating}
-            </span>
-            <span className="text-gray-600">
-              ({dummyReviewCount.toLocaleString()} reviews)
-            </span>
-          </div>
 
           <div className="mb-6">
             <p className="text-gray-700 leading-relaxed text-sm md:text-base">

@@ -4,6 +4,8 @@ import { IAddress } from "../models/address";
 import { ITimeSlot } from "../models/timeslot";
 import { TimeSlotData } from "./technicians.types";
 import { ICoupon } from "../models/coupon";
+import { OfferData } from "./user.types";
+import { CouponData } from "./user.types";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -128,7 +130,7 @@ export interface AddServiceProps {
     description?: string;
     serviceImage?: File | string | null;
     categoryId?: string;
-    designationId: string;
+    designationId?: string;
   };
   isEditing?: boolean;
 }
@@ -147,8 +149,6 @@ export interface CardProps {
   image?: string;
   title?: string;
   price?: number;
-  rating?: number;
-  reviews?: string;
   type: "category" | "service";
   onClick?: () => void;
   buttonLabel?: string;
@@ -245,6 +245,17 @@ export interface BookingSummaryProps {
     description?: string;
     price?: string | number;
   };
+  offerData?: OfferData | null;
+  isLoadingOffer?: boolean;
+  isLoadingCoupons?: boolean;
+  onFetchCoupons: () => void;
+  appliedCoupon?: {
+    code: string;
+    couponId: string;
+    discountAmount: number;
+    finalAmount: number;
+  } | null;
+  onRemoveCoupon?: () => void;
   onConfirmBooking: () => void;
   isLoading?: boolean;
   disabled?: boolean;
@@ -273,6 +284,17 @@ export interface AddCouponProps {
   isLoading?: boolean;
   initialValues?: Partial<ICoupon>;
   isEditing?: boolean;
+}
+
+export interface CouponModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  coupons: CouponData[];
+  onApplyCoupon: (
+    newCoupon: CouponData,
+    currentCoupon?: CouponData | null
+  ) => void;
+  appliedCoupon: CouponData | null;
 }
 
 export interface PrivateRouteProps {

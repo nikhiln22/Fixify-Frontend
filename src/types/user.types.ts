@@ -50,9 +50,11 @@ export interface CreateBookingRequest {
   serviceId: string;
   addressId: string;
   timeSlotId: string;
+  originalAmount?: number;
   bookingAmount: number;
+  offerId: string;
+  couponId: string;
   paymentMethod: "Online" | "Wallet";
-  bookingStatus?: "Pending" | "Booked" | "Cancelled" | "Completed";
 }
 
 export interface BookServiceResponse {
@@ -64,4 +66,36 @@ export interface BookServiceResponse {
     requiresPayment?: boolean;
   };
   status?: number;
+}
+
+export interface BookingDetailsResponse {
+  success: boolean;
+  message: string;
+  data?: IBooking;
+  status?: number;
+}
+
+export interface OfferData {
+  offerId?: string;
+  offerApplied: boolean;
+  offerName: string;
+  discountAmount: number;
+  finalAmount: number;
+  discountValue: number;
+  maxDiscount?: number;
+  minBookingAmount?: number;
+  discountType: string;
+  offerType: string;
+}
+
+export interface CouponData {
+  code: string;
+  title: string;
+  discountValue: number;
+  serviceId?: string;
+  discountType: "percentage" | "flat_amount";
+  maxDiscount?: number;
+  discountAmount: number;
+  finalAmount: number;
+  couponId: string;
 }

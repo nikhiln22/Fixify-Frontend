@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "../../../hooks/useRedux";
 import { showToast } from "../../../utils/toast";
 import UserLayout from "../../../layouts/UserLayout";
 import Banner from "../../../components/common/Banner";
@@ -12,29 +14,196 @@ import {
   PaymentMethod,
 } from "../../../components/user/PaymentMethodSelector";
 import Button from "../../../components/common/Button";
-import { getTimeSlots, bookService } from "../../../services/user.services";
+import {
+  applyBestOffer,
+  getTimeSlots,
+  bookService,
+  getEligibleCoupons,
+  applyCoupon,
+} from "../../../services/user.services";
 import { ITimeSlot } from "../../../models/timeslot";
-import { CreateBookingRequest } from "../../../types/user.types";
+import {
+  CreateBookingRequest,
+  OfferData,
+  CouponData,
+} from "../../../types/user.types";
+import { CouponModal } from "../../../components/user/CouponModal";
+import {
+  applyCoupon as applyCouponAction,
+  removeCoupon as removeCouponAction,
+  clearCouponData,
+} from "../../../redux/slices/couponSlice";
 
 export const UserBooking: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { appliedCoupon } = useAppSelector((state) => state.coupon);
 
   const [timeSlots, setTimeSlots] = useState<ITimeSlot[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isConfirmingBooking, setIsConfirmingBooking] = useState(false);
-  const [selectedSlot, setSelectedSlot] = useState<any>(null);
+  const [selectedSlot, setSelectedSlot] = useState<ITimeSlot | null>(null);
   const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<PaymentMethod | null>(null);
 
+  const [offerData, setOfferData] = useState<OfferData | null>(null);
+  const [isLoadingOffer, setIsLoadingOffer] = useState(true);
+  const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
+
+  const [eligibleCoupons, setEligibleCoupons] = useState<CouponData[]>([]);
+  const [isLoadingCoupons, setIsLoadingCoupons] = useState(false);
+
   const state = location.state;
   const { service, address, technician } = state;
+
+  console.log("technician data in the user booking:", technician);
+
+  useEffect(() => {
+    if (
+      appliedCoupon &&
+      appliedCoupon.serviceId &&
+      appliedCoupon.serviceId !== service._id
+    ) {
+      dispatch(clearCouponData());
+    }
+  }, [service._id, appliedCoupon, dispatch]);
+
+  useEffect(() => {
+    const checkOffers = async () => {
+      if (service) {
+        try {
+          setIsLoadingOffer(true);
+          console.log(
+            `Checking offers for service ${service.name} with serviceID ${service._id} and price ${service.price}`
+          );
+
+          const offerResponse = await applyBestOffer(
+            service._id,
+            service.price
+          );
+          console.log("Offer response in UserBooking:", offerResponse);
+
+          if (offerResponse?.success && offerResponse.data) {
+            setOfferData({
+              offerId: offerResponse.data.offerId,
+              offerApplied: offerResponse.data.offerApplied,
+              offerName: offerResponse.data.offerName,
+              discountAmount: offerResponse.data.discountAmount,
+              finalAmount: offerResponse.data.finalAmount,
+              discountValue: offerResponse.data.discountValue,
+              maxDiscount: offerResponse.data.maxDiscount,
+              discountType: offerResponse.data.discountType,
+              offerType: offerResponse.data.offerType,
+              minBookingAmount: offerResponse.data.minBookingAmount,
+            });
+          }
+        } catch (error) {
+          console.log("Error occurred while fetching offers:", error);
+        } finally {
+          setIsLoadingOffer(false);
+        }
+      }
+    };
+
+    checkOffers();
+  }, [service]);
+
+  const handleFetchCoupons = async () => {
+    console.log("Fetching eligible coupons...");
+
+    if (!service?._id) {
+      console.log("No service ID found");
+      return;
+    }
+
+    try {
+      setIsLoadingCoupons(true);
+      console.log("Fetching eligible coupons for service:", service._id);
+
+      const couponResponse = await getEligibleCoupons(service._id);
+      console.log("Eligible coupons response:", couponResponse);
+
+      if (couponResponse?.success && couponResponse.data) {
+        setEligibleCoupons(couponResponse.data);
+        setIsCouponModalOpen(true);
+        console.log("Coupons stored in local state:", couponResponse.data);
+      } else {
+        showToast({
+          message: "No coupons available for this service",
+          type: "info",
+        });
+      }
+    } catch (error) {
+      console.log("Error fetching eligible coupons:", error);
+      showToast({
+        message: "Failed to fetch coupons",
+        type: "error",
+      });
+    } finally {
+      setIsLoadingCoupons(false);
+    }
+  };
+
+  const handleApplyCoupon = async (
+    newCoupon: CouponData,
+    currentCoupon: CouponData | null = null
+  ) => {
+    try {
+      console.log("Applying coupon:", newCoupon);
+      console.log("Current coupon:", currentCoupon);
+      const response = await applyCoupon(service._id, newCoupon.couponId);
+      console.log("Apply coupon response:", response);
+
+      if (response?.success && response.data) {
+        dispatch(
+          applyCouponAction({
+            ...newCoupon,
+            serviceId: service._id,
+            discountAmount: response.data.discountAmount,
+            finalAmount: response.data.finalAmount,
+            couponId: newCoupon.couponId,
+          })
+        );
+
+        showToast({
+          message: response.message,
+          type: "success",
+        });
+      } else {
+        showToast({
+          message: response?.message || "Failed to apply coupon",
+          type: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error applying coupon:", error);
+      showToast({
+        message: "Failed to apply coupon. Please try again.",
+        type: "error",
+      });
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    if (!appliedCoupon) return;
+    dispatch(removeCouponAction());
+    showToast({
+      message: "Coupon removed successfully",
+      type: "success",
+    });
+  };
+
+  const handleCloseCouponModal = () => {
+    setIsCouponModalOpen(false);
+  };
 
   const fetchTimeSlots = async () => {
     try {
       setIsLoadingSlots(true);
-      const response = await getTimeSlots(technician.id, false);
+      const response = await getTimeSlots(technician._id, false);
 
       if (response.success) {
         setTimeSlots(response.data || []);
@@ -55,7 +224,7 @@ export const UserBooking: React.FC = () => {
     }
   };
 
-  const handleSlotSelect = (slot: any) => {
+  const handleSlotSelect = (slot: ITimeSlot) => {
     setSelectedSlot(slot);
   };
 
@@ -87,18 +256,35 @@ export const UserBooking: React.FC = () => {
     try {
       setIsConfirmingBooking(true);
 
+      let finalBookingAmount = service.price;
+
+      if (offerData?.offerApplied && offerData.finalAmount) {
+        finalBookingAmount = offerData.finalAmount;
+      }
+
+      if (appliedCoupon?.discountAmount) {
+        finalBookingAmount = finalBookingAmount - appliedCoupon.discountAmount;
+      }
+
       const bookingData: CreateBookingRequest = {
         technicianId: technician._id,
         serviceId: service._id,
         addressId: address._id,
         timeSlotId: selectedSlot._id,
-        bookingAmount: service.price,
         paymentMethod: selectedPaymentMethod,
+        originalAmount: service.price,
+        bookingAmount: finalBookingAmount,
+        offerId: offerData?.offerId || "",
+        couponId: appliedCoupon?.couponId || "",
       };
+
+      console.log("Sending booking data to backend:", bookingData);
 
       const response = await bookService(bookingData);
 
       if (response.success && response.data) {
+        dispatch(clearCouponData());
+
         if (response.data.requiresPayment && response.data.checkoutUrl) {
           window.location.href = response.data.checkoutUrl;
         } else {
@@ -121,6 +307,7 @@ export const UserBooking: React.FC = () => {
         });
       }
     } catch (error) {
+      console.error("Booking error:", error);
       showToast({
         message: "Failed to confirm booking. Please try again.",
         type: "error",
@@ -223,10 +410,16 @@ export const UserBooking: React.FC = () => {
           <div className="lg:col-span-1">
             <BookingSummary
               service={service}
+              offerData={offerData}
+              isLoadingOffer={isLoadingOffer}
+              appliedCoupon={appliedCoupon}
               onConfirmBooking={handleConfirmBooking}
+              onFetchCoupons={handleFetchCoupons}
+              onRemoveCoupon={handleRemoveCoupon}
               isLoading={isConfirmingBooking}
               disabled={!isBookingReady}
               selectedPaymentMethod={selectedPaymentMethod}
+              isLoadingCoupons={isLoadingCoupons}
             />
           </div>
         </div>
@@ -239,6 +432,14 @@ export const UserBooking: React.FC = () => {
         technicianName={technician.name}
         onSelectSlot={handleSlotSelect}
         selectedSlot={selectedSlot}
+      />
+
+      <CouponModal
+        isOpen={isCouponModalOpen}
+        onClose={handleCloseCouponModal}
+        coupons={eligibleCoupons}
+        onApplyCoupon={handleApplyCoupon}
+        appliedCoupon={appliedCoupon}
       />
     </UserLayout>
   );

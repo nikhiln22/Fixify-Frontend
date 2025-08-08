@@ -46,6 +46,7 @@ export interface IBooking {
     _id: string;
     paymentStatus: "Paid" | "Refunded";
     paymentMethod?: "Online" | "Wallet";
+    originalAmount?: number;
     amountPaid?: number;
     fixifyShare?: number;
     technicianShare?: number;

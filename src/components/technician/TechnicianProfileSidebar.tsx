@@ -5,7 +5,7 @@ import {
   Settings,
   Clock,
   Briefcase,
-  DollarSign,
+  IndianRupee,
   CreditCard,
 } from "lucide-react";
 
@@ -32,9 +32,9 @@ export const TechnicianProfileSidebar: React.FC = () => {
       path: "/technician/jobs",
     },
     {
-      id: "earnings",
-      label: "Earnings & Payments",
-      icon: DollarSign,
+      id: "Wallet",
+      label: "Wallet & Payments",
+      icon: IndianRupee,
       path: "/technician/earnings",
     },
     {

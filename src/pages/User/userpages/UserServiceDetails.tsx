@@ -87,17 +87,8 @@ export const UserServiceDetails: React.FC = () => {
 
         console.log("techniciansList received:", techniciansList);
 
-        const processedTechnicians = techniciansList.map((technician: any) => ({
-          ...technician, 
-          id: technician._id,
-          name: technician.username, 
-          experience: `${technician.yearsOfExperience} years`, 
-          profileImage: technician.image, 
-          verified: technician.is_verified,
-        }));
+        setTechnicians(techniciansList);
 
-        setTechnicians(processedTechnicians);
-        
         console.log("Technicians state updated");
       } catch (error) {
         console.error("Error fetching technicians:", error);
@@ -123,19 +114,21 @@ export const UserServiceDetails: React.FC = () => {
     [fetchTechnicians]
   );
 
-  const handleTechnicianSelect = useCallback((technician: any) => {
-    setSelectedTechnician(technician);
-    console.log("Selected technician:", technician);
-    
+  const handleTechnicianSelect = useCallback(
+    (technician: any) => {
+      setSelectedTechnician(technician);
+      console.log("Selected technician:", technician);
 
-    navigate('/user/booking', {
-      state: {
-        service: serviceData,
-        address: selectedAddress,
-        technician: technician
-      }
-    });
-  }, [navigate, serviceData, selectedAddress]);
+      navigate("/user/booking", {
+        state: {
+          service: serviceData,
+          address: selectedAddress,
+          technician: technician,
+        },
+      });
+    },
+    [navigate, serviceData, selectedAddress]
+  );
 
   const handleRelatedServiceSelect = useCallback((service: any) => {
     console.log("Selected related service:", service);
@@ -157,12 +150,12 @@ export const UserServiceDetails: React.FC = () => {
       technician: selectedTechnician,
     });
 
-    navigate('/user/booking', {
+    navigate("/user/booking", {
       state: {
         service: serviceData,
         address: selectedAddress,
-        technician: selectedTechnician
-      }
+        technician: selectedTechnician,
+      },
     });
   }, [selectedAddress, selectedTechnician, serviceData, navigate]);
 

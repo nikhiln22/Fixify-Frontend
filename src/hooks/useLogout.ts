@@ -3,8 +3,10 @@ import Cookies from "js-cookie";
 import authService from "../services/auth.services";
 import { Role } from "../types/auth.types";
 import { showToast } from "../utils/toast";
-import { PURGE } from "redux-persist";
 import { useDispatch } from "react-redux";
+import { clearUserData } from "../redux/slices/userSlice";
+import { clearTechnicianData } from "../redux/slices/technicianslice";
+import { clearCouponData } from "../redux/slices/couponSlice";
 
 const useLogout = () => {
   const navigate = useNavigate();
@@ -25,11 +27,9 @@ const useLogout = () => {
       const response = await authService.logOut(currentInterface);
 
       if (response.success) {
-        dispatch({
-          type: PURGE,
-          key: "root",
-          result: () => null,
-        });
+        dispatch(clearCouponData());
+        dispatch(clearUserData());
+        dispatch(clearTechnicianData());
 
         showToast({
           type: "success",

@@ -72,7 +72,7 @@ export const UserBookingSuccess: React.FC = () => {
         <div className="text-center py-10 text-red-500 text-lg">
           <p className="mb-4">Booking not found or verification failed.</p>
           <Button
-            onClick={() => navigate("/user/bookinglist")}
+            onClick={() => navigate("/user/bookings")}
             variant="primary"
             className="px-6 py-2"
           >
@@ -152,14 +152,14 @@ export const UserBookingSuccess: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              onClick={() => navigate("/user/bookinglist")}
+              onClick={() => navigate("/user/bookings")}
               variant="primary"
               className="px-8 py-3"
             >
               View My Bookings
             </Button>
             <Button
-              onClick={() => navigate("/user/services")}
+              onClick={() => navigate("/user/categories")}
               variant="outline"
               className="px-8 py-3"
             >

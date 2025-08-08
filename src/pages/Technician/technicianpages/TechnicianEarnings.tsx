@@ -57,11 +57,9 @@ export const TechnicianEarnings: React.FC = () => {
         <TechnicianProfileSidebar />
         <div className="flex-1 p-6">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Earnings & Payments
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Wallet</h1>
             <p className="text-gray-600">
-              Track your earnings, payments, and wallet balance
+              Manage your wallet balance and view transaction history
             </p>
           </div>
 

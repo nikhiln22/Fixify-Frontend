@@ -18,7 +18,7 @@ import {
   leaveChat,
   sendMessage,
   listenForMessages,
-  stopListening,
+  stopListeningForMessages,
 } from "../../../utils/socket/socket";
 import { IChat } from "../../../models/chat";
 import {
@@ -78,7 +78,7 @@ export const UserBookingsList: React.FC = () => {
     });
 
     return () => {
-      stopListening();
+      stopListeningForMessages();
     };
   }, [isChatModalOpen]);
 
