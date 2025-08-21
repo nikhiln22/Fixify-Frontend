@@ -9,7 +9,7 @@ import { ServiceDetailsCard } from "../../../components/common/ServiceDetailsCar
 import { BookingStatusCard } from "../../../components/common/BookingStatusCard";
 import { CustomerInfoCard } from "../../../components/technician/CustomerInfoCard";
 import { BookingHeader } from "../../../components/common/BookingHeader";
-import { bookingDetails, getRating } from "../../../services/common.services";
+import { bookingDetails, getRating } from "../../../services/commonServices";
 import { showToast } from "../../../utils/toast";
 import { IBooking } from "../../../models/booking";
 import { CancellationCard } from "../../../components/common/CancellationCard";

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "../../../layouts/AdminLayout";
 import Button from "../../../components/common/Button";
 import Modal from "../../../components/common/Modal";
@@ -7,16 +7,14 @@ import {
   createService,
   updateService,
   toggleServiceStatus,
-} from "../../../services/admin.services";
-import {
   getAllServices,
-  getAllCategories,
-} from "../../../services/common.services";
+} from "../../../services/serviceService";
+import { getAllCategories } from "../../../services/categoryService";
+import { getAllDesignations } from "../../../services/designationService";
 import { getServicesColumns } from "../../../constants/tablecolumns/ServiceColumn";
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";
 import { IService } from "../../../models/service";
-import { Icategory } from "../../../models/category";
 import { showToast } from "../../../utils/toast";
 import { Search } from "lucide-react";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
@@ -25,12 +23,17 @@ import SelectField from "../../../components/common/SelectField";
 export const ServiceListPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedService, setSelectedService] = useState<IService | null>(null);
   const [inputValue, setInputValue] = useState<string>("");
-  const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
-  const [categories, setCategories] = useState<Icategory[]>([]);
+  const [categories, setCategories] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [designations, setDesignations] = useState<
+    { value: string; label: string }[]
+  >([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
 
   const itemsPerPage = 6;
@@ -41,55 +44,50 @@ export const ServiceListPage: React.FC = () => {
     { value: "blocked", label: "Blocked Services" },
   ];
 
-  const fetchCategories = async () => {
+  const fetchData = async () => {
     setCategoriesLoading(true);
     try {
-      const response = await getAllCategories(1, "", "admin", "active");
-      if (response && response.data) {
-        setCategories(response.data);
+      const [categoriesResponse, designationsResponse] = await Promise.all([
+        getAllCategories(null, "admin", "", ""),
+        getAllDesignations(null, "admin", "", ""),
+      ]);
+
+      if (categoriesResponse && categoriesResponse.data) {
+        const categoryOptions = [
+          { value: "", label: "All Categories" },
+          ...categoriesResponse.data.map(
+            (category: { _id: string; name: string }) => ({
+              value: category._id,
+              label: category.name,
+            })
+          ),
+        ];
+        setCategories(categoryOptions);
       }
+
+      const designationsData = Array.isArray(designationsResponse)
+        ? designationsResponse
+        : designationsResponse.data || [];
+
+      const designationOptions = designationsData.map(
+        (designation: { _id: string; designation: string }) => ({
+          value: designation._id,
+          label: designation.designation,
+        })
+      );
+      setDesignations(designationOptions);
     } catch (error) {
-      console.error("Error fetching categories:", error);
-      showToast({
-        message: "Failed to load categories",
-        type: "error",
-      });
+      console.error("Error fetching data:", error);
+      setCategories([{ value: "", label: "All Categories" }]);
+      setDesignations([]);
     } finally {
       setCategoriesLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCategories();
+    fetchData();
   }, []);
-
-  const categoryOptions = [
-    { value: "", label: "All Categories" },
-    ...categories.map((category) => ({
-      value: category._id,
-      label: category.name,
-    })),
-  ];
-
-  const fetchServicesWithFilters = useCallback(
-    async (page: number) => {
-      console.log("Fetching services with filters:", {
-        page,
-        searchQuery,
-        selectedCategoryId,
-        filterStatus,
-      });
-
-      return await getAllServices(
-        page,
-        searchQuery,
-        selectedCategoryId,
-        "admin",
-        filterStatus,
-      );
-    },
-    [searchQuery, selectedCategoryId, filterStatus],
-  );
 
   const {
     data: services,
@@ -99,14 +97,21 @@ export const ServiceListPage: React.FC = () => {
     setCurrentPage,
     loading,
     error,
-  } = usePaginatedList(fetchServicesWithFilters);
+  } = usePaginatedList(
+    getAllServices,
+    "admin",
+    searchQuery,
+    filterStatus,
+    itemsPerPage,
+    selectedCategoryId
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
 
   const handleCategoryFilterChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     console.log("Category filter changed to:", e.target.value);
     setSelectedCategoryId(e.target.value);
@@ -114,7 +119,7 @@ export const ServiceListPage: React.FC = () => {
   };
 
   const handleStatusFilterChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     console.log("Status filter changed to:", e.target.value);
     setFilterStatus(e.target.value);
@@ -151,20 +156,24 @@ export const ServiceListPage: React.FC = () => {
     setIsLoading(true);
     try {
       if (selectedService) {
-        const response = await updateService(selectedService._id, formData);
+        const response = await updateService(
+          selectedService._id,
+          formData,
+          "admin"
+        );
         if (response && services) {
           setServices(
             services.map((svc) =>
-              svc._id === selectedService._id ? response.data : svc,
-            ),
+              svc._id === selectedService._id ? response.data : svc
+            )
           );
           showToast({
-            message: "Service updated successfully",
+            message: response.message,
             type: "success",
           });
         }
       } else {
-        const response = await createService(formData);
+        const response = await createService(formData, "admin");
         if (response && services) {
           const firstPageItems = [
             response.data,
@@ -178,7 +187,7 @@ export const ServiceListPage: React.FC = () => {
           }
 
           showToast({
-            message: "Service added successfully",
+            message: response.message,
             type: "success",
           });
         }
@@ -187,7 +196,7 @@ export const ServiceListPage: React.FC = () => {
     } catch (error) {
       console.error(
         `Error ${selectedService ? "updating" : "creating"} service:`,
-        error,
+        error
       );
       showToast({
         message: `Failed to ${selectedService ? "update" : "add"} service`,
@@ -200,22 +209,20 @@ export const ServiceListPage: React.FC = () => {
 
   const handleStatusToggle = async (serviceId: string) => {
     try {
-      const result = await toggleServiceStatus(serviceId);
+      const result = await toggleServiceStatus(serviceId, "admin");
       console.log("result from toggling the service status:", result);
       if (result) {
         setServices((prevServices) =>
           prevServices.map((service) =>
             service._id === serviceId
-              ? result.data || { ...service, status: !service.status }
-              : service,
-          ),
+              ? { ...service, status: result.data.status }
+              : service
+          )
         );
       }
 
-      const service = services.find((svc) => svc._id === serviceId);
-      const statusLabel = service?.status ? "blocked" : "unblocked";
       showToast({
-        message: `Service ${statusLabel} successfully`,
+        message: result.message,
         type: "success",
       });
 
@@ -234,54 +241,55 @@ export const ServiceListPage: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="p-4">
-        <h1 className="text-3xl font-semibold mb-4">Services</h1>
-        <div className="flex justify-between items-center mb-4">
-          <div className="w-full md:w-1/3 relative">
-            <input
-              type="text"
-              placeholder="Search services..."
-              value={inputValue}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Services</h1>
+        <p className="text-gray-600">Manage and monitor services</p>
+      </div>
+      <div className="flex justify-between items-center mb-4">
+        <div className="w-full md:w-1/3 relative">
+          <input
+            type="text"
+            placeholder="Search services..."
+            value={inputValue}
+            onChange={handleInputChange}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-48">
+            <SelectField
+              label=""
+              name="categoryFilter"
+              value={selectedCategoryId}
+              onChange={handleCategoryFilterChange}
+              options={categories}
+              placeholder={
+                categoriesLoading
+                  ? "Loading categories..."
+                  : "Filter by category"
+              }
+              className="mb-0"
+              disabled={categoriesLoading}
             />
-            <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-48">
-              <SelectField
-                label=""
-                name="categoryFilter"
-                value={selectedCategoryId}
-                onChange={handleCategoryFilterChange}
-                options={categoryOptions}
-                placeholder={
-                  categoriesLoading
-                    ? "Loading categories..."
-                    : "Filter by category"
-                }
-                className="mb-0"
-                disabled={categoriesLoading}
-              />
-            </div>
-            <div className="w-48">
-              <SelectField
-                label=""
-                name="statusFilter"
-                value={filterStatus}
-                onChange={handleStatusFilterChange}
-                options={statusOptions}
-                placeholder="Filter by status"
-                className="mb-0"
-              />
-            </div>
-            <Button
-              onClick={handleOpenAddModal}
-              className="h-10 px-4 py-2 whitespace-nowrap"
-            >
-              Add Service
-            </Button>
+          <div className="w-48">
+            <SelectField
+              label=""
+              name="statusFilter"
+              value={filterStatus}
+              onChange={handleStatusFilterChange}
+              options={statusOptions}
+              placeholder="Filter by status"
+              className="mb-0"
+            />
           </div>
+          <Button
+            onClick={handleOpenAddModal}
+            className="h-10 px-4 py-2 whitespace-nowrap"
+          >
+            Add Service
+          </Button>
         </div>
       </div>
 
@@ -322,16 +330,16 @@ export const ServiceListPage: React.FC = () => {
                     description: selectedService.description,
                     serviceImage: selectedService.image || null,
                     categoryId: selectedService.category?._id,
-                    designationId:selectedService.designation
+                    designationId: selectedService.designation,
                   }
                 : undefined
             }
             isEditing={!!selectedService}
+            categoryOptions={categories}
+            designationOptions={designations}
           />
         </div>
       </Modal>
     </AdminLayout>
   );
 };
-
-export default ServiceListPage;

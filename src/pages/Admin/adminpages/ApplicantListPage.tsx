@@ -3,11 +3,10 @@ import { getApplicantsColumns } from "../../../constants/tablecolumns/Applicants
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
-import { getAllApplicants } from "../../../services/admin.services";
-import { useCallback } from "react";
+import { getAllPendingTechnicians } from "../../../services/technicianServices";
 import { useNavigate } from "react-router-dom";
 
-const ApplicantListPage: React.FC = () => {
+export const ApplicantListPage: React.FC = () => {
   const itemsPerPage = 6;
 
   const navigate = useNavigate();
@@ -16,10 +15,6 @@ const ApplicantListPage: React.FC = () => {
     navigate(`/admin/applicant/${applicantId}`);
   };
 
-  const fetchApplicants = useCallback(async (page: number) => {
-    return await getAllApplicants(page);
-  }, []);
-
   const {
     data: applicants,
     currentPage,
@@ -27,19 +22,29 @@ const ApplicantListPage: React.FC = () => {
     setCurrentPage,
     loading,
     error,
-  } = usePaginatedList(fetchApplicants);
+  } = usePaginatedList(
+    getAllPendingTechnicians,
+    "admin",
+    "",
+    "",
+    itemsPerPage,
+    ""
+  );
 
   const columns = getApplicantsColumns(handleViewDetails);
 
   return (
     <AdminLayout>
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-semibold">Applicants</h1>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Applicants</h1>
+        <p className="text-gray-600">
+          Review and manage pending technician applications
+        </p>
+      </div>
 
-        {error && <p className="text-red-500 mb-2">{error}</p>}
+      {error && <p className="text-red-500 mb-2">{error}</p>}
 
+      <div className="px-4">
         <Table
           data={applicants || []}
           columns={columns}
@@ -57,5 +62,3 @@ const ApplicantListPage: React.FC = () => {
     </AdminLayout>
   );
 };
-
-export default ApplicantListPage;

@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Register } from "../../../components/auth/Register";
 import {
   RegisterFormData,
-  // TechnicianTempRegisterResponse,
 } from "../../../types/auth.types";
-import authService from "../../../services/auth.services";
+import authService from "../../../services/authServices";
 import { showToast } from "../../../utils/toast";
 
 export const TechnicianRegister: React.FC = () => {
@@ -31,7 +30,6 @@ export const TechnicianRegister: React.FC = () => {
           email: response?.data?.email,
           action: "register",
           role: "TECHNICIAN",
-          tempTechnicianId: response?.data?.tempTechnicianId,
         };
 
         console.log(

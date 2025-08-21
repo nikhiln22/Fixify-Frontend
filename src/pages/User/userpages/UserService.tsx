@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import UserLayout from "../../../layouts/UserLayout";
 import Banner from "../../../components/common/Banner";
 import Card from "../../../components/common/Card";
-import { getAllServices } from "../../../services/common.services";
+import { getAllServices } from "../../../services/serviceService";
 import Pagination from "../../../components/common/Pagination";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { IService } from "../../../models/service";

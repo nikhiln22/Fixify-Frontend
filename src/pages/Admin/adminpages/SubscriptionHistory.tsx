@@ -5,7 +5,7 @@ import Pagination from "../../../components/common/Pagination";
 import SelectField from "../../../components/common/SelectField";
 import { Search } from "lucide-react";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
-import { getAllSubscriptionPlansHistory } from "../../../services/admin.services";
+import { getAllSubscriptionPlansHistory } from "../../../services/adminServices";
 import { getSubscriptionPlanHistoryColumns } from "../../../constants/tablecolumns/SubscriptionPlanHistoryColumn";
 import Button from "../../../components/common/Button";
 import { useNavigate } from "react-router-dom";

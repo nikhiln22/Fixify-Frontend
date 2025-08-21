@@ -57,7 +57,8 @@ export const getCouponColumns = (
     render: (item) => {
       const isExpired =
         item?.valid_until && new Date(item.valid_until) < new Date();
-      const isManuallyActive = item?.status;
+
+      const isActive = item?.status === "Active";
 
       let status = "Active";
       let colorClass = "bg-green-200 text-green-800";
@@ -65,7 +66,7 @@ export const getCouponColumns = (
       if (isExpired) {
         status = "Expired";
         colorClass = "bg-gray-200 text-gray-800";
-      } else if (!isManuallyActive) {
+      } else if (!isActive) {
         status = "Inactive";
         colorClass = "bg-red-200 text-red-800";
       }
@@ -91,10 +92,6 @@ export const getCouponColumns = (
 
       const isExpired =
         item?.valid_until && new Date(item.valid_until) < new Date();
-
-      if (isExpired) {
-        return <div></div>;
-      }
 
       const ActionButton = () => {
         const [isOpen, setIsOpen] = useState(false);
@@ -126,16 +123,18 @@ export const getCouponColumns = (
               Edit
             </Button>
 
-            <Button
-              onClick={openModal}
-              className={`px-4 py-1 text-xs w-20 ${
-                item?.status
-                  ? "bg-red-500 hover:bg-red-600"
-                  : "bg-green-500 hover:bg-green-600"
-              } text-white`}
-            >
-              {item?.status ? "Block" : "Unblock"}
-            </Button>
+            {!isExpired && (
+              <Button
+                onClick={openModal}
+                className={`px-4 py-1 text-xs w-20 ${
+                  item?.status
+                    ? "bg-red-500 hover:bg-red-600"
+                    : "bg-green-500 hover:bg-green-600"
+                } text-white`}
+              >
+                {item?.status === "Active" ? "Block" : "Unblock"}
+              </Button>
+            )}
 
             <Modal
               isOpen={isOpen}
@@ -151,7 +150,7 @@ export const getCouponColumns = (
               ) : (
                 <p>
                   Are you sure you want to {item?.status ? "block" : "unblock"}{" "}
-                  the coupon <strong>"{item?.title || "this coupon"}"</strong>?
+                  the coupon <strong>"{item?.code}"</strong>?
                 </p>
               )}
             </Modal>

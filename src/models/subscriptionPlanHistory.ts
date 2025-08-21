@@ -13,6 +13,7 @@ export interface ISubscriptionPlanHistory {
   amount: number;
   status: "Active" | "Expired";
   paymentId?: string;
+  expiryDate?: Date;
   createdAt: Date;
   updatedAt: Date;
 }

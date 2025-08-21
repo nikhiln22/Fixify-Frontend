@@ -9,7 +9,10 @@ import Modal from "../../../components/common/Modal";
 import { UserCancellationPolicy } from "../../../components/user/UserCancellationPolicy";
 import { IBooking } from "../../../models/booking";
 import { ChatModal } from "../../../components/common/ChatModal";
-import { cancelBooking, rateService } from "../../../services/user.services";
+import {
+  cancelBooking,
+  createBookingRating,
+} from "../../../services/bookingService";
 import { showToast } from "../../../utils/toast";
 import { Rating } from "../../../components/user/Rating";
 import {
@@ -24,7 +27,7 @@ import { IChat } from "../../../models/chat";
 import {
   getChatMessages,
   sendChatMessage,
-} from "../../../services/common.services";
+} from "../../../services/commonServices";
 
 export const UserBookingsList: React.FC = () => {
   const itemsPerPage = 6;
@@ -203,10 +206,11 @@ export const UserBookingsList: React.FC = () => {
     setIsSubmittingRating(true);
 
     try {
-      const response = await rateService(
+      const response = await createBookingRating(
         selectedRatingBooking._id,
         rating,
-        review
+        review,
+        "user"
       );
 
       if (response.success) {
@@ -253,7 +257,8 @@ export const UserBookingsList: React.FC = () => {
       try {
         const response = await cancelBooking(
           selectedBooking._id,
-          cancellationReason
+          cancellationReason,
+          "user"
         );
 
         if (response.success) {

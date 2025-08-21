@@ -10,10 +10,8 @@ import {
   UpdateAddressResponse,
   DeleteAddressResponse,
   getAddressResponse,
-  CreateBookingRequest,
-  BookServiceResponse,
 } from "../types/user.types";
-import { USER_API } from "../constants/apiRoutes";
+import { getApiRoute, USER_API } from "../constants/apiRoutes";
 
 export const getUserProfile = async (): Promise<UserProfileResponse> => {
   try {
@@ -99,18 +97,6 @@ export const deleteAddress = async (
   }
 };
 
-export const getServiceDetails = async (serviceId: string) => {
-  try {
-    const response = await axiosInstance.get(
-      `${USER_API}/servicedetails/${serviceId}`
-    );
-    return response.data.data;
-  } catch (error) {
-    console.log("error occured while fetching the servicedetails:", error);
-    throw error;
-  }
-};
-
 export const getNearbyTechnicians = async (
   designationId: string,
   latitude: number,
@@ -149,33 +135,6 @@ export const getTimeSlots = async (
     return response.data;
   } catch (error) {
     console.error("error occured while fetching the time slots:", error);
-    throw error;
-  }
-};
-
-export const bookService = async (
-  bookingData: CreateBookingRequest
-): Promise<BookServiceResponse> => {
-  try {
-    const response = await axiosInstance.post(
-      `${USER_API}/bookservice`,
-      bookingData
-    );
-    return response.data;
-  } catch (error) {
-    console.log("error occured while booking the service by the user:", error);
-    throw error;
-  }
-};
-
-export const verifyPaymentSession = async (sessionId: string) => {
-  try {
-    const response = await axiosInstance.get(
-      `${USER_API}/verifypayment/${sessionId}`
-    );
-    return response.data;
-  } catch (error) {
-    console.log("error occured while verifypayment session:", error);
     throw error;
   }
 };
@@ -248,59 +207,6 @@ export const getWalletTransactions = async (
   }
 };
 
-export const cancelBooking = async (
-  bookingId: string,
-  cancellationReason: string
-) => {
-  try {
-    const response = await axiosInstance.put(
-      `${USER_API}/cancelbooking/${bookingId}`,
-      {
-        cancellationReason,
-      }
-    );
-
-    console.log("Cancel booking response:", response);
-    return response.data;
-  } catch (error) {
-    console.error("Error cancelling booking:", error);
-    throw error;
-  }
-};
-
-export const rateService = async (
-  bookingId: string,
-  rating: number,
-  review: string
-) => {
-  try {
-    const response = await axiosInstance.post(
-      `${USER_API}/rateservice/${bookingId}`,
-      { rating, review }
-    );
-    return response.data;
-  } catch (error) {
-    console.log("error occured while rating the service");
-    throw error;
-  }
-};
-
-export const getMostBookedServices = async () => {
-  try {
-    const response = await axiosInstance.get(`${USER_API}/mostbooked`, {
-      params: {
-        limit: 6,
-        days: 30,
-      },
-    });
-
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching most booked services:", error);
-    throw error;
-  }
-};
-
 export const getAllOffers = async () => {
   try {
     const response = await axiosInstance.get(`${USER_API}/offers`);
@@ -350,32 +256,67 @@ export const applyCoupon = async (serviceId: string, couponId: string) => {
   }
 };
 
-export const getAllNotifications = async () => {
+export const getAllUsers = async (
+  page: number | null,
+  role: string,
+  search?: string,
+  filterStatus?: string,
+  limit?: number | null
+): Promise<{
+  data: Iuser[];
+  totalPages: number;
+  currentPage: number;
+  total: number;
+}> => {
   try {
-    const response = await axiosInstance.get(`${USER_API}/notifications`);
-    return response.data;
+    let apiRoute = getApiRoute(role);
+    let queryParams = "";
+    if (
+      page !== undefined &&
+      page !== null &&
+      limit !== null &&
+      limit !== undefined
+    ) {
+      queryParams += `page=${page}&limit=${limit}`;
+      if (search && search.trim() !== "") {
+        queryParams += `&search=${encodeURIComponent(search)}`;
+      }
+
+      if (filterStatus && filterStatus.trim() !== "") {
+        queryParams += `&status=${encodeURIComponent(filterStatus)}`;
+      }
+    }
+    const url = queryParams
+      ? `${apiRoute}/userslist?${queryParams}`
+      : `${apiRoute}/userslist`;
+    const response = await axiosInstance.get(url);
+    console.log("users response:", response);
+    return {
+      data: response.data.data?.users || [],
+      totalPages: response.data.data?.pagination?.pages || 1,
+      currentPage: response.data.data?.pagination?.page || page || 1,
+      total: response.data.data?.pagination?.total || 0,
+    };
   } catch (error) {
-    console.log("error occured while fetching the notifications:", error);
+    console.error("Error fetching the users:", error);
+    return {
+      data: [],
+      totalPages: 0,
+      currentPage: page || 1,
+      total: 0,
+    };
   }
 };
 
-export const getUnreadNotificationsCount = async () => {
+export const toggleUserStatus = async (userId: string, role: string) => {
   try {
-    const response = await axiosInstance.get(`${USER_API}/unreadnotifications`);
-    return response.data;
-  } catch (error) {
-    console.log(
-      "error occured while getting unread notification count:",
-      error
+    const apiRoute = getApiRoute(role);
+    const response = await axiosInstance.patch(
+      `${apiRoute}/blockuser/${userId}`
     );
-  }
-};
-
-export const markNotificationRead = async (notificationId: string) => {
-  try {
-    const response = await axiosInstance.patch(`${USER_API}/${notificationId}`);
     return response.data;
   } catch (error) {
-    console.log("error occured while marking the notification as read");
+    console.log("error toggling user status:", error);
+    throw error;
   }
 };

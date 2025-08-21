@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { MapPin } from "lucide-react";
 import AdminLayout from "../../../layouts/AdminLayout";
 import { useNavigate, useParams } from "react-router-dom";
-import { getTechnicianProfile } from "../../../services/common.services";
+import { getTechnicianProfile } from "../../../services/technicianServices";
 import { Itechnician } from "../../../models/technician";
-import TechnicianProfileCard from "../../../components/technician/TechnicianProfileCard";
+import { ProfileCard } from "../../../components/common/ProfileCard";
+import { TechnicianAboutSection } from "../../../components/technician/AboutSection";
+import { TechnicianCertificatesSection } from "../../../components/technician/CertificateSection";
 import Modal from "../../../components/common/Modal";
 import Button from "../../../components/common/Button";
 import {
-  verifyApplicant,
-  rejectApplicant,
-} from "../../../services/admin.services";
+  approveTechnicians,
+  rejectTechnician,
+} from "../../../services/technicianServices";
 import { showToast } from "../../../utils/toast";
 import { buildCloudinaryUrl } from "../../../utils/cloudinary/cloudinary";
 
@@ -39,25 +42,13 @@ export const ApplicantDetailsPreview: React.FC = () => {
     fetchApplicantDetails();
   }, [applicantId]);
 
-  const formatAddress = (fullAddress: string) => {
-    const parts = fullAddress.split(", ");
-    if (parts.length >= 4) {
-      const city = parts[parts.length - 4] || "";
-      const state = parts[parts.length - 3] || "";
-      const pincode = parts[parts.length - 2] || "";
-      const area = parts[parts.length - 5] || "";
-      return `${area},${city}, ${state} ${pincode}`;
-    }
-    return fullAddress;
-  };
-
   const handleApprove = async () => {
     if (!applicantId) return;
 
     try {
-      await verifyApplicant(applicantId);
+      await approveTechnicians(applicantId, "admin");
       showToast({
-        message: "technician approved successfully",
+        message: "Technician approved successfully",
         type: "success",
       });
       navigate("/admin/technicianlist");
@@ -74,7 +65,7 @@ export const ApplicantDetailsPreview: React.FC = () => {
     if (!applicantId) return;
 
     try {
-      await rejectApplicant(applicantId);
+      await rejectTechnician(applicantId, "admin");
       showToast({
         message: "Applicant application rejected",
         type: "success",
@@ -83,7 +74,7 @@ export const ApplicantDetailsPreview: React.FC = () => {
     } catch (error) {
       console.error("Error rejecting technician:", error);
       showToast({
-        message: "failed to reject applicant",
+        message: "Failed to reject applicant",
         type: "error",
       });
     }
@@ -94,7 +85,16 @@ export const ApplicantDetailsPreview: React.FC = () => {
   };
 
   if (!applicant) {
-    return null;
+    return (
+      <AdminLayout>
+        <div className="flex min-h-screen bg-gray-50 items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading applicant details...</p>
+          </div>
+        </div>
+      </AdminLayout>
+    );
   }
 
   const pageTitle = applicant.is_verified
@@ -103,78 +103,78 @@ export const ApplicantDetailsPreview: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-semibold">{pageTitle}</h1>
+      {/* Match the structure from TechnicianProfile - same spacing and width */}
+      <div className="space-y-8">
+        {/* Header section - same as TechnicianProfile */}
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900">{pageTitle}</h1>
           <Button onClick={handleBack} variant="outline" className="px-6 py-2">
             Back
           </Button>
         </div>
 
-        <div className="mb-8">
-          <TechnicianProfileCard
-            name={applicant.username || "N/A"}
-            email={applicant.email || "N/A"}
-            phone={applicant.phone || 0}
-            Designation={applicant.Designation || "N/A"}
-            yearsOfExperience={applicant.yearsOfExperience || 0}
-            profilePhoto={buildCloudinaryUrl(
-              applicant.image ? applicant.image : "default/profile.jpg"
-            )}
-            address={formatAddress(applicant.address || "")}
-          />
-        </div>
+        <ProfileCard
+          name={applicant.username}
+          email={applicant.email}
+          phone={applicant.phone}
+          image={
+            applicant.image
+              ? buildCloudinaryUrl(applicant.image)
+              : "/default-profile.jpg"
+          }
+          role="technician"
+          Designation={applicant.Designation}
+          yearsOfExperience={applicant.yearsOfExperience}
+          isEditable={false}
+          onSave={() => {}}
+        />
 
-        <div className="bg-white rounded-3xl shadow-md p-8 mb-8 w-full">
-          <h3 className="text-xl font-semibold text-gray-800 mb-6">About</h3>
-          <p className="text-gray-700 leading-relaxed text-lg">
-            {applicant.About || "No additional information provided."}
-          </p>
-        </div>
+        <TechnicianAboutSection
+          initialAbout={applicant.About}
+          onSave={async () => {}}
+          isLoading={false}
+          isEditable={false}
+        />
 
-        <div className="bg-white rounded-3xl shadow-md mb-8 w-full">
-          <div className="p-8 border-b border-gray-200">
-            <h3 className="text-xl font-semibold text-gray-800">
-              Certificates
-            </h3>
-          </div>
-          <div className="p-8">
-            {applicant.certificates && applicant.certificates.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {applicant.certificates.map((cert, index) => (
-                  <div
-                    key={index}
-                    className="bg-gray-50 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow border border-gray-200"
-                    onClick={() => setSelectedCertificate(cert)}
-                  >
-                    <div className="bg-white px-4 py-3 border-b border-gray-200">
-                      <h4 className="font-medium text-gray-800">
-                        Certificate {index + 1}
-                      </h4>
-                    </div>
-                    <div className="p-4 h-40 flex items-center justify-center">
-                      <img
-                        src={buildCloudinaryUrl(cert)}
-                        alt={`Certificate ${index + 1}`}
-                        className="max-h-full max-w-full object-contain rounded"
-                        onError={(e) => {
-                          e.currentTarget.src = "/api/placeholder/150/100";
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
+        <TechnicianCertificatesSection
+          certificates={applicant.certificates?.map((cert) =>
+            buildCloudinaryUrl(cert)
+          )}
+          onCertificatesUpdate={async () => {}}
+          isLoading={false}
+          isEditable={false}
+        />
+
+        {applicant.address && (
+          <div className="bg-white rounded-3xl shadow-md p-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              Work Location
+            </h2>
+            <div className="flex items-start p-4 bg-gray-50 rounded-xl border border-gray-200">
+              <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full mr-4">
+                <MapPin className="w-5 h-5 text-black" />
               </div>
-            ) : (
-              <p className="text-center py-12 text-gray-500 text-lg">
-                No certificates uploaded
-              </p>
-            )}
+              <div className="flex-1">
+                <h4 className="font-semibold text-gray-900 mb-2">
+                  Service Area
+                </h4>
+                <p className="text-gray-600 leading-relaxed mb-3">
+                  {applicant.address}
+                </p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-sm text-blue-800">
+                    <span className="font-medium">Coverage Area:</span> This
+                    technician can accept service requests within 10 km radius
+                    from this location
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
         {!applicant.is_verified && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Button
               onClick={handleApprove}
               variant="primary"
@@ -191,28 +191,28 @@ export const ApplicantDetailsPreview: React.FC = () => {
             </Button>
           </div>
         )}
-
-        <Modal
-          isOpen={!!selectedCertificate}
-          onClose={() => setSelectedCertificate(null)}
-          title="Certificate Preview"
-          cancelText="Close"
-          className="max-w-4xl"
-        >
-          {selectedCertificate && (
-            <div className="max-h-[70vh] overflow-auto">
-              <img
-                src={selectedCertificate}
-                alt="Certificate"
-                className="max-w-full h-auto mx-auto rounded-lg"
-                onError={(e) => {
-                  e.currentTarget.src = "/api/placeholder/800/600";
-                }}
-              />
-            </div>
-          )}
-        </Modal>
       </div>
+
+      <Modal
+        isOpen={!!selectedCertificate}
+        onClose={() => setSelectedCertificate(null)}
+        title="Certificate Preview"
+        cancelText="Close"
+        className="max-w-4xl"
+      >
+        {selectedCertificate && (
+          <div className="max-h-[70vh] overflow-auto">
+            <img
+              src={selectedCertificate}
+              alt="Certificate"
+              className="max-w-full h-auto mx-auto rounded-lg"
+              onError={(e) => {
+                e.currentTarget.src = "/api/placeholder/800/600";
+              }}
+            />
+          </div>
+        )}
+      </Modal>
     </AdminLayout>
   );
 };

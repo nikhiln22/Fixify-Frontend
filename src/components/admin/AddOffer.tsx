@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useFormik } from "formik";
 import Button from "../../components/common/Button";
 import InputField from "../../components/common/InputField";
 import SelectField from "../../components/common/SelectField";
 import { AddOfferProps } from "../../types/component.types";
 import { addOfferSchema } from "../../utils/validations/formvalidationSchema";
-import { getAllCategories } from "../../services/common.services";
+import { IOffer } from "../../models/offer";
 
 export const AddOffer: React.FC<AddOfferProps> = ({
   onCancel,
@@ -13,6 +13,9 @@ export const AddOffer: React.FC<AddOfferProps> = ({
   isLoading = false,
   initialValues,
   isEditing = false,
+  serviceOptions = [],
+  isFetchingServices = false,
+  serviceError = null,
 }) => {
   const getErrorMessage = (error: any): string | undefined => {
     if (typeof error === "string") return error;
@@ -24,36 +27,6 @@ export const AddOffer: React.FC<AddOfferProps> = ({
     if (typeof touched === "boolean") return touched;
     return !!touched;
   };
-  const [serviceOptions, setServiceOptions] = useState<
-    { value: string; label: string }[]
-  >([]);
-  const [isFetchingServices, setIsFetchingServices] = useState(false);
-  const [serviceError, setServiceError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchServices = async () => {
-      setIsFetchingServices(true);
-      setServiceError(null);
-
-      try {
-        const servicesResponse = await getAllCategories();
-        console.log("Services response:", servicesResponse);
-
-        const serviceOptions = servicesResponse.data.map((service: any) => ({
-          value: service._id,
-          label: service.name,
-        }));
-        setServiceOptions(serviceOptions);
-      } catch (error) {
-        console.error("Error fetching services:", error);
-        setServiceError("Failed to load services. Please try again later.");
-      } finally {
-        setIsFetchingServices(false);
-      }
-    };
-
-    fetchServices();
-  }, []);
 
   const formik = useFormik({
     initialValues: initialValues || {
@@ -64,17 +37,20 @@ export const AddOffer: React.FC<AddOfferProps> = ({
       discount_value: "",
       max_discount: "",
       min_booking_amount: "",
-      service_id: "",
+      serviceId: "",
       valid_until: "",
     },
     validationSchema: addOfferSchema,
     onSubmit: async (values) => {
       try {
-        const offerData = {
+        const offerData: Partial<IOffer> = {
           title: values.title,
           description: values.description,
-          offer_type: values.offer_type,
-          discount_type: values.discount_type,
+          offer_type: values.offer_type as
+            | "global"
+            | "service_category"
+            | "first_time_user",
+          discount_type: values.discount_type as "percentage" | "flat_amount",
           discount_value: Number(values.discount_value),
           max_discount: values.max_discount
             ? Number(values.max_discount)
@@ -82,9 +58,9 @@ export const AddOffer: React.FC<AddOfferProps> = ({
           min_booking_amount: values.min_booking_amount
             ? Number(values.min_booking_amount)
             : undefined,
-          service_id:
+          serviceId:
             values.offer_type === "service_category"
-              ? values.service_id
+              ? values.serviceId
               : undefined,
           valid_until: values.valid_until
             ? new Date(values.valid_until)
@@ -101,6 +77,17 @@ export const AddOffer: React.FC<AddOfferProps> = ({
       }
     },
   });
+
+  const handleDiscountTypeChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newType = e.target.value;
+    formik.setFieldValue("discount_type", newType);
+    formik.setFieldValue("discount_value", "");
+    if (newType === "flat_amount") {
+      formik.setFieldValue("max_discount", "");
+    }
+  };
 
   const offerTypeOptions = [
     { value: "global", label: "Global Offer" },
@@ -187,8 +174,8 @@ export const AddOffer: React.FC<AddOfferProps> = ({
         <div className="mb-6 text-left">
           <SelectField
             label="Select Service"
-            name="service_id"
-            value={formik.values.service_id || ""}
+            name="serviceId"
+            value={formik.values.serviceId || ""}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             options={serviceOptions}
@@ -197,12 +184,12 @@ export const AddOffer: React.FC<AddOfferProps> = ({
             }
             error={
               serviceError ||
-              (formik.touched.service_id && formik.errors.service_id)
-                ? serviceError || getErrorMessage(formik.errors.service_id)
+              (formik.touched.serviceId && formik.errors.serviceId)
+                ? serviceError || getErrorMessage(formik.errors.serviceId)
                 : undefined
             }
             touched={
-              getTouchedValue(formik.touched.service_id) || !!serviceError
+              getTouchedValue(formik.touched.serviceId) || !!serviceError
             }
             disabled={isFetchingServices}
           />
@@ -222,7 +209,7 @@ export const AddOffer: React.FC<AddOfferProps> = ({
             label="Discount Type"
             name="discount_type"
             value={formik.values.discount_type || ""}
-            onChange={formik.handleChange}
+            onChange={handleDiscountTypeChange}
             onBlur={formik.handleBlur}
             options={discountTypeOptions}
             placeholder="Select discount type"

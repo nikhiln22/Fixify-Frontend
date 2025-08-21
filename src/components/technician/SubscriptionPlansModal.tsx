@@ -12,6 +12,7 @@ interface SubscriptionPlansModalProps {
   loading?: boolean;
   error?: string | null;
   currentPlan?: string;
+  upcomingPlan?: string;
   title?: string;
 }
 
@@ -23,6 +24,7 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({
   loading = false,
   error = null,
   currentPlan,
+  upcomingPlan,
   title = "Upgrade Your Plan",
 }) => {
   const backdropVariants = {
@@ -78,6 +80,24 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({
     );
   };
 
+  const isUpcomingPlan = (planName: string): boolean => {
+    return !!(
+      upcomingPlan && planName.toLowerCase() === upcomingPlan.toLowerCase()
+    );
+  };
+
+  const isDowngrade = (plan: ISubscriptionPlan): boolean => {
+    if (!currentPlan) return false;
+
+    const currentPlanObj = plans.find(
+      (p) => p.planName.toLowerCase() === currentPlan.toLowerCase()
+    );
+
+    if (!currentPlanObj) return false;
+
+    return plan.price < currentPlanObj.price;
+  };
+
   const sortedPlans = [...plans].sort((a, b) => a.price - b.price);
 
   const renderContent = () => {
@@ -110,6 +130,16 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {sortedPlans.map((plan) => {
           const isCurrent = isCurrentPlan(plan.planName);
+          const isUpcoming = isUpcomingPlan(plan.planName);
+          const isDowngradeAttempt = isDowngrade(plan);
+          const shouldDisable = isCurrent || isUpcoming || isDowngradeAttempt;
+
+          let buttonText = "Choose Plan";
+          if (isCurrent) {
+            buttonText = "Current Plan";
+          } else if (isUpcoming) {
+            buttonText = "Already Purchased";
+          }
 
           return (
             <div
@@ -120,7 +150,6 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({
                   : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-lg"
               }`}
             >
-              {/* Current Plan Badge */}
               {isCurrent && (
                 <div className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
                   Current
@@ -178,11 +207,11 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({
 
                 <Button
                   onClick={() => handlePlanSelect(plan)}
-                  disabled={isCurrent}
-                  variant={isCurrent ? "outline" : "primary"}
+                  disabled={shouldDisable}
+                  variant={shouldDisable ? "outline" : "primary"}
                   className="w-full"
                 >
-                  {isCurrent ? "Current Plan" : "Choose Plan"}
+                  {buttonText}
                 </Button>
               </div>
             </div>

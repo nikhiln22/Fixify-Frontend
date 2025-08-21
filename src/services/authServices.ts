@@ -1,7 +1,6 @@
 import axiosInstance from "../config/axios.config";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { envConfig } from "../config/env.config";
 import {
   LoginFormData,
   LoginResponse,
@@ -9,7 +8,6 @@ import {
   RegisterResponse,
   OTPVerification,
   Role,
-  TempRegisterResponse,
   UserLikeRoles,
   VerifyResetOtpResponse,
 } from "../types/auth.types";
@@ -30,11 +28,11 @@ const getRoleFromUrl = (url: string): Role => {
   }
 };
 
-export const refreshToken = async (role: Role) => {
+export const newRefreshToken = async () => {
   try {
     if (isRefreshing) {
       console.log("Token refresh already in progress");
-      return new Promise((resolve) => {
+      return new Promise<string | null>((resolve) => {
         pendingRequests.push(resolve);
       });
     }
@@ -42,11 +40,7 @@ export const refreshToken = async (role: Role) => {
     isRefreshing = true;
     console.log("Started initiating the new access token");
 
-    const response = await axios.post(
-      `${envConfig.apiUrl}/api/refreshtoken`,
-      { role: role.toLowerCase() },
-      { withCredentials: true }
-    );
+    const response = await axiosInstance.get(`/api/refreshtoken`);
 
     console.log("Response data:", response.data);
 
@@ -80,7 +74,6 @@ export const refreshToken = async (role: Role) => {
   }
 };
 
-
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -105,7 +98,7 @@ axiosInstance.interceptors.response.use(
       !error.config.url.includes("/api/refreshtoken")
     ) {
       try {
-        const newAccessToken = await refreshToken(role);
+        const newAccessToken = await newRefreshToken();
         if (newAccessToken) {
           const newConfig = { ...error.config };
           if (!newConfig.headers) {
@@ -128,7 +121,6 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 
 axiosInstance.interceptors.request.use(
   (config) => {
@@ -156,24 +148,20 @@ const login = async (formData: LoginFormData, role: Role) => {
 };
 
 const register = async (formData: RegisterFormData, role: UserLikeRoles) => {
-  const response = await axiosInstance.post<TempRegisterResponse>(
+  const response = await axiosInstance.post<RegisterResponse>(
     getAuthUrl(role, "register"),
     formData
   );
   return response.data;
 };
 
+// Simplified verifyOtp - no more role-specific payload logic needed
 const verifyOtp = async (
   data: OTPVerification,
   role: UserLikeRoles,
   purpose: "REGISTRATION" | "PASSWORD_RESET" = "REGISTRATION"
 ) => {
-  let payload;
-  if (role.toLowerCase() === "technician") {
-    payload = { ...data, purpose };
-  } else {
-    payload = { ...data, purpose };
-  }
+  const payload = { ...data, purpose };
 
   const response = await axiosInstance.post<
     RegisterResponse | VerifyResetOtpResponse
@@ -221,7 +209,7 @@ const authService = {
   resendOtp,
   forgotPassword,
   resetPassword,
-  refreshToken,
+  newRefreshToken,
   logOut,
 };
 

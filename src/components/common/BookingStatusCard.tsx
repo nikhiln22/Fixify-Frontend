@@ -118,7 +118,6 @@ export const BookingStatusCard: React.FC<BookingStatusCardProps> = ({
     );
   };
 
-  // Show payment info only for user and admin, not for technician
   const showPaymentInfo = userType !== "technician";
 
   return (
@@ -128,7 +127,6 @@ export const BookingStatusCard: React.FC<BookingStatusCardProps> = ({
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-        {/* Booking Date - Always show */}
         <div className="flex flex-col">
           <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">
             Booking Date
@@ -139,7 +137,6 @@ export const BookingStatusCard: React.FC<BookingStatusCardProps> = ({
           </div>
         </div>
 
-        {/* Payment Method - Only for user and admin */}
         {showPaymentInfo && (
           <div className="flex flex-col">
             <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">
@@ -156,7 +153,6 @@ export const BookingStatusCard: React.FC<BookingStatusCardProps> = ({
           </div>
         )}
 
-        {/* Payment Status - Only for user and admin */}
         {showPaymentInfo && (
           <div className="flex flex-col">
             <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">
@@ -173,7 +169,6 @@ export const BookingStatusCard: React.FC<BookingStatusCardProps> = ({
           </div>
         )}
 
-        {/* Booking Status - Always show */}
         <div className="flex flex-col">
           <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">
             {userType === "technician" ? "Job Status" : "Booking Status"}
@@ -184,7 +179,6 @@ export const BookingStatusCard: React.FC<BookingStatusCardProps> = ({
           </div>
         </div>
 
-        {/* Booking ID - Always show if provided */}
         {bookingId && (
           <div className="flex flex-col">
             <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">

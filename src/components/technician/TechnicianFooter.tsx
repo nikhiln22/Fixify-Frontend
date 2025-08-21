@@ -5,10 +5,8 @@ export const TechnicianFooter: React.FC = () => {
   return (
     <footer className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
       <div className="container mx-auto px-6 pt-12 pb-8">
-        {/* Top Section */}
         <div className="flex flex-col lg:flex-row justify-between items-start mb-12 pb-8 border-b border-slate-700">
           <div className="mb-8 lg:mb-0">
-            {/* FIXIFY Logo */}
             <div className="flex items-center space-x-1 mb-4">
               <span className="text-3xl font-bold text-cyan-400">F</span>
               <span className="text-3xl font-bold text-white relative">
@@ -26,7 +24,6 @@ export const TechnicianFooter: React.FC = () => {
             </p>
           </div>
 
-          {/* Newsletter Subscription */}
           <div className="w-full lg:w-96">
             <h3 className="text-xl font-semibold mb-4 text-white">
               Stay Updated
@@ -48,9 +45,7 @@ export const TechnicianFooter: React.FC = () => {
           </div>
         </div>
 
-        {/* Links Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {/* Company */}
           <div>
             <h3 className="text-lg font-semibold mb-6 text-white relative">
               Company
@@ -71,7 +66,6 @@ export const TechnicianFooter: React.FC = () => {
             </ul>
           </div>
 
-          {/* Services */}
           <div>
             <h3 className="text-lg font-semibold mb-6 text-white relative">
               Services
@@ -98,7 +92,6 @@ export const TechnicianFooter: React.FC = () => {
             </ul>
           </div>
 
-          {/* Support */}
           <div>
             <h3 className="text-lg font-semibold mb-6 text-white relative">
               Support
@@ -121,7 +114,6 @@ export const TechnicianFooter: React.FC = () => {
             </ul>
           </div>
 
-          {/* Contact Info */}
           <div>
             <h3 className="text-lg font-semibold mb-6 text-white relative">
               Get in Touch
@@ -152,7 +144,6 @@ export const TechnicianFooter: React.FC = () => {
           </div>
         </div>
 
-        {/* Bottom Section */}
         <div className="border-t border-slate-700 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-slate-400 text-sm mb-4 md:mb-0">

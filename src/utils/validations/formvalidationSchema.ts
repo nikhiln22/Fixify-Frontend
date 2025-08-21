@@ -227,6 +227,7 @@ export const addOfferSchema = Yup.object({
     .nullable(),
 
   min_booking_amount: Yup.number()
+    .required("Minimum booking amount is required")
     .positive("Minimum booking amount must be positive")
     .nullable(),
 
@@ -234,7 +235,7 @@ export const addOfferSchema = Yup.object({
     .required("Valid until date is required")
     .min(new Date(), "Valid until date must be in the future"),
 
-  service_id: Yup.string().when("offer_type", {
+  serviceId: Yup.string().when("offer_type", {
     is: "service_category",
     then: (schema) =>
       schema.required(
@@ -259,7 +260,11 @@ export const addCouponSchema = Yup.object().shape({
     .oneOf(["percentage", "flat_amount"], "Invalid discount type"),
   discount_value: Yup.number()
     .required("Discount value is required")
-    .positive("Discount value must be positive"),
+    .positive("Discount value must be positive")
+    .when("discount_type", {
+      is: "percentage",
+      then: (schema) => schema.max(100, "Percentage cannot exceed 100%"),
+    }),
   max_discount: Yup.number()
     .positive("Maximum discount must be positive")
     .when("discount_type", {

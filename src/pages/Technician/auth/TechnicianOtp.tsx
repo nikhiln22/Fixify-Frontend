@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Otp } from "../../../components/auth/Otp";
-import authService from "../../../services/auth.services";
+import authService from "../../../services/authServices";
 import { showToast } from "../../../utils/toast";
 import { OtpPurpose, OTPVerification } from "../../../types/auth.types";
 
@@ -11,28 +11,14 @@ export const TechnicianOtp: React.FC = () => {
   const handleVerifyOtp = async (
     values: { otp: string },
     email: string,
-    purpose: OtpPurpose,
-    tempId?: string
+    purpose: OtpPurpose
   ) => {
     try {
-      let data: OTPVerification;
-
-      if (purpose === "PASSWORD_RESET") {
-        data = {
-          email,
-          otp: values.otp,
-          purpose,
-        };
-      } else {
-        data = {
-          tempTechnicianId: tempId,
-          otp: values.otp,
-          email,
-          purpose,
-        };
-      }
-
-      console.log("data in the technician otp page:", data);
+      const data: OTPVerification = {
+        email,
+        otp: values.otp,
+        purpose,
+      };
 
       const response = await authService.verifyOtp(data, "TECHNICIAN", purpose);
 
@@ -49,7 +35,9 @@ export const TechnicianOtp: React.FC = () => {
           });
         } else {
           showToast({
-            message: response.message || "Registration successful!",
+            message:
+              response.message ||
+              "Email verified successfully! Please login to continue.",
             type: "success",
           });
           navigate(`/technician/login`);

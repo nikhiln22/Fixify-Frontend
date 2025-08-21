@@ -69,12 +69,12 @@ export const getSubscriptionPlanColumns = (
       <div className="flex justify-center">
         <span
           className={`px-2 py-1 text-xs font-medium rounded ${
-            item?.status
+            item?.status === "Active"
               ? "bg-green-200 text-green-800"
               : "bg-red-200 text-red-800"
           }`}
         >
-          {item?.status ? "Active" : "Inactive"}
+          {item?.status}
         </span>
       </div>
     ),
@@ -116,12 +116,12 @@ export const getSubscriptionPlanColumns = (
             <Button
               onClick={openModal}
               className={`px-4 py-1 text-xs w-20 ${
-                item?.status
+                item?.status === "Active"
                   ? "bg-red-500 hover:bg-red-600"
                   : "bg-green-500 hover:bg-green-600"
               } text-white`}
             >
-              {item?.status ? "Block" : "Unblock"}
+              {item?.status === "Active" ? "Block" : "Unblock"}
             </Button>
 
             <Modal
@@ -131,14 +131,15 @@ export const getSubscriptionPlanColumns = (
               confirmText={isProcessing ? "Processing..." : "Confirm"}
               cancelText="Cancel"
               onConfirm={handleConfirm}
-              confirmButtonColor={item?.status ? "red" : "green"}
+              confirmButtonColor={item?.status === "Active" ? "red" : "green"}
             >
               {isProcessing ? (
                 <p className="text-center py-4">Processing your request...</p>
               ) : (
                 <p>
-                  Are you sure you want to {item?.status ? "block" : "unblock"}{" "}
-                  the Subscription Plan{" "}
+                  Are you sure you want to{" "}
+                  {item?.status === "Active" ? "block" : "unblock"} the
+                  Subscription Plan{" "}
                   <strong>"{item?.planName || "this plan"}"</strong>?
                 </p>
               )}

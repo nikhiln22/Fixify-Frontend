@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import UserLayout from "../../../layouts/UserLayout";
 import Button from "../../../components/common/Button";
 import Banner from "../../../components/common/Banner";
-import { verifyPaymentSession } from "../../../services/user.services";
+import { verifyPaymentSession } from "../../../services/bookingService";
 import { showToast } from "../../../utils/toast";
 import dayjs from "dayjs";
 import { IBooking } from "../../../models/booking";
@@ -33,7 +33,7 @@ export const UserBookingSuccess: React.FC = () => {
       if (sessionId && !hasVerified.current) {
         hasVerified.current = true;
         try {
-          const res = await verifyPaymentSession(sessionId);
+          const res = await verifyPaymentSession(sessionId, "user");
           if (res.success && res.data) {
             setBooking(res.data);
             showToast({ type: "success", message: "Payment Verified!" });

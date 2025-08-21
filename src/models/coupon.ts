@@ -9,7 +9,7 @@ export interface ICoupon {
   min_booking_amount?: number;
   used_by_users?: string;
   valid_until?: Date;
-  status?: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  status?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

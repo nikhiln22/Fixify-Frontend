@@ -8,8 +8,8 @@ export interface IOffer {
   max_discount?: number;
   min_booking_amount?: number;
   serviceId?: string;
-  status: boolean;
+  status?: string;
   valid_until?: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

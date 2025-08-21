@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import AdminLayout from "../../../layouts/AdminLayout";
-import { getBookings } from "../../../services/common.services";
+import { getBookings } from "../../../services/commonServices";
 import SelectField from "../../../components/common/SelectField";
 import { Search } from "lucide-react";
 import { getBookingsColumns } from "../../../constants/tablecolumns/BookingsColumn";

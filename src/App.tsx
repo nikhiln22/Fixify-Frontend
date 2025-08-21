@@ -9,12 +9,14 @@ import { AdminRoutes } from "./routes/AdminRoutes";
 import { store, persistor } from "./redux/store";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
+import { ScrollToTop } from "./components/common/ScrollToTop";
 
 function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
+          <ScrollToTop />
           <ToastContainer
             position="top-center"
             autoClose={5000}

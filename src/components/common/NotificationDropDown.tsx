@@ -29,6 +29,8 @@ interface NotificationDropdownProps {
   onNotificationClick: (notificationId: string) => void;
   onMarkAllRead: () => void;
   onNewNotification: (notification: Notification) => void;
+  disabled?: boolean;
+  userType?: "user" | "technician" | "admin";
 }
 
 export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
@@ -40,60 +42,68 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   onNotificationClick,
   onMarkAllRead,
   onNewNotification,
+  disabled = false,
+  userType = "user",
 }) => {
   const userData = useAppSelector((state) => state.user.userData);
+  const technicianData = useAppSelector(
+    (state) => state.technician.technicianData
+  );
 
   // Initialize socket connection and listeners
   useEffect(() => {
-    if (userData?._id) {
-      // Connect socket and authenticate user
-      connectSocket();
-      authenticateUser(userData._id, "user");
+    if (!disabled) {
+      const userId = userType === "user" ? userData?._id : technicianData?._id;
 
-      // Listen for real-time notifications
-      listenForNotifications((newNotification) => {
-        console.log("New notification received:", newNotification);
+      if (userId) {
+        // Connect socket and authenticate user
+        connectSocket();
+        authenticateUser(userId, userType);
 
-        // Pass new notification to parent component
-        onNewNotification(newNotification);
+        // Listen for real-time notifications
+        listenForNotifications((newNotification) => {
+          console.log("New notification received:", newNotification);
 
-        // Optional: Show browser notification
-        if (Notification.permission === "granted") {
-          new Notification(newNotification.title, {
-            body: newNotification.message,
-            icon: "/favicon.ico",
-          });
-        }
-      });
+          // Pass new notification to parent component
+          onNewNotification(newNotification);
+        });
+      }
     }
 
     return () => {
       stopListeningForNotifications();
     };
-  }, [userData?._id, onNewNotification]);
+  }, [
+    userData?._id,
+    technicianData?._id,
+    onNewNotification,
+    disabled,
+    userType,
+  ]);
 
-  // Request browser notification permission
   useEffect(() => {
-    if (Notification.permission === "default") {
+    if (!disabled && Notification.permission === "default") {
       Notification.requestPermission();
     }
-  }, []);
+  }, [disabled]);
 
   const handleNotificationClick = (notificationId: string) => {
-    // Emit socket event to mark as read
-    markNotificationAsRead(notificationId);
-
-    // Call parent handler for API call
-    onNotificationClick(notificationId);
+    if (!disabled) {
+      markNotificationAsRead(notificationId);
+      onNotificationClick(notificationId);
+    }
   };
 
   const handleMarkAllRead = () => {
-    // Call parent handler for API call
-    onMarkAllRead();
+    if (!disabled) {
+      onMarkAllRead();
+    }
   };
 
   const handleClose = () => {
-    onToggle();
+    if (!disabled) {
+      onToggle();
+    }
   };
 
   const formatDate = (dateString: Date | string) => {
@@ -111,20 +121,26 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   return (
     <div className="relative">
       <button
-        onClick={onToggle}
-        className="relative w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-all duration-200 hover:scale-105"
+        onClick={disabled ? undefined : onToggle}
+        className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
+          disabled
+            ? "bg-gray-200 cursor-not-allowed"
+            : "bg-gray-100 hover:bg-gray-200 hover:scale-105"
+        }`}
+        disabled={disabled}
       >
-        <Bell className="h-5 w-5 text-gray-600" />
-        {unreadCount > 0 && (
+        <Bell
+          className={`h-5 w-5 ${disabled ? "text-gray-400" : "text-gray-600"}`}
+        />
+        {!disabled && unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </button>
 
-      {isOpen && (
+      {!disabled && isOpen && (
         <div className="absolute right-0 top-12 w-96 bg-white rounded-xl shadow-xl ring-1 ring-black/5 focus:outline-none z-10 border border-gray-100">
-          {/* Header with close button and mark all read */}
           <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-800">
               Notifications
@@ -168,7 +184,6 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                   className="px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-b-0 transition-colors duration-150"
                 >
                   <div className="flex items-start space-x-3">
-                    {/* Individual tick mark for each notification */}
                     <button
                       onClick={() => handleNotificationClick(notification.id)}
                       className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center transition-colors duration-150 flex-shrink-0 ${

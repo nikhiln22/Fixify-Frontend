@@ -7,11 +7,17 @@ interface TechnicianCertificatesSectionProps {
   certificates?: string[];
   onCertificatesUpdate: (files: File[]) => Promise<void>;
   isLoading: boolean;
+  isEditable: boolean;
 }
 
 export const TechnicianCertificatesSection: React.FC<
   TechnicianCertificatesSectionProps
-> = ({ certificates = [], onCertificatesUpdate, isLoading }) => {
+> = ({
+  certificates = [],
+  onCertificatesUpdate,
+  isLoading,
+  isEditable = true,
+}) => {
   const [selectedCertificate, setSelectedCertificate] = useState<string | null>(
     null
   );
@@ -111,14 +117,16 @@ export const TechnicianCertificatesSection: React.FC<
               Certificates
             </h2>
           </div>
-          <button
-            onClick={() => setIsAddingCertificates(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-            disabled={isLoading}
-          >
-            <Plus className="w-4 h-4" />
-            Add Certificates
-          </button>
+          {isEditable && (
+            <button
+              onClick={() => setIsAddingCertificates(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              disabled={isLoading}
+            >
+              <Plus className="w-4 h-4" />
+              Add Certificates
+            </button>
+          )}
         </div>
 
         <div className="p-8">
@@ -155,15 +163,19 @@ export const TechnicianCertificatesSection: React.FC<
                 No certificates uploaded yet
               </h3>
               <p className="text-gray-500 mb-6">
-                Add your professional certificates to build credibility
+                {isEditable
+                  ? "Add your professional certificates to build credibility"
+                  : "No certificates available"}
               </p>
-              <button
-                onClick={() => setIsAddingCertificates(true)}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                Upload Your First Certificate
-              </button>
+              {isEditable && (
+                <button
+                  onClick={() => setIsAddingCertificates(true)}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Upload Your First Certificate
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -190,108 +202,110 @@ export const TechnicianCertificatesSection: React.FC<
         )}
       </Modal>
 
-      <Modal
-        isOpen={isAddingCertificates}
-        onClose={handleCancel}
-        title="Add New Certificates"
-        className="max-w-2xl"
-      >
-        <div className="space-y-6">
-          <div
-            className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
-              dragActive
-                ? "border-blue-500 bg-blue-50"
-                : "border-gray-300 hover:border-blue-400"
-            }`}
-            onDrop={handleDrop}
-            onDragOver={handleDrag}
-            onDragEnter={handleDrag}
-            onDragLeave={handleDrag}
-          >
-            <FileImage className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Drag and drop certificate images here
-            </h3>
-            <p className="text-gray-500 mb-4">or click to browse files</p>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-              id="certificate-upload"
-            />
-            <label
-              htmlFor="certificate-upload"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
+      {isEditable && (
+        <Modal
+          isOpen={isAddingCertificates}
+          onClose={handleCancel}
+          title="Add New Certificates"
+          className="max-w-2xl"
+        >
+          <div className="space-y-6">
+            <div
+              className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
+                dragActive
+                  ? "border-blue-500 bg-blue-50"
+                  : "border-gray-300 hover:border-blue-400"
+              }`}
+              onDrop={handleDrop}
+              onDragOver={handleDrag}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
             >
-              Choose Files
-            </label>
-            <p className="text-xs text-gray-500 mt-3">
-              Supported formats: JPEG, PNG, WebP • Max size: 5MB per file
-            </p>
-          </div>
-
-          {newCertificates.length > 0 && (
-            <div>
-              <div className="flex justify-between items-center mb-3">
-                <h4 className="font-medium text-gray-700">
-                  Selected Files ({newCertificates.length})
-                </h4>
-                <span className="text-sm text-gray-500">
-                  Total: {formatFileSize(getTotalFileSize())}
-                </span>
-              </div>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {newCertificates.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <FileImage className="w-4 h-4 text-gray-500" />
-                      <div>
-                        <span className="text-sm font-medium text-gray-700 block truncate max-w-48">
-                          {file.name}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {formatFileSize(file.size)}
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeCertificateFile(index)}
-                      className="text-red-500 hover:text-red-700 p-1 rounded transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
+              <FileImage className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                Drag and drop certificate images here
+              </h3>
+              <p className="text-gray-500 mb-4">or click to browse files</p>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+                id="certificate-upload"
+              />
+              <label
+                htmlFor="certificate-upload"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
+              >
+                Choose Files
+              </label>
+              <p className="text-xs text-gray-500 mt-3">
+                Supported formats: JPEG, PNG, WebP • Max size: 5MB per file
+              </p>
             </div>
-          )}
 
-          <div className="flex gap-3 pt-4">
-            <Button
-              onClick={handleSave}
-              disabled={isLoading || newCertificates.length === 0}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex-1"
-            >
-              {isLoading
-                ? "Uploading..."
-                : `Upload ${newCertificates.length} Certificate${newCertificates.length !== 1 ? "s" : ""}`}
-            </Button>
-            <Button
-              onClick={handleCancel}
-              variant="outline"
-              className="px-6 py-2"
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
+            {newCertificates.length > 0 && (
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="font-medium text-gray-700">
+                    Selected Files ({newCertificates.length})
+                  </h4>
+                  <span className="text-sm text-gray-500">
+                    Total: {formatFileSize(getTotalFileSize())}
+                  </span>
+                </div>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {newCertificates.map((file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    >
+                      <div className="flex items-center gap-3">
+                        <FileImage className="w-4 h-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm font-medium text-gray-700 block truncate max-w-48">
+                            {file.name}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {formatFileSize(file.size)}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => removeCertificateFile(index)}
+                        className="text-red-500 hover:text-red-700 p-1 rounded transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-4">
+              <Button
+                onClick={handleSave}
+                disabled={isLoading || newCertificates.length === 0}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex-1"
+              >
+                {isLoading
+                  ? "Uploading..."
+                  : `Upload ${newCertificates.length} Certificate${newCertificates.length !== 1 ? "s" : ""}`}
+              </Button>
+              <Button
+                onClick={handleCancel}
+                variant="outline"
+                className="px-6 py-2"
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+            </div>
           </div>
-        </div>
-      </Modal>
+        </Modal>
+      )}
     </>
   );
 };

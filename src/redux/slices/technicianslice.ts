@@ -1,15 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Itechnician } from "../../models/technician";
 
-type TechnicianReduxData = Omit<
-  Itechnician,
-  | "status"
-  | "role"
-  | "createdAt"
-  | "updatedAt"
-  | "access_token"
-  | "refresh_token"
->;
+type TechnicianReduxData = Omit<Itechnician, "createdAt" | "updatedAt">;
 
 interface TechnicianState {
   technicianData: TechnicianReduxData | null;

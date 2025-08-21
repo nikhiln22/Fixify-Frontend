@@ -1,11 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Register } from "../../../components/auth/Register";
-import {
-  RegisterFormData,
-  UserTempRegisterResponse,
-} from "../../../types/auth.types";
-import authService from "../../../services/auth.services";
+import { RegisterFormData } from "../../../types/auth.types";
+import authService from "../../../services/authServices";
 import { showToast } from "../../../utils/toast";
 
 export const UserRegister: React.FC = () => {
@@ -13,10 +10,7 @@ export const UserRegister: React.FC = () => {
 
   const handleSubmit = async (values: RegisterFormData) => {
     try {
-      const response = (await authService.register(
-        values,
-        "USER"
-      )) as UserTempRegisterResponse;
+      const response = await authService.register(values, "USER");
 
       if (response.success) {
         showToast({
@@ -25,10 +19,9 @@ export const UserRegister: React.FC = () => {
         });
 
         const stateData = {
-          email: response.email,
+          email: response.data?.email || values.email,
           action: "register",
           role: "USER",
-          tempUserId: response.tempUserId,
         };
 
         navigate(`/user/otp`, { state: stateData });

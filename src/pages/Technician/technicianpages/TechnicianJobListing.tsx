@@ -13,11 +13,11 @@ import {
   cancelBooking,
   generateCompletionOtp,
   verifyCompletionOtp,
-} from "../../../services/technician.services";
+} from "../../../services/technicianServices";
 import { showToast } from "../../../utils/toast";
 import { ChatModal } from "../../../components/common/ChatModal";
 import SelectField from "../../../components/common/SelectField";
-import { getBookings } from "../../../services/common.services";
+import { getBookings } from "../../../services/commonServices";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
 import {
   connectSocket,
@@ -31,7 +31,7 @@ import { IChat } from "../../../models/chat";
 import {
   getChatMessages,
   sendChatMessage,
-} from "../../../services/common.services";
+} from "../../../services/commonServices";
 
 export const TechnicianJobListing: React.FC = () => {
   const itemsPerPage = 6;

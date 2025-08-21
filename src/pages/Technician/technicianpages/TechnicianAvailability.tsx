@@ -11,7 +11,7 @@ import {
   createTimeSlots,
   getTimeSlots,
   blockTimeSlot,
-} from "../../../services/technician.services";
+} from "../../../services/technicianServices";
 import { ITimeSlot } from "../../../models/timeslot";
 import { showToast } from "../../../utils/toast";
 

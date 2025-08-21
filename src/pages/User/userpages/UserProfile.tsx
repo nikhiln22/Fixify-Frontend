@@ -3,13 +3,13 @@ import UserLayout from "../../../layouts/UserLayout";
 import { UserProfileSidebar } from "../../../components/user/UserProfileSidebar";
 import { ProfileCard } from "../../../components/common/ProfileCard";
 import { AddressManager } from "../../../components/user/AddressManager";
-import { getUserProfile, editProfile } from "../../../services/user.services";
+import { getUserProfile, editProfile } from "../../../services/userServices";
 import {
   addAddress,
   getUserAddresses,
   updateAddress,
   deleteAddress,
-} from "../../../services/user.services";
+} from "../../../services/userServices";
 import { Iuser } from "../../../models/user";
 import { IAddress } from "../../../models/address";
 import { updateUserData } from "../../../redux/slices/userSlice";

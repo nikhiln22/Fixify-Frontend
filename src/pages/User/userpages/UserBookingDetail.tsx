@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import UserLayout from "../../../layouts/UserLayout";
 import { UserProfileSidebar } from "../../../components/user/UserProfileSidebar";
 import Button from "../../../components/common/Button";
-import { bookingDetails, getRating } from "../../../services/common.services";
+import { bookingDetails, getRating } from "../../../services/commonServices";
 import { showToast } from "../../../utils/toast";
 import { IBooking } from "../../../models/booking";
 import { BookingHeader } from "../../../components/common/BookingHeader";
@@ -15,6 +15,7 @@ import { ScheduleInfoCard } from "../../../components/common/ScheduledInfoCard";
 import { CancellationCard } from "../../../components/common/CancellationCard";
 import { IRating } from "../../../models/IRating";
 import { RatingCard } from "../../../components/common/RatingCard";
+
 
 export const BookingDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -49,7 +50,7 @@ export const BookingDetailsPage: React.FC = () => {
           type: "error",
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error fetching booking details:", error);
       setError("Failed to fetch booking details");
       showToast({

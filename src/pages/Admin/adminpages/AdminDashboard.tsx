@@ -6,7 +6,7 @@ import {
   getBookingStatusDistribution,
   getRevenueTrends,
   getServiceCategoryPerformance,
-} from "../../../services/admin.services";
+} from "../../../services/adminServices";
 import { BookingStatusChart } from "../../../components/admin/BookingStatsChart";
 import RevenueTrendsChart from "../../../components/admin/RevenueTrendCharts";
 import { ServiceCategoryChart } from "../../../components/admin/ServiceCategoryChart";
@@ -94,7 +94,6 @@ export const AdminDashboard: React.FC = () => {
         setLoading(true);
         setChartLoading(true);
 
-        // Fetch stats, booking status, and revenue trends data
         const [
           statsResponse,
           chartResponse,
@@ -104,7 +103,7 @@ export const AdminDashboard: React.FC = () => {
           getDashboardStats(),
           getBookingStatusDistribution(),
           getRevenueTrends(getDaysForPeriod(timePeriod)),
-          getServiceCategoryPerformance(10, 30), // Top 10 categories, last 30 days
+          getServiceCategoryPerformance(10, 30),
         ]);
 
         setStats(statsResponse.data);

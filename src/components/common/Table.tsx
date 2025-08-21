@@ -3,7 +3,7 @@ const Table = <T extends object>({
   data,
   columns,
   currentPage,
-  pageSize = 5,
+  pageSize,
 }: TableProps<T>) => {
   return (
     <div className="overflow-x-auto w-full">
@@ -53,7 +53,7 @@ const Table = <T extends object>({
                       {col.render
                         ? col.render(
                             row,
-                            (currentPage - 1) * pageSize + rowIndex,
+                            (currentPage - 1) * pageSize + rowIndex
                           )
                         : String(row[col.key as keyof T])}
                     </td>

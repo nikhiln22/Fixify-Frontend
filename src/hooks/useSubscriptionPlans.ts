@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   toggleSubscriptionPlanStatus,
   getAllSubscriptionPlans,
-} from "../services/admin.services";
+} from "../services/adminServices";
 import { usePaginatedList } from "./usePaginatedList";
 import { ISubscriptionPlan } from "../models/subscriptionPlan";
 

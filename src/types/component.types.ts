@@ -6,6 +6,7 @@ import { TimeSlotData } from "./technicians.types";
 import { ICoupon } from "../models/coupon";
 import { OfferData } from "./user.types";
 import { CouponData } from "./user.types";
+import { IOffer } from "../models/offer";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -58,8 +59,8 @@ export interface TableProps<T> {
   data: T[];
   columns: Column<T>[];
   currentPage: number;
+  pageSize: number;
   loading?: boolean;
-  pageSize?: number;
 }
 
 export interface PaginationProps {
@@ -83,6 +84,8 @@ export interface AddDesignationFormProps {
 export interface QualificationFormProps {
   onSubmit: (formData: any) => void;
   onCancel: () => void;
+  designationOptions: { value: string; label: string }[];
+  designationsLoading: boolean;
 }
 
 export interface VerificationBannerProps {
@@ -133,6 +136,8 @@ export interface AddServiceProps {
     designationId?: string;
   };
   isEditing?: boolean;
+  categoryOptions: { value: string; label: string }[];
+  designationOptions: { value: string; label: string }[];
 }
 
 export interface BannerProps {
@@ -272,17 +277,41 @@ export interface WalletBalanceProps {
 
 export interface AddOfferProps {
   onCancel?: () => void;
-  onSubmit?: (data: any) => Promise<void>;
+  onSubmit?: (data: Partial<IOffer>) => Promise<void>;
   isLoading?: boolean;
-  initialValues?: any;
+  initialValues?: {
+    _id?: string;
+    title: string;
+    description: string;
+    offer_type: "global" | "service_category" | "first_time_user";
+    discount_type: "percentage" | "flat_amount";
+    discount_value: string | number;
+    max_discount?: string | number;
+    min_booking_amount?: string | number;
+    serviceId?: string;
+    valid_until: string;
+  };
   isEditing?: boolean;
+  serviceOptions?: { value: string; label: string }[];
+  isFetchingServices?: boolean;
+  serviceError?: string | null;
 }
 
 export interface AddCouponProps {
   onCancel?: () => void;
-  onSubmit?: (data: any) => Promise<void>;
+  onSubmit?: (data: Partial<ICoupon>) => Promise<void>;
   isLoading?: boolean;
-  initialValues?: Partial<ICoupon>;
+  initialValues?: {
+    _id?: string;
+    code: string;
+    title: string;
+    description: string;
+    discount_type: "percentage" | "flat_amount";
+    discount_value: number | string;
+    max_discount?: string | number;
+    min_booking_amount?: number | string;
+    valid_until?: string;
+  };
   isEditing?: boolean;
 }
 

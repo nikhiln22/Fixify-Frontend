@@ -13,6 +13,7 @@ export interface SubmitTechnicianQualificationResponse {
     | "image"
     | "certificates"
     | "address"
+    | "email_verified"
   >;
 }
 
@@ -31,12 +32,12 @@ export interface TimeSlotData {
 export interface CreateTimeSlotsResponse {
   success: boolean;
   message: string;
-  data?: any; 
+  data?: any;
 }
 
-export interface GetTimeSlotResponse{
-  success:boolean;
-  message:string;
-  status:number;
-  data?:ITimeSlot[];
+export interface GetTimeSlotResponse {
+  success: boolean;
+  message: string;
+  status: number;
+  data?: ITimeSlot[];
 }

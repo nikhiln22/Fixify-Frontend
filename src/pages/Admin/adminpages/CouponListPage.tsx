@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "../../../layouts/AdminLayout";
 import Button from "../../../components/common/Button";
 import Table from "../../../components/common/Table";
@@ -14,7 +14,7 @@ import {
   updateCoupon,
   toggleCouponStatus,
   getAllCoupons,
-} from "../../../services/admin.services";
+} from "../../../services/couponService";
 import { ICoupon } from "../../../models/coupon";
 import { getCouponColumns } from "../../../constants/tablecolumns/couponColumn";
 
@@ -31,21 +31,8 @@ export const CouponListPage: React.FC = () => {
   const statusOptions = [
     { value: "", label: "All Coupons" },
     { value: "active", label: "Active Coupons" },
-    { value: "inactive", label: "Inactive Coupons" },
+    { value: "blocked", label: "Blocked Coupons" },
   ];
-
-  const fetchCouponsWithFilters = useCallback(
-    async (page: number) => {
-      console.log("Fetching coupons with filters:", {
-        page,
-        searchQuery,
-        filterStatus,
-      });
-
-      return await getAllCoupons(page, searchQuery, filterStatus);
-    },
-    [searchQuery, filterStatus]
-  );
 
   const {
     data: coupons,
@@ -54,7 +41,13 @@ export const CouponListPage: React.FC = () => {
     totalPages,
     setCurrentPage,
     loading,
-  } = usePaginatedList(fetchCouponsWithFilters);
+  } = usePaginatedList(
+    getAllCoupons,
+    "admin",
+    searchQuery,
+    filterStatus,
+    itemsPerPage
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -94,11 +87,15 @@ export const CouponListPage: React.FC = () => {
     setSelectedCoupon(null);
   };
 
-  const handleSubmitCoupon = async (couponData: any) => {
+  const handleSubmitCoupon = async (couponData: Partial<ICoupon>) => {
     setIsLoading(true);
     try {
       if (selectedCoupon) {
-        const response = await updateCoupon(selectedCoupon._id, couponData);
+        const response = await updateCoupon(
+          selectedCoupon._id,
+          couponData,
+          "admin"
+        );
         if (response && coupons) {
           setCoupons(
             coupons.map((coupon) =>
@@ -111,7 +108,7 @@ export const CouponListPage: React.FC = () => {
           });
         }
       } else {
-        const response = await addCoupon(couponData);
+        const response = await addCoupon(couponData, "admin");
         if (response && coupons) {
           const firstPageItems = [
             response.data,
@@ -147,22 +144,19 @@ export const CouponListPage: React.FC = () => {
 
   const handleStatusToggle = async (couponId: string) => {
     try {
-      const result = await toggleCouponStatus(couponId);
+      const result = await toggleCouponStatus(couponId, "admin");
       console.log("result from toggling the coupon status:", result);
       if (result) {
         setCoupons((prevCoupons) =>
           prevCoupons.map((coupon) =>
             coupon._id === couponId
-              ? result.data || { ...coupon, status: !coupon.status }
+              ? { ...coupon, status: result.data.status }
               : coupon
           )
         );
       }
-
-      const coupon = coupons.find((coup) => coup._id === couponId);
-      const statusLabel = coupon?.status ? "blocked" : "unblocked";
       showToast({
-        message: `Coupon ${statusLabel} successfully`,
+        message: result.message,
         type: "success",
       });
 
@@ -181,38 +175,39 @@ export const CouponListPage: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="p-4">
-        <h1 className="text-3xl font-semibold mb-4">Coupons</h1>
-        <div className="flex justify-between items-center mb-4">
-          <div className="w-full md:w-1/3 relative">
-            <input
-              type="text"
-              placeholder="Search coupons..."
-              value={inputValue}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Coupons</h1>
+        <p className="text-gray-600">Manage and monitor Coupons</p>
+      </div>
+      <div className="flex justify-between items-center mb-4">
+        <div className="w-full md:w-1/3 relative">
+          <input
+            type="text"
+            placeholder="Search coupons..."
+            value={inputValue}
+            onChange={handleInputChange}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-48">
+            <SelectField
+              label=""
+              name="statusFilter"
+              value={filterStatus}
+              onChange={handleStatusFilterChange}
+              options={statusOptions}
+              placeholder="Filter by status"
+              className="mb-0"
             />
-            <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-48">
-              <SelectField
-                label=""
-                name="statusFilter"
-                value={filterStatus}
-                onChange={handleStatusFilterChange}
-                options={statusOptions}
-                placeholder="Filter by status"
-                className="mb-0"
-              />
-            </div>
-            <Button
-              onClick={handleOpenAddModal}
-              className="h-10 px-4 py-2 whitespace-nowrap"
-            >
-              Add Coupon
-            </Button>
-          </div>
+          <Button
+            onClick={handleOpenAddModal}
+            className="h-10 px-4 py-2 whitespace-nowrap"
+          >
+            Add Coupon
+          </Button>
         </div>
       </div>
 
@@ -244,7 +239,7 @@ export const CouponListPage: React.FC = () => {
             isLoading={isLoading}
             initialValues={
               selectedCoupon
-                ? ({
+                ? {
                     _id: selectedCoupon._id,
                     code: selectedCoupon.code,
                     title: selectedCoupon.title,
@@ -258,7 +253,7 @@ export const CouponListPage: React.FC = () => {
                           .toISOString()
                           .split("T")[0]
                       : undefined,
-                  } as Partial<ICoupon>)
+                  }
                 : undefined
             }
             isEditing={!!selectedCoupon}

@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Itechnician } from "../../models/technician";
 import { Column } from "../../types/component.types";
 import Modal from "../../components/common/Modal";
+import Button from "../../components/common/Button";
 
 export const getTechniciansColumns = (
   handleStatusToggle: (id: string) => void,
-  handleView: (technician: Itechnician) => void,
+  handleView: (technician: Itechnician) => void
 ): Column<Itechnician>[] => [
   {
     key: "_id",
@@ -34,7 +35,9 @@ export const getTechniciansColumns = (
     key: "Designation",
     label: "Designation",
     render: (item) => (
-      <div className="text-center">{item.Designation?.designation || "N/A"}</div>
+      <div className="text-center">
+        {item.Designation?.designation || "N/A"}
+      </div>
     ),
   },
   {
@@ -75,23 +78,23 @@ export const getTechniciansColumns = (
 
         return (
           <div className="flex justify-center gap-2">
-            <button
+            <Button
               onClick={openModal}
-              className={`px-3 py-1 rounded ${
-                item.status === "Active"
+              className={`px-4 py-1 text-xs min-w-[80px] ${
+                item?.status
                   ? "bg-red-500 hover:bg-red-600"
                   : "bg-green-500 hover:bg-green-600"
-              } text-white`}
+              }`}
             >
               {item.status === "Active" ? "Block" : "UnBlock"}
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={handleViewClick}
               className="px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600"
             >
               View
-            </button>
+            </Button>
 
             <Modal
               isOpen={isOpen}

@@ -7,12 +7,12 @@ import TechnicianList from "../../../components/user/TechncianList";
 import AddressSelector from "../../../components/user/AddressSelector";
 import RelatedServices from "../../../components/user/RelatedServices";
 import {
-  getServiceDetails,
   getUserAddresses,
   getNearbyTechnicians,
-} from "../../../services/user.services";
+} from "../../../services/userServices";
 import { IService } from "../../../models/service";
 import { IAddress } from "../../../models/address";
+import { getServiceDetails } from "../../../services/serviceService";
 
 export const UserServiceDetails: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState<IAddress | null>(null);
@@ -31,7 +31,9 @@ export const UserServiceDetails: React.FC = () => {
     const fetchData = async () => {
       try {
         const [serviceResponse, addressesResponse] = await Promise.all([
-          serviceId ? getServiceDetails(serviceId) : Promise.resolve(null),
+          serviceId
+            ? getServiceDetails(serviceId, "user")
+            : Promise.resolve(null),
           getUserAddresses(),
         ]);
 

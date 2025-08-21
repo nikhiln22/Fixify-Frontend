@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ResetPassword } from "../../../components/auth/ResetPassword";
-import authService from "../../../services/auth.services";
+import authService from "../../../services/authServices";
 import { showToast } from "../../../utils/toast";
 
 export const TechnicianResetPassword: React.FC = () => {

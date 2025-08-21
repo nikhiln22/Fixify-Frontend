@@ -5,16 +5,18 @@ export interface Itechnician {
   phone: number;
   status?: string;
   is_verified: boolean;
+  email_verified: boolean;
   yearsOfExperience?: number;
-  Designation?: string;
+  Designation?: {
+    _id: string;
+    designation: string;
+  };
   About?: string;
   image?: string;
   certificates?: string[];
   address?: string;
   longitude?: number;
   latitude?: number;
-  role: string;
   createdAt: Date;
   updatedAt: Date;
-  access_token: string;
 }

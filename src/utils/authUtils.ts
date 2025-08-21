@@ -13,3 +13,24 @@ export const getAccessToken = (role: Role) => {
       return null;
   }
 };
+
+export const getTokenRole = (token: string): string | null => {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.role;
+  } catch (error) {
+    console.log("error decoding the token:", error);
+    return null;
+  }
+};
+
+export const isTokenValid = (token: string): boolean => {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+
+    return payload.exp > currentTime;
+  } catch (error) {
+    return false;
+  }
+};

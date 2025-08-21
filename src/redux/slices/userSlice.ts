@@ -3,12 +3,8 @@ import { Iuser } from "../../models/user";
 
 type UserReduxData = Omit<
   Iuser,
-  | "status"
-  | "role"
   | "createdAt"
   | "updatedAt"
-  | "access_token"
-  | "refresh_token"
 >;
 
 interface UserState {

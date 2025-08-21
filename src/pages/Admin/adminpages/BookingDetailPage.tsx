@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AdminLayout from "../../../layouts/AdminLayout";
 import Button from "../../../components/common/Button";
-import { bookingDetails, getRating } from "../../../services/common.services";
+import { bookingDetails, getRating } from "../../../services/commonServices";
 import { showToast } from "../../../utils/toast";
 import { IBooking } from "../../../models/booking";
 import { BookingHeader } from "../../../components/common/BookingHeader";
@@ -17,6 +17,7 @@ import { RevenueDetailCard } from "../../../components/admin/RevenueDetailCard";
 import { DollarSign } from "lucide-react";
 import { RatingCard } from "../../../components/common/RatingCard";
 import { IRating } from "../../../models/IRating";
+import { technicianReviews } from "../../../services/adminServices";
 
 export const BookingDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +26,7 @@ export const BookingDetailPage: React.FC = () => {
   const [rating, setRating] = useState<IRating | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [averageRating, setAverageRating] = useState<number | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -75,6 +77,21 @@ export const BookingDetailPage: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchTechnicianAverageRating = async () => {
+      if (!booking?.technicianId?._id) return;
+
+      try {
+        const response = await technicianReviews(booking.technicianId._id);
+        setAverageRating(response.averageRating);
+      } catch (error) {
+        console.log("Failed to fetch technician rating:", error);
+      }
+    };
+
+    fetchTechnicianAverageRating();
+  }, [booking?.technicianId?._id]);
+
   const handleBackClick = () => {
     navigate("/admin/bookings");
   };
@@ -121,13 +138,11 @@ export const BookingDetailPage: React.FC = () => {
 
   const technicianData = booking.technicianId
     ? {
-        id: booking.technicianId._id || "",
-        name: booking.technicianId.username || "N/A",
-        experience: Number(booking.technicianId.yearsOfExperience) || 0,
-        designation:
-          booking.technicianId.Designation?.designation || "Not specified",
-        profileImage: booking.technicianId.image || "/default-avatar.png",
-        verified: booking.technicianId.is_verified || false,
+        _id: booking.technicianId._id || "",
+        username: booking.technicianId.username || "N/A",
+        averageRating: averageRating,
+        yearsOfExperience: Number(booking.technicianId.yearsOfExperience) || 0,
+        image: booking.technicianId.image || "/default-avatar.png",
       }
     : null;
 

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "../../../layouts/AdminLayout";
 import Button from "../../../components/common/Button";
 import Table from "../../../components/common/Table";
@@ -14,7 +14,8 @@ import {
   updateOffer,
   toggleOfferStatus,
   getAllOffers,
-} from "../../../services/admin.services";
+} from "../../../services/offerService";
+import { getAllCategories } from "../../../services/categoryService";
 import { IOffer } from "../../../models/offer";
 import { getOffersColumns } from "../../../constants/tablecolumns/offerColumns";
 
@@ -26,26 +27,19 @@ export const OfferListPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
 
+  const [serviceOptions, setServiceOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [isFetchingServices, setIsFetchingServices] = useState(false);
+  const [serviceError, setServiceError] = useState<string | null>(null);
+
   const itemsPerPage = 6;
 
   const statusOptions = [
     { value: "", label: "All Offers" },
     { value: "active", label: "Active Offers" },
-    { value: "inactive", label: "Inactive Offers" },
+    { value: "blocked", label: "Blocked Offers" },
   ];
-
-  const fetchOffersWithFilters = useCallback(
-    async (page: number) => {
-      console.log("Fetching offers with filters:", {
-        page,
-        searchQuery,
-        filterStatus,
-      });
-
-      return await getAllOffers(page, searchQuery, filterStatus);
-    },
-    [searchQuery, filterStatus]
-  );
 
   const {
     data: offers,
@@ -54,7 +48,40 @@ export const OfferListPage: React.FC = () => {
     totalPages,
     setCurrentPage,
     loading,
-  } = usePaginatedList(fetchOffersWithFilters);
+  } = usePaginatedList(
+    getAllOffers,
+    "admin",
+    searchQuery,
+    filterStatus,
+    itemsPerPage
+  );
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      setIsFetchingServices(true);
+      setServiceError(null);
+
+      try {
+        const servicesResponse = await getAllCategories(null, "admin", "", "");
+        console.log("Services response:", servicesResponse);
+
+        const serviceOptions = servicesResponse.data.map(
+          (service: { _id: string; name: string }) => ({
+            value: service._id,
+            label: service.name,
+          })
+        );
+        setServiceOptions(serviceOptions);
+      } catch (error) {
+        console.error("Error fetching services:", error);
+        setServiceError("Failed to load services. Please try again later.");
+      } finally {
+        setIsFetchingServices(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -94,11 +121,15 @@ export const OfferListPage: React.FC = () => {
     setSelectedOffer(null);
   };
 
-  const handleSubmitOffer = async (offerData: any) => {
+  const handleSubmitOffer = async (offerData: Partial<IOffer>) => {
     setIsLoading(true);
     try {
       if (selectedOffer) {
-        const response = await updateOffer(selectedOffer._id, offerData);
+        const response = await updateOffer(
+          selectedOffer._id,
+          offerData,
+          "admin"
+        );
         if (response && offers) {
           setOffers(
             offers.map((offer) =>
@@ -111,7 +142,7 @@ export const OfferListPage: React.FC = () => {
           });
         }
       } else {
-        const response = await addOffer(offerData);
+        const response = await addOffer(offerData, "admin");
         if (response && offers) {
           const firstPageItems = [
             response.data,
@@ -147,22 +178,20 @@ export const OfferListPage: React.FC = () => {
 
   const handleStatusToggle = async (offerId: string) => {
     try {
-      const result = await toggleOfferStatus(offerId);
+      const result = await toggleOfferStatus(offerId, "admin");
       console.log("result from toggling the offer status:", result);
       if (result) {
         setOffers((prevOffers) =>
           prevOffers.map((offer) =>
             offer._id === offerId
-              ? result.data || { ...offer, status: !offer.status }
+              ? { ...offer, status: result.data.status }
               : offer
           )
         );
       }
 
-      const offer = offers.find((off) => off._id === offerId);
-      const statusLabel = offer?.status ? "blocked" : "unblocked";
       showToast({
-        message: `Offer ${statusLabel} successfully`,
+        message: result.message,
         type: "success",
       });
 
@@ -181,38 +210,39 @@ export const OfferListPage: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="p-4">
-        <h1 className="text-3xl font-semibold mb-4">Offers</h1>
-        <div className="flex justify-between items-center mb-4">
-          <div className="w-full md:w-1/3 relative">
-            <input
-              type="text"
-              placeholder="Search offers..."
-              value={inputValue}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Offers</h1>
+        <p className="text-gray-600">Manage and monitor Offers</p>
+      </div>
+      <div className="flex justify-between items-center mb-4">
+        <div className="w-full md:w-1/3 relative">
+          <input
+            type="text"
+            placeholder="Search offers..."
+            value={inputValue}
+            onChange={handleInputChange}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-48">
+            <SelectField
+              label=""
+              name="statusFilter"
+              value={filterStatus}
+              onChange={handleStatusFilterChange}
+              options={statusOptions}
+              placeholder="Filter by status"
+              className="mb-0"
             />
-            <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-48">
-              <SelectField
-                label=""
-                name="statusFilter"
-                value={filterStatus}
-                onChange={handleStatusFilterChange}
-                options={statusOptions}
-                placeholder="Filter by status"
-                className="mb-0"
-              />
-            </div>
-            <Button
-              onClick={handleOpenAddModal}
-              className="h-10 px-4 py-2 whitespace-nowrap"
-            >
-              Add Offer
-            </Button>
-          </div>
+          <Button
+            onClick={handleOpenAddModal}
+            className="h-10 px-4 py-2 whitespace-nowrap"
+          >
+            Add Offer
+          </Button>
         </div>
       </div>
 
@@ -253,7 +283,7 @@ export const OfferListPage: React.FC = () => {
                     discount_value: selectedOffer.discount_value,
                     max_discount: selectedOffer.max_discount,
                     min_booking_amount: selectedOffer.min_booking_amount,
-                    service_id: selectedOffer.serviceId,
+                    serviceId: selectedOffer.serviceId,
                     valid_until: selectedOffer.valid_until
                       ? new Date(selectedOffer.valid_until)
                           .toISOString()
@@ -263,11 +293,12 @@ export const OfferListPage: React.FC = () => {
                 : undefined
             }
             isEditing={!!selectedOffer}
+            serviceOptions={serviceOptions}
+            isFetchingServices={isFetchingServices}
+            serviceError={serviceError}
           />
         </div>
       </Modal>
     </AdminLayout>
   );
 };
-
-export default OfferListPage;

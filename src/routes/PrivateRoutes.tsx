@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import authService from "../services/auth.services";
+import authService from "../services/authServices";
 import { PrivateRouteProps } from "../types/component.types";
 import cookie from "js-cookie";
 
@@ -16,7 +16,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ role }) => {
     const token = cookie.get("access_token");
     console.log("token in the private route:", token);
 
-    if (token) {
+    if (token && isRoleMatch(token, role)) {
       setIsAuthenticated(true);
       setIsChecking(false);
       return;
@@ -25,9 +25,9 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ role }) => {
     console.log(`No access token found for ${role}, trying to refresh...`);
 
     try {
-      const newAccessToken = await authService.refreshToken(role);
+      const newAccessToken = await authService.newRefreshToken();
 
-      if (newAccessToken) {
+      if (newAccessToken && isRoleMatch(newAccessToken, role)) {
         console.log(`New access token generated for ${role}!`);
         setIsAuthenticated(true);
       } else {
@@ -40,6 +40,11 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ role }) => {
     }
 
     setIsChecking(false);
+  };
+
+  const isRoleMatch = (token: string, role: string) => {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.role?.toUpperCase() === role;
   };
 
   if (isChecking) {

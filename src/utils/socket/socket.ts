@@ -8,6 +8,7 @@ export interface ISocketNotificationData {
   type: string;
   createdAt: Date;
   recipientId: string;
+  isRead: boolean;
   recipientType: "user" | "admin" | "technician";
 }
 

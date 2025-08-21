@@ -3,10 +3,8 @@ export interface Iuser {
   username: string;
   email: string;
   phone: number;
-  status: boolean;
+  status: string;
   image?: string;
-  role: string;
-  createdAt: Date;
-  updatedAt: Date;
-  access_token: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

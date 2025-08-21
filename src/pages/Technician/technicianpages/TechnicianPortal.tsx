@@ -12,8 +12,9 @@ import {
   getTechnicianEarnings,
   getTechnicianServiceCategories,
   getTechnicianBookingStatus,
-} from "../../../services/technician.services";
-import { getTechnicianProfile } from "../../../services/common.services";
+} from "../../../services/technicianServices";
+import { getTechnicianProfile } from "../../../services/technicianServices";
+import { getAllDesignations } from "../../../services/designationService";
 import { useDispatch } from "react-redux";
 import { updateTechnicianData } from "../../../redux/slices/technicianslice";
 
@@ -39,10 +40,9 @@ interface EarningsSummary {
   period: string;
 }
 
-
 interface ServiceRevenueData {
-  serviceId: string; 
-  serviceName: string; 
+  serviceId: string;
+  serviceName: string;
   revenue: number;
   jobsCount: number;
   percentage: number;
@@ -61,10 +61,17 @@ export const TechnicianPortal: React.FC = () => {
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [showQualificationForm, setShowQualificationForm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [designations, setDesignations] = useState<
+    {
+      value: string;
+      label: string;
+    }[]
+  >([]);
+  const [designationsLoading, setDesignationsLoading] = useState(false);
 
-  // Stats state
   const [statsData, setStatsData] = useState<TechnicianDashboardStatsData>({
     totalEarnings: 0,
     completedJobs: 0,
@@ -73,7 +80,6 @@ export const TechnicianPortal: React.FC = () => {
   });
   const [statsLoading, setStatsLoading] = useState(true);
 
-  // Earnings chart state
   const [earningsData, setEarningsData] = useState<EarningsData[]>([]);
   const [earningsSummary, setEarningsSummary] =
     useState<EarningsSummary | null>(null);
@@ -81,17 +87,15 @@ export const TechnicianPortal: React.FC = () => {
   const [earningsError, setEarningsError] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<Period>("daily");
 
-  // Service Revenue Chart state (renamed and updated)
   const [serviceRevenueData, setServiceRevenueData] = useState<
     ServiceRevenueData[]
-  >([]); // Changed from serviceCategoriesData
-  const [serviceRevenueLoading, setServiceRevenueLoading] = useState(false); // Changed from serviceCategoriesLoading
+  >([]);
+  const [serviceRevenueLoading, setServiceRevenueLoading] = useState(false);
   const [serviceRevenueError, setServiceRevenueError] = useState<string | null>(
     null
-  ); // Changed from serviceCategoriesError
+  );
   const [totalRevenue, setTotalRevenue] = useState(0);
 
-  // Booking Status Chart state
   const [bookingStatusData, setBookingStatusData] = useState<
     BookingStatusData[]
   >([]);
@@ -101,7 +105,32 @@ export const TechnicianPortal: React.FC = () => {
   );
   const [totalBookings, setTotalBookings] = useState(0);
 
-  // Fetch dashboard stats
+  const fetchDesignations = async () => {
+    try {
+      setDesignationsLoading(true);
+      const response = await getAllDesignations(null, "technician", "", "");
+      console.log("Designations response in portal:", response);
+
+      const designationsData = Array.isArray(response)
+        ? response
+        : response.data || [];
+
+      const designationOptions = designationsData.map(
+        (designation: { _id: string; designation: string }) => ({
+          value: designation._id,
+          label: designation.designation,
+        })
+      );
+
+      setDesignations(designationOptions);
+    } catch (error) {
+      console.error("Error occurred while fetching designations:", error);
+      setDesignations([]);
+    } finally {
+      setDesignationsLoading(false);
+    }
+  };
+
   const fetchDashboardStats = async () => {
     try {
       setStatsLoading(true);
@@ -123,7 +152,6 @@ export const TechnicianPortal: React.FC = () => {
     }
   };
 
-  // Fetch earnings data
   const fetchEarningsData = async (period: Period) => {
     try {
       setEarningsLoading(true);
@@ -131,7 +159,7 @@ export const TechnicianPortal: React.FC = () => {
 
       console.log(`Fetching ${period} earnings data...`);
 
-      const response = await getTechnicianEarnings(period);
+      const response = await getTechnicianEarnings();
       console.log("Earnings data response:", response);
 
       if (response.success) {
@@ -152,44 +180,42 @@ export const TechnicianPortal: React.FC = () => {
     }
   };
 
-  // Fetch service revenue data (renamed and updated)
   const fetchServiceRevenue = async () => {
     try {
       setServiceRevenueLoading(true);
       setServiceRevenueError(null);
 
       console.log("Fetching service revenue data...");
-      const response = await getTechnicianServiceCategories();
+      const response = await getTechnicianServiceCategories("technician");
       console.log("Service revenue response:", response);
 
       if (response.success) {
-        setServiceRevenueData(response.data || []); // Updated variable name
+        setServiceRevenueData(response.data || []);
         setTotalRevenue(response.totalRevenue || 0);
       } else {
         setServiceRevenueError(
-          response.message || "Failed to fetch service revenue" // Updated error message
+          response.message || "Failed to fetch service revenue"
         );
-        setServiceRevenueData([]); // Updated variable name
+        setServiceRevenueData([]);
         setTotalRevenue(0);
       }
     } catch (error) {
       console.error("Error fetching service revenue:", error);
       setServiceRevenueError("Network error. Please try again.");
-      setServiceRevenueData([]); // Updated variable name
+      setServiceRevenueData([]);
       setTotalRevenue(0);
     } finally {
       setServiceRevenueLoading(false);
     }
   };
 
-  // Fetch booking status data
   const fetchBookingStatus = async () => {
     try {
       setBookingStatusLoading(true);
       setBookingStatusError(null);
 
       console.log("Fetching booking status data...");
-      const response = await getTechnicianBookingStatus();
+      const response = await getTechnicianBookingStatus("technician");
       console.log("Booking status response:", response);
 
       if (response.success) {
@@ -212,7 +238,6 @@ export const TechnicianPortal: React.FC = () => {
     }
   };
 
-  // Handle period change
   const handlePeriodChange = (period: Period) => {
     setSelectedPeriod(period);
     fetchEarningsData(period);
@@ -222,7 +247,7 @@ export const TechnicianPortal: React.FC = () => {
     const fetchTechnicianProfile = async () => {
       try {
         setIsLoading(true);
-        const response = await getTechnicianProfile();
+        const response = await getTechnicianProfile("technician");
         console.log(
           "technician profile in the technician portal page:",
           response
@@ -230,7 +255,9 @@ export const TechnicianPortal: React.FC = () => {
 
         if (response) {
           const isVerifiedFromDB = response.is_verified || false;
+          const isEmailVerifiedFromDB = response.email_verified || false;
           setIsVerified(isVerifiedFromDB);
+          setIsEmailVerified(isEmailVerifiedFromDB);
 
           const hasQualifications = !!(
             response.yearsOfExperience ||
@@ -243,10 +270,9 @@ export const TechnicianPortal: React.FC = () => {
 
           if (isVerifiedFromDB) {
             setIsSubmitted(false);
-            // Fetch all dashboard data for verified technicians
             fetchDashboardStats();
             fetchEarningsData(selectedPeriod);
-            fetchServiceRevenue(); // Updated function name
+            fetchServiceRevenue();
             fetchBookingStatus();
           } else if (hasQualifications) {
             setIsSubmitted(true);
@@ -254,6 +280,8 @@ export const TechnicianPortal: React.FC = () => {
             setIsSubmitted(false);
           }
         }
+
+        fetchDesignations();
       } catch (error) {
         console.error("Error fetching technician profile:", error);
       } finally {
@@ -306,6 +334,7 @@ export const TechnicianPortal: React.FC = () => {
           About: response.technician.About,
           image: response.technician.image,
           certificates: response.technician.certificates,
+          emailemail_verified: response.technician.email_verified,
         };
         console.log("Dispatching updateTechnicianData with:", technicianData);
         dispatch(updateTechnicianData(technicianData));
@@ -346,11 +375,9 @@ export const TechnicianPortal: React.FC = () => {
             <p className="text-gray-600">Track your performance and earnings</p>
           </div>
 
-          {/* Stats Cards Section */}
           <TechnicianDashboardStats stats={statsData} loading={statsLoading} />
 
           <div className="w-full max-w-6xl mx-auto space-y-8">
-            {/* Earnings Chart Section */}
             <TechnicianEarningsChart
               earningsData={earningsData}
               summary={earningsSummary}
@@ -362,9 +389,9 @@ export const TechnicianPortal: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <ServiceRevenueChart
-                data={serviceRevenueData} 
-                loading={serviceRevenueLoading} 
-                error={serviceRevenueError} 
+                data={serviceRevenueData}
+                loading={serviceRevenueLoading}
+                error={serviceRevenueError}
                 totalRevenue={totalRevenue}
               />
 
@@ -385,33 +412,38 @@ export const TechnicianPortal: React.FC = () => {
             <QualificationForm
               onSubmit={handleFormSubmit}
               onCancel={handleFormCancel}
+              designationOptions={designations}
+              designationsLoading={designationsLoading}
             />
           </div>
         </div>
       )}
 
-      {!isLoading && !isVerified && !showQualificationForm && (
-        <div className="flex flex-col items-center">
-          <h1 className="text-3xl font-bold text-center mb-12">
-            Welcome to Technician Portal
-          </h1>
+      {!isLoading &&
+        isEmailVerified &&
+        !isVerified &&
+        !showQualificationForm && (
+          <div className="flex flex-col items-center">
+            <h1 className="text-3xl font-bold text-center mb-12">
+              Welcome to Technician Portal
+            </h1>
 
-          <VerificationBanner
-            isVerified={isVerified}
-            isSubmitted={isSubmitted}
-            onStartVerification={handleStartVerification}
-          />
+            <VerificationBanner
+              isVerified={isVerified}
+              isSubmitted={isSubmitted}
+              onStartVerification={handleStartVerification}
+            />
 
-          {!isSubmitted && (
-            <div className="mt-8 text-center max-w-2xl">
-              <p className="text-gray-700">
-                Complete your verification to access all features of the
-                technician portal.
-              </p>
-            </div>
-          )}
-        </div>
-      )}
+            {!isSubmitted && (
+              <div className="mt-8 text-center max-w-2xl">
+                <p className="text-gray-700">
+                  Complete your verification to access all features of the
+                  technician portal.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
     </TechnicianLayout>
   );
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import UserLayout from "../../../layouts/UserLayout";
 import Banner from "../../../components/common/Banner";
 import Card from "../../../components/common/Card";
-import { getAllCategories } from "../../../services/common.services";
+import { getAllCategories } from "../../../services/categoryService";
 import Pagination from "../../../components/common/Pagination";
 import { useNavigate } from "react-router-dom";
 import { Icategory } from "../../../models/category";

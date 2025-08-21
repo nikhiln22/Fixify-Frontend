@@ -3,13 +3,17 @@ import { Navigate, Outlet } from "react-router-dom";
 import { PublicRouteProps } from "../types/component.types";
 import cookie from "js-cookie";
 
-const PublicRoute: React.FC<PublicRouteProps> = ({ redirectTo }) => {
+const PublicRoute: React.FC<PublicRouteProps> = ({ role, redirectTo }) => {
   const token = cookie.get("access_token");
 
   console.log("token in the public route:", token);
 
   if (token) {
-    return <Navigate to={redirectTo} />;
+    const payload = JSON.parse(atob(token.split(".")[1]));
+
+    if (role === payload.role?.toUpperCase()) {
+      return <Navigate to={redirectTo} />;
+    }
   }
 
   return <Outlet />;

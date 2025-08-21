@@ -8,8 +8,8 @@ export interface IService {
     _id: string;
     name: string;
   };
-  designation?:string,
-  status: boolean;
+  designation?: string;
+  status: string;
   createdAt: string;
   updatedAt: string;
 }

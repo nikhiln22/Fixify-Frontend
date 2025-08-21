@@ -6,12 +6,14 @@ interface TechnicianAboutSectionProps {
   initialAbout?: string;
   onSave: (aboutText: string) => Promise<void>;
   isLoading: boolean;
+  isEditable: boolean;
 }
 
 export const TechnicianAboutSection: React.FC<TechnicianAboutSectionProps> = ({
   initialAbout = "",
   onSave,
-  isLoading
+  isLoading,
+  isEditable = true,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [aboutText, setAboutText] = useState(initialAbout);
@@ -49,41 +51,47 @@ export const TechnicianAboutSection: React.FC<TechnicianAboutSectionProps> = ({
     <div className="bg-white rounded-3xl shadow-md p-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-900">About</h2>
-        
-        {isEditing ? (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="primary"
-              onClick={handleSaveClick}
-              className="px-4 py-2 flex items-center gap-2"
-              disabled={isSaving || aboutText.trim().length === 0}
-            >
-              <Save className="w-4 h-4" />
-              {isSaving ? "Saving..." : "Save"}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleCancelEdit}
-              className="px-4 py-2 flex items-center gap-2"
-              disabled={isSaving}
-            >
-              <X className="w-4 h-4" />
-              Cancel
-            </Button>
-          </div>
-        ) : (
-          <Button
-            variant="outline"
-            onClick={handleEditClick}
-            className="px-4 py-2 flex items-center gap-2"
-            disabled={isLoading}
-          >
-            <Edit2 className="w-4 h-4" />
-            Edit
-          </Button>
+
+        {isEditable && (
+          <>
+            {isEditing ? (
+              // Save/Cancel buttons (when editing)
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="primary"
+                  onClick={handleSaveClick}
+                  className="px-4 py-2 flex items-center gap-2"
+                  disabled={isSaving || aboutText.trim().length === 0}
+                >
+                  <Save className="w-4 h-4" />
+                  {isSaving ? "Saving..." : "Save"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleCancelEdit}
+                  className="px-4 py-2 flex items-center gap-2"
+                  disabled={isSaving}
+                >
+                  <X className="w-4 h-4" />
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              // Edit button (when not editing)
+              <Button
+                variant="outline"
+                onClick={handleEditClick}
+                className="px-4 py-2 flex items-center gap-2"
+                disabled={isLoading}
+              >
+                <Edit2 className="w-4 h-4" />
+                Edit
+              </Button>
+            )}
+          </>
         )}
       </div>
-      
+
       <div className="space-y-4">
         {isEditing ? (
           <>
@@ -99,14 +107,18 @@ export const TechnicianAboutSection: React.FC<TechnicianAboutSectionProps> = ({
           </>
         ) : (
           <>
-            <div 
-              className="min-h-[120px] cursor-pointer group"
-              onClick={handleEditClick}
+            <div
+              className={`min-h-[120px] ${isEditable ? "cursor-pointer group" : ""}`}
+              onClick={isEditable ? handleEditClick : undefined}
             >
-              <p className="text-gray-700 leading-relaxed text-base group-hover:text-gray-800 transition-colors">
+              <p
+                className={`text-gray-700 leading-relaxed text-base ${isEditable ? "group-hover:text-gray-800 transition-colors" : ""}`}
+              >
                 {initialAbout || (
                   <span className="text-gray-500 italic">
-                    No information provided yet. Click here or use the edit button to add your professional background and expertise.
+                    {isEditable
+                      ? "No information provided yet. Click here or use the edit button to add your professional background and expertise."
+                      : "No information provided yet."}
                   </span>
                 )}
               </p>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Calendar, Clock, CreditCard, Star, TrendingUp } from "lucide-react";
-import Button from "../common/Button"; 
+import Button from "../common/Button";
 
 interface CurrentSubscriptionProps {
   subscription: {
@@ -12,14 +12,54 @@ interface CurrentSubscriptionProps {
     durationInMonths: number;
     expiresAt?: string;
     amount: number;
-  };
+  } | null;
   onUpgrade?: () => void;
+  showUpgradeButton?: boolean;
+  title?: string;
+  isUpcoming?: boolean; 
 }
 
 export const CurrentSubscriptionPlan: React.FC<CurrentSubscriptionProps> = ({
   subscription,
   onUpgrade,
+  showUpgradeButton = true,
+  title = "Current Subscription",
+  isUpcoming = false,
 }) => {
+  if (!subscription) {
+    // you should add an shimmer effect here later
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+        <div className="animate-pulse">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="h-8 bg-gray-200 rounded w-48"></div>
+              <div className="h-6 bg-gray-200 rounded w-16"></div>
+            </div>
+            <div className="h-10 bg-gray-200 rounded w-32"></div>
+          </div>
+
+          <div className="mb-6">
+            <div className="h-12 bg-gray-200 rounded w-40"></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-gray-50 rounded-lg p-4">
+                <div className="h-5 bg-gray-200 rounded w-24 mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-16"></div>
+              </div>
+            ))}
+          </div>
+
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="h-5 bg-gray-200 rounded w-32 mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const {
     planName,
     status,
@@ -31,9 +71,8 @@ export const CurrentSubscriptionPlan: React.FC<CurrentSubscriptionProps> = ({
     amount,
   } = subscription;
 
-
-  const getPlanColor = (plan: string) => {
-    switch (plan.toUpperCase()) {
+  const getPlanColor = (planName: string) => {
+    switch (planName.toUpperCase()) {
       case "BASIC":
         return "bg-blue-50 border-blue-200 text-blue-800";
       case "PRO":
@@ -60,23 +99,28 @@ export const CurrentSubscriptionPlan: React.FC<CurrentSubscriptionProps> = ({
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <h2 className="text-2xl font-semibold text-gray-900">
-            Current Subscription
+            {title}
           </h2>
-          <span
-            className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(
-              status
-            )}`}
-          >
-            {status}
-          </span>
+          {!isUpcoming && (
+            <span
+              className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(
+                status
+              )}`}
+            >
+              {status}
+            </span>
+          )}
+          {isUpcoming && (
+            <span className="px-3 py-1 text-sm font-medium rounded-full bg-orange-100 text-orange-800">
+              Upcoming
+            </span>
+          )}
         </div>
-          <Button
-            onClick={onUpgrade}
-            variant="primary"
-            className="px-4 py-2"
-          >
+        {showUpgradeButton && (
+          <Button onClick={onUpgrade} variant="primary" className="px-4 py-2">
             Upgrade Plan
           </Button>
+        )}
       </div>
 
       <div className="mb-6">
@@ -146,14 +190,22 @@ export const CurrentSubscriptionPlan: React.FC<CurrentSubscriptionProps> = ({
         <div className="flex items-center justify-center gap-2">
           <Calendar className="w-4 h-4 text-gray-600" />
           <span className="text-sm text-gray-600">
-            {durationInMonths === 0 ? "Duration:" : "Expires:"}
+            {isUpcoming
+              ? "Activates:"
+              : durationInMonths === 0
+                ? "Duration:"
+                : "Expires:"}
           </span>
           <span className="font-medium text-gray-900">
-            {durationInMonths === 0
-              ? "Lifetime"
-              : expiresAt
+            {isUpcoming
+              ? expiresAt
                 ? formatDate(expiresAt)
-                : "N/A"}
+                : "When current plan expires"
+              : durationInMonths === 0
+                ? "Lifetime"
+                : expiresAt
+                  ? formatDate(expiresAt)
+                  : "N/A"}
           </span>
         </div>
       </div>

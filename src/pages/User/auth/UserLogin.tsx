@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Login } from "../../../components/auth/Login";
-import authService from "../../../services/auth.services";
+import authService from "../../../services/authServices";
 import { showToast } from "../../../utils/toast";
 import Cookies from "js-cookie";
 import { setUserData } from "../../../redux/slices/userSlice";
@@ -33,15 +33,15 @@ export const UserLogin: React.FC = () => {
         });
 
         const userData = response.data.user as Iuser;
-        console.log("username:", userData.username);
+
         const userInfo = {
           _id: userData._id,
           username: userData.username,
           email: userData.email,
           phone: userData.phone,
           image: userData.image,
+          status: userData.status,
         };
-        console.log("before dispatching the user details to the state");
         dispatch(setUserData(userInfo));
 
         navigate("/user/home");

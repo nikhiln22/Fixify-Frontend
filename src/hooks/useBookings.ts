@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { getBookings } from "../services/common.services";
+import { getBookings } from "../services/commonServices";
 import { usePaginatedList } from "./usePaginatedList";
 import { IBooking } from "../models/booking";
 import { useNavigate } from "react-router-dom";

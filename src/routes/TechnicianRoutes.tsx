@@ -15,7 +15,7 @@ import { PageNotFound } from "../components/common/PageNotFound";
 import { useAppSelector } from "../hooks/useRedux";
 import { TechnicianJobListing } from "../pages/Technician/technicianpages/TechnicianJobListing";
 import { TechnicianBookingDetail } from "../pages/Technician/technicianpages/TechnicianBookingDetail";
-import TechnicianSubscription from "../pages/Technician/technicianpages/TechnicianSubscription";
+import { TechnicianSubscription } from "../pages/Technician/technicianpages/TechnicianSubscription";
 
 export const TechnicianRoutes: React.FC = () => {
   const user = useAppSelector(
@@ -23,7 +23,6 @@ export const TechnicianRoutes: React.FC = () => {
   );
   return (
     <Routes>
-      {/* Technician public routes */}
       <Route element={<TechnicianPublicRoute />}>
         <Route path="/technician/login" element={<TechnicianLogin />} />
         <Route path="/technician/register" element={<TechnicianRegister />} />
@@ -38,7 +37,6 @@ export const TechnicianRoutes: React.FC = () => {
         />
       </Route>
 
-      {/* Technician private routes */}
       <Route element={<TechnicianPrivateRoute />}>
         <Route path="/technician/portal" element={<TechnicianPortal />} />
         <Route path="/technician/profile" element={<TechnicianProfile />} />

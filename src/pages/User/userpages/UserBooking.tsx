@@ -17,10 +17,10 @@ import Button from "../../../components/common/Button";
 import {
   applyBestOffer,
   getTimeSlots,
-  bookService,
   getEligibleCoupons,
   applyCoupon,
-} from "../../../services/user.services";
+} from "../../../services/userServices";
+import { bookService } from "../../../services/bookingService";
 import { ITimeSlot } from "../../../models/timeslot";
 import {
   CreateBookingRequest,
@@ -280,7 +280,7 @@ export const UserBooking: React.FC = () => {
 
       console.log("Sending booking data to backend:", bookingData);
 
-      const response = await bookService(bookingData);
+      const response = await bookService(bookingData, "user");
 
       if (response.success && response.data) {
         dispatch(clearCouponData());

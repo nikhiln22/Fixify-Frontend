@@ -70,7 +70,8 @@ export const getOffersColumns = (
     render: (item) => {
       const isExpired =
         item?.valid_until && new Date(item.valid_until) < new Date();
-      const isManuallyActive = item?.status;
+
+      const isActive = item?.status === "Active";
 
       let status = "Active";
       let colorClass = "bg-green-200 text-green-800";
@@ -78,7 +79,7 @@ export const getOffersColumns = (
       if (isExpired) {
         status = "Expired";
         colorClass = "bg-gray-200 text-gray-800";
-      } else if (!isManuallyActive) {
+      } else if (!isActive) {
         status = "Inactive";
         colorClass = "bg-red-200 text-red-800";
       }
@@ -104,10 +105,6 @@ export const getOffersColumns = (
 
       const isExpired =
         item?.valid_until && new Date(item.valid_until) < new Date();
-
-      if (isExpired) {
-        return <div></div>;
-      }
 
       const ActionButton = () => {
         const [isOpen, setIsOpen] = useState(false);
@@ -139,17 +136,18 @@ export const getOffersColumns = (
               Edit
             </Button>
 
-            <Button
-              onClick={openModal}
-              className={`px-4 py-1 text-xs w-20 ${
-                item?.status
-                  ? "bg-red-500 hover:bg-red-600"
-                  : "bg-green-500 hover:bg-green-600"
-              } text-white`}
-            >
-              {item?.status ? "Block" : "Unblock"}
-            </Button>
-
+            {!isExpired && (
+              <Button
+                onClick={openModal}
+                className={`px-4 py-1 text-xs w-20 ${
+                  item?.status === "Active"
+                    ? "bg-red-500 hover:bg-red-600"
+                    : "bg-green-500 hover:bg-green-600"
+                } text-white`}
+              >
+                {item?.status === "Active" ? "Block" : "Unblock"}
+              </Button>
+            )}
             <Modal
               isOpen={isOpen}
               onClose={closeModal}
@@ -157,14 +155,15 @@ export const getOffersColumns = (
               confirmText={isProcessing ? "Processing..." : "Confirm"}
               cancelText="Cancel"
               onConfirm={handleConfirm}
-              confirmButtonColor={item?.status ? "red" : "green"}
+              confirmButtonColor={item?.status === "Active" ? "red" : "green"}
             >
               {isProcessing ? (
                 <p className="text-center py-4">Processing your request...</p>
               ) : (
                 <p>
-                  Are you sure you want to {item?.status ? "block" : "unblock"}{" "}
-                  the offer <strong>"{item?.title || "this offer"}"</strong>?
+                  Are you sure you want to{" "}
+                  {item?.status === "Active" ? "block" : "unblock"} the offer{" "}
+                  <strong>"{item?.title || "this offer"}"</strong>?
                 </p>
               )}
             </Modal>

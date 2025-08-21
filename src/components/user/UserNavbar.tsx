@@ -1,37 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Search, User, Menu } from "lucide-react";
-import useLogout from "../../hooks/useLogout";
+import { Search, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAppSelector } from "../../hooks/useRedux";
-import Modal from "../../components/common/Modal";
-import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 import { NotificationDropdown } from "../../components/common/NotificationDropDown";
+import { Dropdown } from "../../components/common/DropDown";
+import { Logo } from "../common/Logo";
 import {
   getAllNotifications,
   getUnreadNotificationsCount,
   markNotificationRead,
-} from "../../services/user.services";
-
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: string;
-  createdAt: Date;
-  recipientId: string;
-  recipientType: "user" | "admin" | "technician";
-  isRead: boolean;
-}
+} from "../../services/notificationService";
+import { INotification } from "../../models/notification";
 
 export const UserNavbar: React.FC = () => {
-  const logout = useLogout();
-  const userData = useAppSelector((state) => state.user.userData);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<INotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -43,13 +27,13 @@ export const UserNavbar: React.FC = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await getAllNotifications();
+      const response = await getAllNotifications("user");
 
       if (response && response.success) {
         setNotifications(response.data || []);
 
         const unread =
-          response.data?.filter((notif: Notification) => !notif.isRead)
+          response.data?.filter((notif: INotification) => !notif.isRead)
             .length || 0;
         setUnreadCount(unread);
       }
@@ -62,7 +46,7 @@ export const UserNavbar: React.FC = () => {
 
   const fetchUnreadCount = async () => {
     try {
-      const response = await getUnreadNotificationsCount();
+      const response = await getUnreadNotificationsCount("user");
 
       if (response && response.success) {
         setUnreadCount(response.data?.unreadCount || 0);
@@ -74,7 +58,7 @@ export const UserNavbar: React.FC = () => {
 
   const handleNotificationClick = async (notificationId: string) => {
     try {
-      const response = await markNotificationRead(notificationId);
+      const response = await markNotificationRead(notificationId, "user");
 
       if (response && response.success) {
         setNotifications((prev) =>
@@ -99,7 +83,7 @@ export const UserNavbar: React.FC = () => {
       );
 
       const markAllPromises = unreadNotifications.map((notif) =>
-        markNotificationRead(notif.id)
+        markNotificationRead(notif.id, "user")
       );
 
       await Promise.all(markAllPromises);
@@ -116,47 +100,16 @@ export const UserNavbar: React.FC = () => {
     }
   };
 
-  const handleNewNotification = (newNotification: Notification) => {
+  const handleNewNotification = (newNotification: INotification) => {
     setNotifications((prev) => [newNotification, ...prev]);
-
     setUnreadCount((prev) => prev + 1);
-  };
-
-  const handleLogoutClick = () => {
-    setIsUserDropdownOpen(false);
-    setIsLogoutModalOpen(true);
-  };
-
-  const handleLogoutConfirm = () => {
-    logout();
-    setIsLogoutModalOpen(false);
-  };
-
-  const handleLogoutCancel = () => {
-    setIsLogoutModalOpen(false);
   };
 
   return (
     <>
       <header className="bg-white/95 backdrop-blur-md py-4 px-6 shadow-lg sticky top-0 z-50 border-b border-gray-100">
         <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center">
-            <Link to="/user/home" className="flex items-center">
-              <div className="flex flex-col items-center">
-                <div className="flex items-center space-x-1">
-                  <span className="text-2xl font-bold text-cyan-500">F</span>
-                  <span className="text-2xl font-bold text-slate-800 relative">
-                    I
-                    <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-orange-400 rounded-sm"></div>
-                  </span>
-                  <span className="text-2xl font-bold text-slate-800">X</span>
-                  <span className="text-2xl font-bold text-slate-800">I</span>
-                  <span className="text-2xl font-bold text-cyan-500">F</span>
-                  <span className="text-2xl font-bold text-slate-800">Y</span>
-                </div>
-              </div>
-            </Link>
-          </div>
+          <Logo role="user" />
 
           <div className="relative flex-grow max-w-lg mx-6">
             <div className="relative">
@@ -199,63 +152,7 @@ export const UserNavbar: React.FC = () => {
                 onNewNotification={handleNewNotification}
               />
 
-              <div className="relative">
-                <button
-                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center focus:outline-none overflow-hidden border-2 border-white shadow-lg hover:scale-105 transition-all duration-200"
-                >
-                  {userData?.image ? (
-                    <img
-                      src={buildCloudinaryUrl(userData.image)}
-                      alt={userData.username || "User"}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : (
-                    <User className="h-5 w-5 text-white" />
-                  )}
-                </button>
-
-                {isUserDropdownOpen && (
-                  <div className="absolute right-0 top-12 w-52 bg-white rounded-xl shadow-xl py-2 ring-1 ring-black/5 focus:outline-none z-10 border border-gray-100">
-                    <div className="px-4 py-3 border-b border-gray-100">
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center overflow-hidden mr-3">
-                          {userData?.image ? (
-                            <img
-                              src={buildCloudinaryUrl(userData.image)}
-                              alt={userData.username || "User"}
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          ) : (
-                            <User className="h-4 w-4 text-white" />
-                          )}
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">
-                            {userData?.username || "User"}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {userData?.email || ""}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <Link
-                      to="/user/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-                    >
-                      My Profile
-                    </Link>
-                    <div className="border-t border-gray-100 mt-1"></div>
-                    <a
-                      className="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer transition-colors duration-150"
-                      onClick={handleLogoutClick}
-                    >
-                      Sign out
-                    </a>
-                  </div>
-                )}
-              </div>
+              <Dropdown role="user" />
 
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -294,19 +191,6 @@ export const UserNavbar: React.FC = () => {
           </div>
         )}
       </header>
-
-      <Modal
-        isOpen={isLogoutModalOpen}
-        onClose={handleLogoutCancel}
-        title="Confirm Logout"
-        confirmText="Logout"
-        cancelText="Cancel"
-        onConfirm={handleLogoutConfirm}
-        confirmButtonColor="red"
-        className="max-w-md"
-      >
-        Are you sure you want to logout?
-      </Modal>
     </>
   );
 };

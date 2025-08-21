@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Upload,
   MapPin,
@@ -12,7 +12,6 @@ import { useFormik } from "formik";
 import InputField from "../../components/common/InputField";
 import SelectField from "../../components/common/SelectField";
 import Button from "../../components/common/Button";
-import { getAllDesignations } from "../../services/common.services";
 import { QualificationFormProps } from "../../types/component.types";
 import { professionQualificationSchema } from "../../utils/validations/formvalidationSchema";
 import { showToast } from "../../utils/toast";
@@ -22,13 +21,10 @@ import { MapLocation } from "../../types/map.types";
 export const QualificationForm: React.FC<QualificationFormProps> = ({
   onSubmit,
   onCancel,
+  designationOptions,
+  designationsLoading,
 }) => {
-  const [designations, setDesignations] = useState<
-    { _id: string; name: string }[]
-  >([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-    const formik = useFormik({
+  const formik = useFormik({
     initialValues: {
       experience: "",
       designation: "",
@@ -73,41 +69,6 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
       );
     },
   });
-
-  useEffect(() => {
-    const fetchDesignations = async () => {
-      setIsLoading(true);
-      try {
-        const designationNames = await getAllDesignations(
-          undefined,
-          "",
-          "technician"
-        );
-        console.log("Raw API response:", designationNames);
-        console.log("Type of response:", typeof designationNames);
-        console.log("Is array:", Array.isArray(designationNames));
-        
-        if (Array.isArray(designationNames)) {
-          console.log("First item:", designationNames[0]);
-          setDesignations(designationNames as { _id: string; name: string }[]);
-        } else {
-          console.log("Response is not an array, setting empty array");
-          setDesignations([]);
-        }
-      } catch (err) {
-        console.error("Error fetching designations:", err);
-        showToast({
-          message: "Failed to load job designations. Please try again later.",
-          type: "error",
-        });
-        setDesignations([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchDesignations();
-  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, files } = e.target;
@@ -155,22 +116,10 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
                 value={formik.values.designation}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                options={
-                  isLoading
-                    ? [{ value: "", label: "Loading designations..." }]
-                    : (() => {
-                        console.log("Designations for options:", designations);
-                        const options = designations.map((designation) => ({
-                          value: designation._id,
-                          label: designation.name,
-                        }));
-                        console.log("Generated options:", options);
-                        return options;
-                      })()
-                }
+                options={designationOptions || []}
                 placeholder="Select your specialization"
                 required={true}
-                disabled={isLoading}
+                disabled={designationsLoading}
                 error={
                   formik.touched.designation && formik.errors.designation
                     ? formik.errors.designation
@@ -435,7 +384,7 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
           </Button>
           <Button
             type="submit"
-            disabled={formik.isSubmitting || isLoading}
+            disabled={formik.isSubmitting}
             variant="primary"
             isLoading={formik.isSubmitting}
             className="px-8 py-3"

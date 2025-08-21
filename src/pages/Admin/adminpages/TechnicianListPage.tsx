@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "../../../layouts/AdminLayout";
 import { getTechniciansColumns } from "../../../constants/tablecolumns/TechniciansColumn";
 import Table from "../../../components/common/Table";
@@ -8,8 +8,8 @@ import { Search } from "lucide-react";
 import {
   getAllTechnicians,
   toggleTechnicianStatus,
-} from "../../../services/admin.services";
-import { getAllDesignations } from "../../../services/common.services";
+} from "../../../services/technicianServices";
+import { getAllDesignations } from "../../../services/designationService";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
 import { Itechnician } from "../../../models/technician";
 import { useNavigate } from "react-router-dom";
@@ -38,16 +38,20 @@ export const TechnicianListPage: React.FC = () => {
     const fetchDesignations = async () => {
       setLoadingDesignations(true);
       try {
-        const result = await getAllDesignations(undefined, undefined, "admin");
+        const result = await getAllDesignations(null, "admin", "", "", null);
 
-        if (typeof result === "object" && "data" in result) {
-          const designationData = result.data || [];
-          const designationOptions = [
+        if (result && result.data && Array.isArray(result.data)) {
+          const designationOptions: { value: string; label: string }[] = [
             { value: "", label: "All Designations" },
-            ...designationData.map((designation: any) => ({
-              value: designation.designation,
-              label: designation.designation,
-            })),
+            ...result.data.map(
+              (designation: {
+                _id: string;
+                designation: string;
+              }): { value: string; label: string } => ({
+                value: designation._id,
+                label: designation.designation,
+              })
+            ),
           ];
           setDesignations(designationOptions);
         } else {
@@ -64,18 +68,6 @@ export const TechnicianListPage: React.FC = () => {
     fetchDesignations();
   }, []);
 
-  const fetchTechniciansWithSearch = useCallback(
-    async (page: number) => {
-      return await getAllTechnicians(
-        page,
-        searchQuery,
-        filterStatus,
-        filterDesignation,
-      );
-    },
-    [searchQuery, filterStatus, filterDesignation],
-  );
-
   const {
     data: technicians,
     setData: setTechnicians,
@@ -84,21 +76,30 @@ export const TechnicianListPage: React.FC = () => {
     setCurrentPage,
     loading,
     error,
-  } = usePaginatedList(fetchTechniciansWithSearch);
+  } = usePaginatedList<Itechnician>(
+    getAllTechnicians,
+    "admin",
+    searchQuery,
+    filterStatus,
+    itemsPerPage,
+    filterDesignation
+  );
 
   const handleStatusToggle = async (technicianId: string) => {
     try {
-      const result = await toggleTechnicianStatus(technicianId);
+      const result = await toggleTechnicianStatus(technicianId, "admin");
       console.log(
         "result of toggling the technician status from the admin side:",
-        result,
+        result
       );
 
-      if (result && result.technician) {
+      if (result.success) {
         setTechnicians((prevTechnicians) =>
           prevTechnicians.map((technician) =>
-            technician._id === technicianId ? result.technician : technician,
-          ),
+            technician._id === technicianId
+              ? { ...technician, status: result.data.status }
+              : technician
+          )
         );
       }
     } catch (error) {
@@ -123,7 +124,7 @@ export const TechnicianListPage: React.FC = () => {
   };
 
   const handleDesignationFilterChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setFilterDesignation(e.target.value);
     setCurrentPage(1);
@@ -142,50 +143,51 @@ export const TechnicianListPage: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-semibold">Technicians</h1>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Technicians</h1>
+        <p className="text-gray-600">
+          Manage and monitor registered technicians
+        </p>
+      </div>
+
+      <div className="mb-4 flex justify-between items-center gap-4">
+        <div className="relative w-full md:w-1/3">
+          <input
+            type="text"
+            placeholder="Search technicians..."
+            value={inputValue}
+            onChange={handleInputChange}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
         </div>
 
-        <div className="mb-4 flex justify-between items-center gap-4">
-          <div className="relative w-full md:w-1/3">
-            <input
-              type="text"
-              placeholder="Search technicians..."
-              value={inputValue}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <div className="flex gap-4">
+          <div className="w-50">
+            <SelectField
+              label=""
+              name="designationFilter"
+              value={filterDesignation}
+              onChange={handleDesignationFilterChange}
+              options={designations}
+              placeholder={
+                loadingDesignations ? "Loading..." : "Filter by Designation"
+              }
+              className="mb-0"
+              disabled={loadingDesignations}
             />
-            <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
           </div>
 
-          <div className="flex gap-4">
-            <div className="w-50">
-              <SelectField
-                label=""
-                name="designationFilter"
-                value={filterDesignation}
-                onChange={handleDesignationFilterChange}
-                options={designations}
-                placeholder={
-                  loadingDesignations ? "Loading..." : "Filter by Designation"
-                }
-                className="mb-0"
-                disabled={loadingDesignations}
-              />
-            </div>
-
-            <div className="w-40">
-              <SelectField
-                label=""
-                name="statusFilter"
-                value={filterStatus}
-                onChange={handleFilterChange}
-                options={filterOptions}
-                placeholder="Filter by Status"
-                className="mb-0"
-              />
-            </div>
+          <div className="w-40">
+            <SelectField
+              label=""
+              name="statusFilter"
+              value={filterStatus}
+              onChange={handleFilterChange}
+              options={filterOptions}
+              placeholder="Filter by Status"
+              className="mb-0"
+            />
           </div>
         </div>
       </div>

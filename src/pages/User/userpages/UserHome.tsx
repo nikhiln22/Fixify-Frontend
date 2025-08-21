@@ -3,11 +3,8 @@ import UserLayout from "../../../layouts/UserLayout";
 import MostBookedServices from "../../../components/user/MostBookedServices";
 import MainBannerCarousel from "../../../components/user/MainBannerCarousel";
 import ServiceCategories from "../../../components/user/ServiceCategories";
-import {
-  getMostBookedServices,
-  getAllOffers,
-} from "../../../services/user.services";
-
+import { getAllOffers } from "../../../services/userServices";
+import { getMostBookedServices } from "../../../services/serviceService";
 
 export const UserHome: React.FC = () => {
   const [mostBookedServices, setMostBookedServices] = useState([]);
@@ -18,7 +15,7 @@ export const UserHome: React.FC = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await getMostBookedServices();
+        const response = await getMostBookedServices("user");
         setMostBookedServices(response.data);
       } catch (error) {
         console.error("Failed to fetch services:", error);

@@ -8,7 +8,7 @@ import {
   verifyWalletSession,
   walletBalance,
   getWalletTransactions,
-} from "../../../services/user.services";
+} from "../../../services/userServices";
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";
 import { getWalletTransactionsColumns } from "../../../constants/tablecolumns/WalletTransactionsColumn";

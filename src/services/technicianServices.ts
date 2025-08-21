@@ -6,8 +6,9 @@ import {
   SubmitTechnicianQualificationResponse,
   TimeSlotData,
 } from "../types/technicians.types";
-import { TECHNICIAN_API } from "../constants/apiRoutes";
+import { getApiRoute, TECHNICIAN_API } from "../constants/apiRoutes";
 import { ISubscriptionPlanHistory } from "../models/subscriptionPlanHistory";
+import { Itechnician } from "../models/technician";
 
 export const submitTechnicianQualification = async (
   formdata: FormData
@@ -26,6 +27,209 @@ export const submitTechnicianQualification = async (
     return response.data;
   } catch (error) {
     console.error("Error submitting qualification:", error);
+    throw error;
+  }
+};
+
+export const getAllTechnicians = async (
+  page: number | null,
+  role: string,
+  search?: string,
+  filterStatus?: string,
+  limit?: number | null,
+  filterDesignation?: string
+): Promise<{
+  data: Itechnician[];
+  totalPages: number;
+  currentPage: number;
+  total: number;
+}> => {
+  try {
+    let queryParams = "";
+
+    if (
+      page !== undefined &&
+      page !== null &&
+      limit !== null &&
+      limit !== undefined
+    ) {
+      queryParams += `page=${page}&limit=${limit}`;
+
+      if (search && search.trim() !== "") {
+        queryParams += `&search=${encodeURIComponent(search)}`;
+      }
+
+      if (filterStatus && filterStatus.trim() !== "") {
+        queryParams += `&status=${encodeURIComponent(filterStatus)}`;
+      }
+
+      if (filterDesignation && filterDesignation.trim() !== "") {
+        queryParams += `&designation=${encodeURIComponent(filterDesignation)}`;
+      }
+    }
+
+    const apiRoute = getApiRoute(role);
+
+    const url = queryParams
+      ? `${apiRoute}/technicianslist?${queryParams}`
+      : `${apiRoute}/technicianslist`;
+
+    const response = await axiosInstance.get(url);
+    console.log("technicians response:", response);
+
+    return {
+      data: response.data.data?.technicians || [],
+      totalPages: response.data.data?.pagination?.pages || 1,
+      currentPage: response.data.data?.pagination?.page || page || 1,
+      total: response.data.data?.pagination?.total || 0,
+    };
+  } catch (error) {
+    console.error("Error fetching the technicians:", error);
+    return {
+      data: [],
+      totalPages: 0,
+      currentPage: page || 1,
+      total: 0,
+    };
+  }
+};
+
+export const getTechnicianProfile = async (
+  role: string,
+  technicianId?: string
+): Promise<Itechnician> => {
+  try {
+    console.log(`fetching technician profile for ${role}`);
+
+    const apiRoute = getApiRoute(role);
+
+    const url =
+      role === "technician"
+        ? `${apiRoute}/technicianprofile`
+        : `${apiRoute}/technicianprofile/${technicianId}`;
+
+    const response = await axiosInstance.get(url);
+
+    console.log(`technician profile response for ${role}:`, response);
+
+    if (response.data.data) {
+      return response.data.data;
+    } else {
+      throw new Error("Technician data not found in response");
+    }
+  } catch (error) {
+    console.error(`Error fetching technician profile for ${role}:`, error);
+    throw error;
+  }
+};
+
+export const toggleTechnicianStatus = async (
+  technicianId: string,
+  role: string
+) => {
+  try {
+    const apiRoute = getApiRoute(role);
+    const response = await axiosInstance.patch(
+      `${apiRoute}/blocktechnician/${technicianId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error toggling technician status:", error);
+    throw error;
+  }
+};
+
+export const getAllPendingTechnicians = async (
+  page: number | null,
+  role: string,
+  search?: string,
+  filterStatus?: string,
+  limit?: number | null,
+  filterDesignation?: string
+): Promise<{
+  data: Itechnician[];
+  totalPages: number;
+  currentPage: number;
+  total: number;
+}> => {
+  try {
+    const apiRoute = getApiRoute(role);
+
+    let queryParams = "";
+
+    if (
+      page !== null &&
+      page !== undefined &&
+      limit !== null &&
+      limit !== undefined
+    ) {
+      queryParams = `page=${page}&limit=${limit}`;
+    }
+
+    if (search?.trim()) {
+      queryParams += queryParams
+        ? `&search=${encodeURIComponent(search)}`
+        : `search=${encodeURIComponent(search)}`;
+    }
+
+    if (filterStatus?.trim()) {
+      queryParams += queryParams
+        ? `&status=${encodeURIComponent(filterStatus)}`
+        : `status=${encodeURIComponent(filterStatus)}`;
+    }
+
+    if (filterDesignation?.trim()) {
+      queryParams += queryParams
+        ? `&designation=${encodeURIComponent(filterDesignation)}`
+        : `designation=${encodeURIComponent(filterDesignation)}`;
+    }
+
+    const url = queryParams
+      ? `${apiRoute}/applicantslist?${queryParams}`
+      : `${apiRoute}/applicantslist`;
+
+    const response = await axiosInstance.get(url);
+    console.log("applicants response:", response);
+
+    return {
+      data: response.data.data?.applicants || [],
+      totalPages: response.data.data?.pagination?.pages || 1,
+      currentPage: response.data.data?.pagination?.page || page || 1,
+      total: response.data.data?.pagination?.total || 0,
+    };
+  } catch (error) {
+    console.error("Error fetching the applicants:", error);
+    return {
+      data: [],
+      totalPages: 0,
+      currentPage: page || 1,
+      total: 0,
+    };
+  }
+};
+
+export const approveTechnicians = async (applicantId: string, role: string) => {
+  try {
+    let apiRoute = getApiRoute(role);
+    const response = await axiosInstance.patch(
+      `${apiRoute}/verifyapplicant/${applicantId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("Error occured while verifying the technician:", error);
+    throw error;
+  }
+};
+
+export const rejectTechnician = async (applicantId: string, role: string) => {
+  try {
+    const apiRoute = getApiRoute(role);
+    const response = await axiosInstance.delete(
+      `${apiRoute}/rejectapplicant/${applicantId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("Error occured while rejecting the technician:", error);
     throw error;
   }
 };
@@ -254,40 +458,6 @@ export const verifyPurchase = async (sessionId: string) => {
   } catch (error) {
     console.log("error occurred while verifying the purchase");
     throw error;
-  }
-};
-
-export const getAllNotifications = async () => {
-  try {
-    const response = await axiosInstance.get(`${TECHNICIAN_API}/notifications`);
-    return response.data;
-  } catch (error) {
-    console.log("error occured while fetching the notifications:", error);
-  }
-};
-
-export const getUnreadNotificationsCount = async () => {
-  try {
-    const response = await axiosInstance.get(
-      `${TECHNICIAN_API}/unreadnotifications`
-    );
-    return response.data;
-  } catch (error) {
-    console.log(
-      "error occured while getting unread notification count:",
-      error
-    );
-  }
-};
-
-export const markNotificationRead = async (notificationId: string) => {
-  try {
-    const response = await axiosInstance.patch(
-      `${TECHNICIAN_API}/${notificationId}`
-    );
-    return response.data;
-  } catch (error) {
-    console.log("error occured while marking the notification as read");
   }
 };
 

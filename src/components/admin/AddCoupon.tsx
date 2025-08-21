@@ -5,6 +5,7 @@ import InputField from "../../components/common/InputField";
 import SelectField from "../../components/common/SelectField";
 import { AddCouponProps } from "../../types/component.types";
 import { addCouponSchema } from "../../utils/validations/formvalidationSchema";
+import { ICoupon } from "../../models/coupon";
 
 export const AddCoupon: React.FC<AddCouponProps> = ({
   onCancel,
@@ -38,11 +39,11 @@ export const AddCoupon: React.FC<AddCouponProps> = ({
     validationSchema: addCouponSchema,
     onSubmit: async (values) => {
       try {
-        const couponData = {
+        const couponData: Partial<ICoupon> = {
           code: (values.code || " ").toUpperCase(),
           title: values.title,
           description: values.description,
-          discount_type: values.discount_type,
+          discount_type: values.discount_type as "percentage" | "flat_amount",
           discount_value: Number(values.discount_value),
           max_discount: values.max_discount
             ? Number(values.max_discount)
@@ -65,6 +66,17 @@ export const AddCoupon: React.FC<AddCouponProps> = ({
       }
     },
   });
+
+  const handleDiscountTypeChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newType = e.target.value;
+    formik.setFieldValue("discount_type", newType);
+    formik.setFieldValue("discount_value", "");
+    if (newType === "flat_amount") {
+      formik.setFieldValue("max_discount", "");
+    }
+  };
 
   const discountTypeOptions = [
     { value: "percentage", label: "Percentage (%)" },
@@ -148,7 +160,7 @@ export const AddCoupon: React.FC<AddCouponProps> = ({
           label="Discount Type"
           name="discount_type"
           value={formik.values.discount_type || ""}
-          onChange={formik.handleChange}
+          onChange={handleDiscountTypeChange}
           onBlur={formik.handleBlur}
           options={discountTypeOptions}
           placeholder="Select discount type"

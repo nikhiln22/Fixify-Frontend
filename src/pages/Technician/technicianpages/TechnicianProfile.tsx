@@ -5,8 +5,8 @@ import { TechnicianProfileSidebar } from "../../../components/technician/Technic
 import { ProfileCard } from "../../../components/common/ProfileCard";
 import { TechnicianAboutSection } from "../../../components/technician/AboutSection";
 import { TechnicianCertificatesSection } from "../../../components/technician/CertificateSection";
-import { getTechnicianProfile } from "../../../services/common.services";
-import { getReviews } from "../../../services/technician.services";
+import { getTechnicianProfile } from "../../../services/technicianServices";
+import { getReviews } from "../../../services/technicianServices";
 import { Itechnician } from "../../../models/technician";
 import { updateTechnicianData } from "../../../redux/slices/technicianslice";
 import { useDispatch } from "react-redux";
@@ -64,7 +64,7 @@ export const TechnicianProfile: React.FC = () => {
 
   const fetchTechnicianProfile = async () => {
     try {
-      const response = await getTechnicianProfile();
+      const response = await getTechnicianProfile("technician");
       console.log(
         "technician profile response in the technician profile page:",
         response
@@ -231,6 +231,7 @@ export const TechnicianProfile: React.FC = () => {
               initialAbout={technicianData.About}
               onSave={handleAboutSave}
               isLoading={isLoading}
+              isEditable
             />
 
             <TechnicianCertificatesSection
@@ -239,6 +240,7 @@ export const TechnicianProfile: React.FC = () => {
               )}
               onCertificatesUpdate={handleCertificatesUpdate}
               isLoading={isLoading}
+              isEditable
             />
 
             <ReviewSection

@@ -49,12 +49,12 @@ export const getCategoriesColumns = (
       <div className="flex justify-center">
         <span
           className={`px-2 py-1 text-xs font-medium rounded ${
-            item?.status
+            item?.status === "Active"
               ? "bg-green-200 text-green-800"
               : "bg-red-200 text-red-800"
           }`}
         >
-          {item?.status ? "Active" : "Inactive"}
+          {item?.status === "Active" ? "Active" : "Inactive"}
         </span>
       </div>
     ),
@@ -105,7 +105,7 @@ export const getCategoriesColumns = (
                   : "bg-green-500 hover:bg-green-600"
               }`}
             >
-              {item?.status ? "Block" : "Unblock"}
+              {item?.status === "Active" ? "Block" : "Unblock"}
             </Button>
 
             <Modal
@@ -121,8 +121,9 @@ export const getCategoriesColumns = (
                 <p className="text-center py-4">Processing your request...</p>
               ) : (
                 <p>
-                  Are you sure you want to {item?.status ? "block" : "unblock"}{" "}
-                  category <strong>{item?.name || "this category"}</strong>?
+                  Are you sure you want to{" "}
+                  {item?.status === "Active" ? "block" : "unblock"} category{" "}
+                  <strong>{item?.name}</strong>?
                 </p>
               )}
             </Modal>

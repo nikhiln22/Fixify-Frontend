@@ -75,7 +75,7 @@ export const getBookingsColumns = (
       <div className="text-center font-medium">
         ₹
         {role === "technician"
-          ? (item.bookingAmount * 0.8).toFixed(2)
+          ? item.paymentId.technicianShare
           : item.bookingAmount}
       </div>
     ),

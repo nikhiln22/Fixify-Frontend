@@ -7,7 +7,7 @@ export interface ISubscriptionPlan {
   profileBoost: boolean;
   durationInMonths: number;
   description: string;
-  status: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  status?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

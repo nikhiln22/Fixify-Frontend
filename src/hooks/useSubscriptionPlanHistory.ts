@@ -1,4 +1,4 @@
-import { getAllSubscriptionPlansHistory } from "../services/admin.services";
+import { getAllSubscriptionPlansHistory } from "../services/adminServices";
 import { usePaginatedList } from "./usePaginatedList";
 import { ISubscriptionPlanHistory } from "../models/subscriptionPlanHistory";
 

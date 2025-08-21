@@ -9,7 +9,7 @@ import { usePaginatedList } from "../../../hooks/usePaginatedList";
 import {
   walletBalance,
   getWalletTransactions,
-} from "../../../services/technician.services";
+} from "../../../services/technicianServices";
 
 export const TechnicianEarnings: React.FC = () => {
   const [balance, setBalance] = useState<number>(0);

@@ -3,7 +3,7 @@ import { HelpCircle, Info, Copyright } from "lucide-react";
 
 const AdminFooter: React.FC = () => {
   const currentYear = new Date().getFullYear();
-  const appVersion = "v1.2.0"; // You can replace this with your actual version
+  const appVersion = "v1.2.0"; 
 
   return (
     <footer className="bg-white border-t border-gray-200 py-4 px-6 text-sm text-gray-600">

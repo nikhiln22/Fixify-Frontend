@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "../../../layouts/AdminLayout";
 import Button from "../../../components/common/Button";
 import Table from "../../../components/common/Table";
@@ -14,7 +14,7 @@ import {
   updateSubscriptionPlan,
   toggleSubscriptionPlanStatus,
   getAllSubscriptionPlans,
-} from "../../../services/admin.services";
+} from "../../../services/subscriptionPlanService";
 import { ISubscriptionPlan } from "../../../models/subscriptionPlan";
 import { getSubscriptionPlanColumns } from "../../../constants/tablecolumns/SubscriptionPlanColumns";
 import { Link } from "react-router-dom";
@@ -28,12 +28,6 @@ export const SubscriptionPlan: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
 
-  const [overviewData, setOverviewData] = useState({
-    activeTechnicians: 0,
-    paidSubscribers: 0,
-    monthlyRevenue: 0,
-  });
-
   const itemsPerPage = 6;
 
   const statusOptions = [
@@ -42,29 +36,6 @@ export const SubscriptionPlan: React.FC = () => {
     { value: "inactive", label: "Inactive Plans" },
   ];
 
-  const fetchSubscriptionPlansWithFilters = useCallback(
-    async (page: number) => {
-      console.log("Fetching subscription plans with filters:", {
-        page,
-        searchQuery,
-        filterStatus,
-      });
-
-      const result = await getAllSubscriptionPlans(
-        page,
-        searchQuery,
-        filterStatus
-      );
-
-      if (result.overview) {
-        setOverviewData(result.overview);
-      }
-
-      return result;
-    },
-    [searchQuery, filterStatus]
-  );
-
   const {
     data: subscriptionPlans,
     setData: setSubscriptionPlans,
@@ -72,7 +43,20 @@ export const SubscriptionPlan: React.FC = () => {
     totalPages,
     setCurrentPage,
     loading,
-  } = usePaginatedList(fetchSubscriptionPlansWithFilters);
+    overview,
+  } = usePaginatedList(
+    getAllSubscriptionPlans,
+    "admin",
+    searchQuery,
+    filterStatus,
+    itemsPerPage
+  );
+
+  const overviewData = overview || {
+    activeTechnicians: 0,
+    paidSubscribers: 0,
+    monthlyRevenue: 0,
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -118,7 +102,8 @@ export const SubscriptionPlan: React.FC = () => {
       if (selectedSubscriptionPlan) {
         const response = await updateSubscriptionPlan(
           selectedSubscriptionPlan._id,
-          subscriptionPlanData
+          subscriptionPlanData,
+          "admin"
         );
         if (response && subscriptionPlans) {
           setSubscriptionPlans(
@@ -132,7 +117,10 @@ export const SubscriptionPlan: React.FC = () => {
           });
         }
       } else {
-        const response = await addSubscriptionPlan(subscriptionPlanData);
+        const response = await addSubscriptionPlan(
+          subscriptionPlanData,
+          "admin"
+        );
         if (response && subscriptionPlans) {
           const firstPageItems = [
             response.data,
@@ -168,22 +156,24 @@ export const SubscriptionPlan: React.FC = () => {
 
   const handleStatusToggle = async (subscriptionPlanId: string) => {
     try {
-      const result = await toggleSubscriptionPlanStatus(subscriptionPlanId);
+      const result = await toggleSubscriptionPlanStatus(
+        subscriptionPlanId,
+        "admin"
+      );
       console.log("result from toggling the subscription plan status:", result);
       if (result) {
+        console.log("New status:", result.data.status);
         setSubscriptionPlans((prevPlans) =>
           prevPlans.map((plan) =>
             plan._id === subscriptionPlanId
-              ? result.data || { ...plan, isActive: !plan.status }
+              ? { ...plan, status: result.data.status }
               : plan
           )
         );
       }
 
-      const plan = subscriptionPlans.find((p) => p._id === subscriptionPlanId);
-      const statusLabel = plan?.status ? "blocked" : "unblocked";
       showToast({
-        message: `Subscription plan ${statusLabel} successfully`,
+        message: result.message,
         type: "success",
       });
 
@@ -310,7 +300,7 @@ export const SubscriptionPlan: React.FC = () => {
             isLoading={isLoading}
             initialValues={
               selectedSubscriptionPlan
-                ? ({
+                ? {
                     _id: selectedSubscriptionPlan._id,
                     planName: selectedSubscriptionPlan.planName,
                     price: selectedSubscriptionPlan.price,
@@ -319,7 +309,7 @@ export const SubscriptionPlan: React.FC = () => {
                       selectedSubscriptionPlan.WalletCreditDelay,
                     durationInMonths: selectedSubscriptionPlan.durationInMonths,
                     description: selectedSubscriptionPlan.description,
-                  } as Partial<ISubscriptionPlan>)
+                  }
                 : undefined
             }
             isEditing={!!selectedSubscriptionPlan}

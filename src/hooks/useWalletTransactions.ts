@@ -1,4 +1,4 @@
-import { getWalletTransactions } from "../services/user.services";
+import { getWalletTransactions } from "../services/userServices";
 import { usePaginatedList } from "./usePaginatedList";
 import { IWalletTransaction } from "../models/walletTransaction";
 

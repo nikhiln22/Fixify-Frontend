@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Column } from "../../types/component.types";
 import { Idesignation } from "../../models/designation";
 import Modal from "../../components/common/Modal";
+import Button from "../../components/common/Button";
 
 export const getJobDesignationColumns = (
-  handleStatusToggle: (id: string) => void,
+  handleStatusToggle: (id: string) => void
 ): Column<Idesignation>[] => [
   {
     key: "_id",
@@ -32,7 +33,7 @@ export const getJobDesignationColumns = (
               : "bg-red-200 text-red-800"
           }`}
         >
-          {item.status ? "Active" : "InActive"}
+          {item.status}
         </span>
       </div>
     ),
@@ -58,14 +59,16 @@ export const getJobDesignationColumns = (
 
         return (
           <div className="flex justify-center">
-            <button
+            <Button
               onClick={openModal}
-              className={`px-3 py-1 rounded ${
-                item.status ? "bg-red-500" : "bg-green-500"
-              } text-white`}
+              className={`px-4 py-1 text-xs min-w-[80px] ${
+                item?.status
+                  ? "bg-red-500 hover:bg-red-600"
+                  : "bg-green-500 hover:bg-green-600"
+              }`}
             >
-              {item.status ? "Block" : "Unblock"}
-            </button>
+              {item.status === "Active" ? "Block" : "Unblock"}
+            </Button>
 
             <Modal
               isOpen={isOpen}
@@ -77,8 +80,9 @@ export const getJobDesignationColumns = (
               confirmButtonColor={item.status ? "red" : "green"}
             >
               <p>
-                Are you sure you want to {item.status ? "block" : "unblock"} the
-                designation "{item.designation}"?
+                Are you sure you want to{" "}
+                {item.status === "Active" ? "block" : "unblock"} the designation{" "}
+                <strong>{item.designation}</strong>
               </p>
             </Modal>
           </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useFormik } from "formik";
 import Button from "../../components/common/Button";
 import InputField from "../../components/common/InputField";
@@ -6,10 +6,6 @@ import SelectField from "../../components/common/SelectField";
 import { Upload, X } from "lucide-react";
 import { AddServiceProps } from "../../types/component.types";
 import { addServiceSchema } from "../../utils/validations/formvalidationSchema";
-import {
-  getAllCategories,
-  getAllDesignations,
-} from "../../services/common.services";
 import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
 export const AddService: React.FC<AddServiceProps> = ({
@@ -18,74 +14,9 @@ export const AddService: React.FC<AddServiceProps> = ({
   isLoading = false,
   initialValues,
   isEditing = false,
+  categoryOptions,
+  designationOptions,
 }) => {
-  const [categoryOptions, setCategoryOptions] = useState<
-    { value: string; label: string }[]
-  >([]);
-  const [isFetchingCategories, setIsFetchingCategories] = useState(false);
-  const [categoryError, setCategoryError] = useState<string | null>(null);
-
-  const [designationOptions, setDesignationOptions] = useState<
-    { value: string; label: string }[]
-  >([]);
-  const [isFetchingDesignations, setIsFetchingDesignations] = useState(false);
-  const [designationError, setDesignationError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsFetchingCategories(true);
-      setIsFetchingDesignations(true);
-      setCategoryError(null);
-      setDesignationError(null);
-
-      try {
-        const [categoriesResponse, designationsResponse] = await Promise.all([
-          getAllCategories(),
-          getAllDesignations(),
-        ]);
-
-        console.log(
-          "response from the add category form component:",
-          categoriesResponse
-        );
-
-        const categoriesData = Array.isArray(categoriesResponse)
-          ? categoriesResponse
-          : categoriesResponse.data || [];
-
-        const categoryOptions = categoriesData.map((category: any) => ({
-          value: category._id,
-          label: category.name,
-        }));
-        setCategoryOptions(categoryOptions);
-
-        console.log("Job designations response:", designationsResponse);
-
-        const designationsData = Array.isArray(designationsResponse)
-          ? designationsResponse
-          : designationsResponse.data || [];
-
-        const designationOptions = designationsData.map((designation: any) => ({
-          value: designation._id,
-          label: designation.designation,
-        }));
-        setDesignationOptions(designationOptions);
-        
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setCategoryError("Failed to load categories. Please try again later.");
-        setDesignationError(
-          "Failed to load job designations. Please try again later."
-        );
-      } finally {
-        setIsFetchingCategories(false);
-        setIsFetchingDesignations(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
   const formik = useFormik({
     initialValues: initialValues || {
       serviceName: "",
@@ -220,26 +151,20 @@ export const AddService: React.FC<AddServiceProps> = ({
           value={formik.values.categoryId || ""}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          options={categoryOptions}
-          placeholder={
-            isFetchingCategories ? "Loading categories..." : "Select a category"
-          }
+          options={categoryOptions || []}
+          placeholder="Select a category"
           error={
-            categoryError ||
-            (formik.touched.categoryId && formik.errors.categoryId)
-              ? categoryError || formik.errors.categoryId?.toString()
+            formik.touched.categoryId && formik.errors.categoryId
+              ? formik.errors.categoryId?.toString()
               : undefined
           }
-          touched={formik.touched.categoryId || !!categoryError}
-          disabled={isFetchingCategories}
+          touched={formik.touched.categoryId}
         />
-        {categoryOptions.length === 0 &&
-          !isFetchingCategories &&
-          !categoryError && (
-            <p className="mt-1 text-sm text-amber-600">
-              No categories available. Please add categories first.
-            </p>
-          )}
+        {categoryOptions?.length === 0 && (
+          <p className="mt-1 text-sm text-amber-600">
+            No categories available. Please add categories first.
+          </p>
+        )}
       </div>
 
       <div className="mb-6 text-left">
@@ -249,28 +174,20 @@ export const AddService: React.FC<AddServiceProps> = ({
           value={formik.values.designationId || ""}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          options={designationOptions}
-          placeholder={
-            isFetchingDesignations
-              ? "Loading designations..."
-              : "Select a job designation"
-          }
+          options={designationOptions || []}
+          placeholder="Select a job designation"
           error={
-            designationError ||
-            (formik.touched.designationId && formik.errors.designationId)
-              ? designationError || formik.errors.designationId?.toString()
+            formik.touched.designationId && formik.errors.designationId
+              ? formik.errors.designationId?.toString()
               : undefined
           }
-          touched={formik.touched.designationId || !!designationError}
-          disabled={isFetchingDesignations}
+          touched={formik.touched.designationId}
         />
-        {designationOptions.length === 0 &&
-          !isFetchingDesignations &&
-          !designationError && (
-            <p className="mt-1 text-sm text-amber-600">
-              No job designations available. Please add job designations first.
-            </p>
-          )}
+        {designationOptions?.length === 0 && (
+          <p className="mt-1 text-sm text-amber-600">
+            No job designations available. Please add job designations first.
+          </p>
+        )}
       </div>
 
       <div className="mb-6 text-left">
@@ -360,11 +277,7 @@ export const AddService: React.FC<AddServiceProps> = ({
           type="submit"
           variant="primary"
           isLoading={isLoading || formik.isSubmitting}
-          disabled={
-            formik.isSubmitting ||
-            isFetchingCategories ||
-            isFetchingDesignations
-          }
+          disabled={formik.isSubmitting}
           className="py-2 px-4 w-24"
         >
           {isEditing ? "Update" : "Add"}
