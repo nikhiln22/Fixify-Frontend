@@ -2,7 +2,7 @@ import { io, Socket } from "socket.io-client";
 import { envConfig } from "../../config/env.config";
 
 export interface ISocketNotificationData {
-  id: string;
+  _id: string;
   title: string;
   message: string;
   type: string;
@@ -32,7 +32,7 @@ export const connectSocket = (): Socket | null => {
   return socket;
 };
 
-// ===== USER AUTHENTICATION =====
+// checking whether an authenticated user
 export const authenticateUser = (
   userId: string,
   userType: "user" | "admin" | "technician"
@@ -72,7 +72,9 @@ export const sendMessage = (
   }
 };
 
-export const listenForMessages = (callback: (message: any) => void): void => {
+export const listenForMessages = (
+  callback: (message: string) => void
+): void => {
   if (socket) {
     socket.on("new_message", callback);
   }

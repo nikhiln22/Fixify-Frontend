@@ -20,7 +20,7 @@ export const TechnicianLogin: React.FC = () => {
 
       if (response.success) {
         showToast({
-          message: "Login successful!",
+          message: response.message,
           type: "success",
         });
 
@@ -38,13 +38,13 @@ export const TechnicianLogin: React.FC = () => {
         navigate("/technician/portal");
       } else {
         showToast({
-          message: response.message || "Login failed",
+          message: response.message,
           type: "error",
         });
       }
     } catch (err: any) {
       showToast({
-        message: err?.response?.data?.message || "Login failed.",
+        message: err?.response?.data?.message,
         type: "error",
       });
     }

@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AdminLayout from "../../../layouts/AdminLayout";
 import Button from "../../../components/common/Button";
-import { bookingDetails, getRating } from "../../../services/commonServices";
+import {
+  bookingDetails,
+  getBookingRating,
+} from "../../../services/bookingService";
 import { showToast } from "../../../utils/toast";
 import { IBooking } from "../../../models/booking";
 import { BookingHeader } from "../../../components/common/BookingHeader";
@@ -17,7 +20,7 @@ import { RevenueDetailCard } from "../../../components/admin/RevenueDetailCard";
 import { DollarSign } from "lucide-react";
 import { RatingCard } from "../../../components/common/RatingCard";
 import { IRating } from "../../../models/IRating";
-import { technicianReviews } from "../../../services/adminServices";
+// import { technicianReviews } from "../../../services/adminServices";
 
 export const BookingDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -26,7 +29,7 @@ export const BookingDetailPage: React.FC = () => {
   const [rating, setRating] = useState<IRating | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [averageRating, setAverageRating] = useState<number | null>(null);
+  // const [averageRating, setAverageRating] = useState<number | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -37,9 +40,9 @@ export const BookingDetailPage: React.FC = () => {
   const fetchBookingDetails = async () => {
     try {
       setLoading(true);
-      const response = await bookingDetails(id!, "ADMIN");
+      const response = await bookingDetails(id!, "admin");
 
-      if (response.success) {
+      if (response.success && response.data) {
         setBooking(response.data);
 
         if (response?.data?.bookingStatus === "Completed") {
@@ -66,7 +69,7 @@ export const BookingDetailPage: React.FC = () => {
 
   const fetchRating = async () => {
     try {
-      const ratingResponse = await getRating(id!, "admin");
+      const ratingResponse = await getBookingRating(id!, "admin");
       console.log("Rating response:", ratingResponse);
 
       if (ratingResponse.success) {
@@ -77,20 +80,20 @@ export const BookingDetailPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchTechnicianAverageRating = async () => {
-      if (!booking?.technicianId?._id) return;
+  // useEffect(() => {
+  //   const fetchTechnicianAverageRating = async () => {
+  //     if (!booking?.technicianId?._id) return;
 
-      try {
-        const response = await technicianReviews(booking.technicianId._id);
-        setAverageRating(response.averageRating);
-      } catch (error) {
-        console.log("Failed to fetch technician rating:", error);
-      }
-    };
+  //     try {
+  //       const response = await technicianReviews(booking.technicianId._id);
+  //       setAverageRating(response.averageRating);
+  //     } catch (error) {
+  //       console.log("Failed to fetch technician rating:", error);
+  //     }
+  //   };
 
-    fetchTechnicianAverageRating();
-  }, [booking?.technicianId?._id]);
+  //   fetchTechnicianAverageRating();
+  // }, [booking?.technicianId?._id]);
 
   const handleBackClick = () => {
     navigate("/admin/bookings");
@@ -140,7 +143,7 @@ export const BookingDetailPage: React.FC = () => {
     ? {
         _id: booking.technicianId._id || "",
         username: booking.technicianId.username || "N/A",
-        averageRating: averageRating,
+        averageRating: 0,
         yearsOfExperience: Number(booking.technicianId.yearsOfExperience) || 0,
         image: booking.technicianId.image || "/default-avatar.png",
       }

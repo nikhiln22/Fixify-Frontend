@@ -4,7 +4,6 @@ import { UserProfileSidebar } from "../../../components/user/UserProfileSidebar"
 import { getBookingsColumns } from "../../../constants/tablecolumns/BookingsColumn";
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";
-import useBookings from "../../../hooks/useBookings";
 import Modal from "../../../components/common/Modal";
 import { UserCancellationPolicy } from "../../../components/user/UserCancellationPolicy";
 import { IBooking } from "../../../models/booking";
@@ -12,6 +11,7 @@ import { ChatModal } from "../../../components/common/ChatModal";
 import {
   cancelBooking,
   createBookingRating,
+  getBookings,
 } from "../../../services/bookingService";
 import { showToast } from "../../../utils/toast";
 import { Rating } from "../../../components/user/Rating";
@@ -27,11 +27,13 @@ import { IChat } from "../../../models/chat";
 import {
   getChatMessages,
   sendChatMessage,
-} from "../../../services/commonServices";
+} from "../../../services/chatService";
+import { usePaginatedList } from "../../../hooks/usePaginatedList";
+import { useNavigate } from "react-router-dom";
 
 export const UserBookingsList: React.FC = () => {
   const itemsPerPage = 6;
-
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<IBooking | null>(null);
   const [cancellationReason, setCancellationReason] = useState("");
@@ -52,15 +54,18 @@ export const UserBookingsList: React.FC = () => {
   const [review, setReview] = useState("");
 
   const {
-    bookings,
+    data: bookings,
     setData: setBookings,
     currentPage,
     totalPages,
     setCurrentPage,
     loading,
     error,
-    handleViewDetails,
-  } = useBookings("user");
+  } = usePaginatedList(getBookings, "user", "", "", itemsPerPage);
+
+  const handleViewDetails = (bookingId: string) => {
+    navigate(`/user/bookings/${bookingId}`);
+  };
 
   useEffect(() => {
     connectSocket();

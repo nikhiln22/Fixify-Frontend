@@ -4,14 +4,14 @@ import Button from "../../components/common/Button";
 
 interface TechnicianAboutSectionProps {
   initialAbout?: string;
-  onSave: (aboutText: string) => Promise<void>;
-  isLoading: boolean;
+  onSave?: (aboutText: string) => Promise<void>;
+  isLoading?: boolean;
   isEditable: boolean;
 }
 
 export const TechnicianAboutSection: React.FC<TechnicianAboutSectionProps> = ({
   initialAbout = "",
-  onSave,
+  // onSave,
   isLoading,
   isEditable = true,
 }) => {
@@ -32,7 +32,7 @@ export const TechnicianAboutSection: React.FC<TechnicianAboutSectionProps> = ({
     if (!isSaving && aboutText.trim().length > 0) {
       setIsSaving(true);
       try {
-        await onSave(aboutText);
+        // await onSave(aboutText);
         setIsEditing(false);
       } catch (error) {
         console.error("Error saving about section:", error);

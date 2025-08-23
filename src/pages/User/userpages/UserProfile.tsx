@@ -27,7 +27,7 @@ export const UserProfile: React.FC = () => {
     const fetchUserProfile = async () => {
       try {
         const response = await getUserProfile();
-        console.log("fetching the profile of the user in the page:",response);
+        console.log("fetching the profile of the user in the page:", response);
         if (response.success && response.data) {
           setUserData(response.data);
           await fetchUserAddresses();
@@ -68,21 +68,22 @@ export const UserProfile: React.FC = () => {
       console.log("Profile updated successfully:", response);
 
       if (response && userData) {
-        setUserData((prevUserData) => ({
-          ...prevUserData!,
-          username: response.username || prevUserData!.username,
-          phone: response.phone || prevUserData!.phone,
-          image:
-            response.image !== undefined ? response.image : prevUserData!.image,
-        }));
-
-        const updatedUserData = {
+        const newUserData = {
+          ...userData,
           username: response.username || userData.username,
           phone: response.phone || userData.phone,
           image: response.image !== undefined ? response.image : userData.image,
         };
 
-        dispatch(updateUserData(updatedUserData));
+        setUserData(newUserData);
+
+        dispatch(
+          updateUserData({
+            username: newUserData.username,
+            phone: newUserData.phone,
+            image: newUserData.image,
+          })
+        );
 
         showToast({
           message: "Profile updated successfully",
@@ -198,7 +199,7 @@ export const UserProfile: React.FC = () => {
           </div>
 
           <div className="space-y-8">
-            {userData && (
+            {userData && !isLoading && (
               <ProfileCard
                 name={userData.username}
                 email={userData.email}

@@ -5,8 +5,8 @@ import Modal from "../../components/common/Modal";
 
 interface TechnicianCertificatesSectionProps {
   certificates?: string[];
-  onCertificatesUpdate: (files: File[]) => Promise<void>;
-  isLoading: boolean;
+  onCertificatesUpdate?: (files: File[]) => Promise<void>;
+  isLoading?: boolean;
   isEditable: boolean;
 }
 
@@ -14,7 +14,7 @@ export const TechnicianCertificatesSection: React.FC<
   TechnicianCertificatesSectionProps
 > = ({
   certificates = [],
-  onCertificatesUpdate,
+  // onCertificatesUpdate,
   isLoading,
   isEditable = true,
 }) => {
@@ -83,7 +83,7 @@ export const TechnicianCertificatesSection: React.FC<
     }
 
     try {
-      await onCertificatesUpdate(newCertificates);
+      // await onCertificatesUpdate(newCertificates);
       setNewCertificates([]);
       setIsAddingCertificates(false);
     } catch (error) {

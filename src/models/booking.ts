@@ -55,6 +55,7 @@ export interface IBooking {
     refundStatus?: "Not Refunded" | "Refunded";
     refundDate?: Date;
     refundAmount?: number;
+    creditReleaseDate?: Date;
   };
   cancellationDate?: Date;
   cancellationReason?: string;

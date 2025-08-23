@@ -8,11 +8,13 @@ import { useNavigate } from "react-router-dom";
 interface MostBookedServicesProps {
   services: IService[];
   loading?: boolean;
+  error?: string | null;
 }
 
 const MostBookedServices: React.FC<MostBookedServicesProps> = ({
   services,
   loading = false,
+  error = null,
 }) => {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -33,7 +35,7 @@ const MostBookedServices: React.FC<MostBookedServicesProps> = ({
   };
 
   const handleServiceClick = (serviceId: string) => {
-    navigate(`/user/servicedetails/${serviceId}`)
+    navigate(`/user/servicedetails/${serviceId}`);
     console.log("Service clicked:", serviceId);
   };
 
@@ -56,6 +58,19 @@ const MostBookedServices: React.FC<MostBookedServicesProps> = ({
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-6 max-w-7xl w-full">
+          <h2 className="text-2xl font-bold mb-6">Most Booked Services</h2>
+          <div className="text-center text-red-500 py-12">
+            <p>{error}</p>
           </div>
         </div>
       </section>

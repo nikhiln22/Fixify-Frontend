@@ -3,7 +3,7 @@ import {
   MapLocation,
   MapConfig,
   MapInstance,
-  ReverseGeocodeResult,
+  // ReverseGeocodeResult,
   MapCallbacks,
 } from "../../types/map.types";
 import { MAP_CONFIG, MAP_ERRORS } from "../../config/mapConfig";

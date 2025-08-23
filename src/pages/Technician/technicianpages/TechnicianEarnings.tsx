@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { TechnicianProfileSidebar } from "../../../components/technician/TechnicianProfileSidebar";
 import TechnicianLayout from "../../../layouts/TechnicianLayout";
 import { WalletBalance } from "../../../components/common/WalletBalance";
@@ -9,7 +9,8 @@ import { usePaginatedList } from "../../../hooks/usePaginatedList";
 import {
   walletBalance,
   getWalletTransactions,
-} from "../../../services/technicianServices";
+} from "../../../services/walletService";
+import { IWalletTransaction } from "../../../models/walletTransaction";
 
 export const TechnicianEarnings: React.FC = () => {
   const [balance, setBalance] = useState<number>(0);
@@ -20,7 +21,7 @@ export const TechnicianEarnings: React.FC = () => {
   const fetchWalletBalance = async () => {
     try {
       setIsLoadingBalance(true);
-      const response = await walletBalance();
+      const response = await walletBalance("technician");
       console.log("response:", response);
       setBalance(response.data.balance);
     } catch (error) {
@@ -30,20 +31,19 @@ export const TechnicianEarnings: React.FC = () => {
     }
   };
 
-  const fetchWalletTransactionsWithPagination = useCallback(
-    async (page: number) => {
-      return await getWalletTransactions(page);
-    },
-    []
-  );
-
   const {
     data: transactions,
     currentPage,
     totalPages,
     setCurrentPage,
     loading: transactionsLoading,
-  } = usePaginatedList(fetchWalletTransactionsWithPagination);
+  } = usePaginatedList<IWalletTransaction>(
+    getWalletTransactions,
+    "technician",
+    "",
+    "",
+    itemsPerPage
+  );
 
   useEffect(() => {
     fetchWalletBalance();

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import UserLayout from "../../../layouts/UserLayout";
 import Banner from "../../../components/common/Banner";
 import Card from "../../../components/common/Card";
@@ -7,41 +7,34 @@ import Pagination from "../../../components/common/Pagination";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { IService } from "../../../models/service";
 import { buildCloudinaryUrl } from "../../../utils/cloudinary/cloudinary";
+import { usePaginatedList } from "../../../hooks/usePaginatedList";
 
 export const UserService: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { categoryId } = useParams<{ categoryId: string }>();
+  const itemsPerPage = 6;
 
-  const [services, setServices] = useState<IService[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(0);
   const categoryName = location.state?.categoryName || "Services";
 
-  const fetchServices = async (page: number = 1) => {
-    try {
-      setLoading(true);
-      const response = await getAllServices(page, "", categoryId, "user");
-      console.log("response from the serviceListing page:", response);
-      setServices(response.data);
-      setTotalPages(response.totalPages);
-      setCurrentPage(response.currentPage);
-    } catch (error) {
-      console.error("Error fetching services:", error);
-      setServices([]);
-      setTotalPages(0);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchServices(1);
-  }, [categoryId]);
+  const {
+    data: services,
+    currentPage,
+    totalPages,
+    setCurrentPage,
+    loading,
+    error,
+  } = usePaginatedList<IService>(
+    getAllServices,
+    "user",
+    "",
+    "",
+    itemsPerPage,
+    categoryId
+  );
 
   const handlePageChange = (page: number) => {
-    fetchServices(page);
+    setCurrentPage(page);
   };
 
   const handleServiceClick = (service: IService) => {
@@ -61,6 +54,13 @@ export const UserService: React.FC = () => {
           <p className="text-left text-2xl font-bold py-10">
             Choose your {categoryName.toLowerCase()}
           </p>
+
+          {error && (
+            <div className="flex justify-center items-center py-20">
+              <p className="text-lg text-red-600">{error}</p>
+            </div>
+          )}
+
           {loading ? (
             <div className="flex justify-center items-center py-20">
               <p className="text-lg text-gray-600">Loading services...</p>
@@ -87,11 +87,11 @@ export const UserService: React.FC = () => {
                 ))}
               </div>
 
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
 
               <div className="text-center py-12">
                 <h3 className="text-2xl font-bold mb-2">
@@ -100,11 +100,13 @@ export const UserService: React.FC = () => {
               </div>
             </>
           ) : (
-            <div className="flex justify-center items-center py-20">
-              <p className="text-lg text-gray-600">
-                No services found for this category
-              </p>
-            </div>
+            !loading && (
+              <div className="flex justify-center items-center py-20">
+                <p className="text-lg text-gray-600">
+                  No services found for this category
+                </p>
+              </div>
+            )
           )}
         </div>
       </div>

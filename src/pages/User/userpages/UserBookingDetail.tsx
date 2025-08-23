@@ -3,7 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import UserLayout from "../../../layouts/UserLayout";
 import { UserProfileSidebar } from "../../../components/user/UserProfileSidebar";
 import Button from "../../../components/common/Button";
-import { bookingDetails, getRating } from "../../../services/commonServices";
+import {
+  bookingDetails,
+  getBookingRating,
+} from "../../../services/bookingService";
 import { showToast } from "../../../utils/toast";
 import { IBooking } from "../../../models/booking";
 import { BookingHeader } from "../../../components/common/BookingHeader";
@@ -15,7 +18,6 @@ import { ScheduleInfoCard } from "../../../components/common/ScheduledInfoCard";
 import { CancellationCard } from "../../../components/common/CancellationCard";
 import { IRating } from "../../../models/IRating";
 import { RatingCard } from "../../../components/common/RatingCard";
-
 
 export const BookingDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,7 +36,7 @@ export const BookingDetailsPage: React.FC = () => {
   const fetchBookingDetails = async () => {
     try {
       setLoading(true);
-      const response = await bookingDetails(id!, "USER");
+      const response = await bookingDetails(id!, "user");
       console.log("response in the userbooking details page:", response);
 
       if (response.success && response.data) {
@@ -64,7 +66,7 @@ export const BookingDetailsPage: React.FC = () => {
 
   const fetchRating = async () => {
     try {
-      const ratingResponse = await getRating(id!, "user");
+      const ratingResponse = await getBookingRating(id!, "user");
       console.log("Rating response:", ratingResponse);
 
       if (ratingResponse.success) {

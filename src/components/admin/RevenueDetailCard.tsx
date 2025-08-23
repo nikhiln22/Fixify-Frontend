@@ -1,5 +1,5 @@
 import React from "react";
-import { User, Wrench, Building, IndianRupee } from "lucide-react";
+import { User, Wrench, Building, IndianRupee, Calendar } from "lucide-react";
 
 interface RevenueDetailCardProps {
   totalAmount: number;
@@ -7,6 +7,7 @@ interface RevenueDetailCardProps {
   technicianShare: number;
   technicianPaid: boolean;
   technicianPaidAt?: Date;
+  creditReleaseDate?: Date;
 }
 
 export const RevenueDetailCard: React.FC<RevenueDetailCardProps> = ({
@@ -15,6 +16,7 @@ export const RevenueDetailCard: React.FC<RevenueDetailCardProps> = ({
   technicianShare,
   technicianPaid,
   technicianPaidAt,
+  creditReleaseDate,
 }) => {
   const revenuePercentage = Math.round((fixifyShare / totalAmount) * 100);
   const technicianPercentage = Math.round(
@@ -115,7 +117,7 @@ export const RevenueDetailCard: React.FC<RevenueDetailCardProps> = ({
                 </span>
               </div>
 
-              {technicianPaidAt && (
+              {technicianPaid && technicianPaidAt && (
                 <p className="text-xs text-gray-500 mt-1">
                   Paid on:{" "}
                   {new Date(technicianPaidAt).toLocaleDateString("en-US", {
@@ -124,6 +126,22 @@ export const RevenueDetailCard: React.FC<RevenueDetailCardProps> = ({
                     year: "numeric",
                   })}
                 </p>
+              )}
+
+              {!technicianPaid && creditReleaseDate && (
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="flex items-center justify-center h-4 w-4 bg-orange-100 rounded-full">
+                    <Calendar className="h-3 w-3 text-orange-600" />
+                  </div>
+                  <p className="text-xs text-orange-600 font-medium">
+                    Credit Release Date:{" "}
+                    {new Date(creditReleaseDate).toLocaleDateString("en-US", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
               )}
             </div>
           </div>

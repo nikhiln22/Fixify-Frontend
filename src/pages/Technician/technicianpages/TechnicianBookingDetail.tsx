@@ -9,12 +9,16 @@ import { ServiceDetailsCard } from "../../../components/common/ServiceDetailsCar
 import { BookingStatusCard } from "../../../components/common/BookingStatusCard";
 import { CustomerInfoCard } from "../../../components/technician/CustomerInfoCard";
 import { BookingHeader } from "../../../components/common/BookingHeader";
-import { bookingDetails, getRating } from "../../../services/commonServices";
+import {
+  bookingDetails,
+  getBookingRating,
+} from "../../../services/bookingService";
 import { showToast } from "../../../utils/toast";
 import { IBooking } from "../../../models/booking";
 import { CancellationCard } from "../../../components/common/CancellationCard";
 import { IRating } from "../../../models/IRating";
 import { RatingCard } from "../../../components/common/RatingCard";
+import { RevenueDetailCard } from "../../../components/admin/RevenueDetailCard";
 
 export const TechnicianBookingDetail: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
@@ -33,9 +37,9 @@ export const TechnicianBookingDetail: React.FC = () => {
   const fetchBookingDetails = async () => {
     try {
       setLoading(true);
-      const response = await bookingDetails(bookingId!, "TECHNICIAN");
+      const response = await bookingDetails(bookingId!, "technician");
 
-      if (response.success) {
+      if (response.success && response.data) {
         setBooking(response.data);
 
         if (response.data.bookingStatus === "Completed") {
@@ -62,7 +66,7 @@ export const TechnicianBookingDetail: React.FC = () => {
 
   const fetchRating = async () => {
     try {
-      const ratingResponse = await getRating(bookingId!, "technician");
+      const ratingResponse = await getBookingRating(bookingId!, "technician");
       console.log("Rating response:", ratingResponse);
 
       if (ratingResponse.success) {
@@ -124,6 +128,12 @@ export const TechnicianBookingDetail: React.FC = () => {
         email: booking.userId.email || "N/A",
       }
     : null;
+
+  const showRevenueDetails =
+    booking.bookingStatus !== "Cancelled" &&
+    booking.paymentId &&
+    booking.paymentId.fixifyShare !== undefined &&
+    booking.paymentId.technicianShare !== undefined;
 
   return (
     <TechnicianLayout>
@@ -219,6 +229,20 @@ export const TechnicianBookingDetail: React.FC = () => {
                 </div>
               )}
             </div>
+
+            {showRevenueDetails && (
+              <RevenueDetailCard
+                totalAmount={
+                  booking.paymentId.amountPaid || booking.bookingAmount
+                }
+                fixifyShare={booking.paymentId.fixifyShare!}
+                technicianShare={booking.paymentId.technicianShare!}
+                technicianPaid={booking.paymentId.technicianPaid || false}
+                technicianPaidAt={booking.paymentId.technicianPaidAt}
+                creditReleaseDate={booking.paymentId.creditReleaseDate}
+              />
+            )}
+
             {booking.bookingStatus === "Completed" && (
               <RatingCard rating={rating} />
             )}

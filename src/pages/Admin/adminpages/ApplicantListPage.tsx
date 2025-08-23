@@ -45,19 +45,34 @@ export const ApplicantListPage: React.FC = () => {
       {error && <p className="text-red-500 mb-2">{error}</p>}
 
       <div className="px-4">
-        <Table
-          data={applicants || []}
-          columns={columns}
-          currentPage={currentPage}
-          loading={loading}
-          pageSize={itemsPerPage}
-        />
+        {loading ? (
+          <p className="text-gray-500">Loading applicants...</p>
+        ) : applicants && applicants.length > 0 ? (
+          <>
+            <Table
+              data={applicants}
+              columns={columns}
+              currentPage={currentPage}
+              loading={loading}
+              pageSize={itemsPerPage}
+            />
 
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </>
+        ) : (
+          <div className="text-center py-10">
+            <p className="text-gray-600 text-lg font-medium">
+              No pending applications found.
+            </p>
+            <p className="text-gray-500 text-sm mt-1">
+              All technician applications have been reviewed.
+            </p>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );

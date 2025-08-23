@@ -8,27 +8,17 @@ import {
   markNotificationAsRead,
 } from "../../utils/socket/socket";
 import { useAppSelector } from "../../hooks/useRedux";
-
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: string;
-  createdAt: Date;
-  recipientId: string;
-  recipientType: "user" | "admin" | "technician";
-  isRead: boolean;
-}
+import { INotification } from "../../models/notification";
 
 interface NotificationDropdownProps {
   isOpen: boolean;
   onToggle: () => void;
-  notifications: Notification[];
+  notifications: INotification[];
   unreadCount: number;
   loading: boolean;
   onNotificationClick: (notificationId: string) => void;
-  onMarkAllRead: () => void;
-  onNewNotification: (notification: Notification) => void;
+  onMarkAllRead?: () => void;
+  onNewNotification: (notification: INotification) => void;
   disabled?: boolean;
   userType?: "user" | "technician" | "admin";
 }
@@ -40,7 +30,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   unreadCount,
   loading,
   onNotificationClick,
-  onMarkAllRead,
+  // onMarkAllRead,
   onNewNotification,
   disabled = false,
   userType = "user",
@@ -49,11 +39,19 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   const technicianData = useAppSelector(
     (state) => state.technician.technicianData
   );
+  const adminData = useAppSelector((state) => state.admin.adminData);
 
   // Initialize socket connection and listeners
   useEffect(() => {
     if (!disabled) {
-      const userId = userType === "user" ? userData?._id : technicianData?._id;
+      let userId;
+      if (userType === "user") {
+        userId = userData?._id;
+      } else if (userType === "technician") {
+        userId = technicianData?._id;
+      } else if (userType === "admin") {
+        userId = adminData?._id;
+      }
 
       if (userId) {
         // Connect socket and authenticate user
@@ -76,6 +74,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   }, [
     userData?._id,
     technicianData?._id,
+    adminData?._id,
     onNewNotification,
     disabled,
     userType,
@@ -94,11 +93,11 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     }
   };
 
-  const handleMarkAllRead = () => {
-    if (!disabled) {
-      onMarkAllRead();
-    }
-  };
+  // const handleMarkAllRead = () => {
+  //   if (!disabled) {
+  //     onMarkAllRead();
+  //   }
+  // };
 
   const handleClose = () => {
     if (!disabled) {
@@ -148,7 +147,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             <div className="flex items-center space-x-2">
               {unreadCount > 0 && (
                 <button
-                  onClick={handleMarkAllRead}
+                  // onClick={handleMarkAllRead}
                   className="p-1 hover:bg-gray-100 rounded-md transition-colors duration-150"
                   title="Mark all as read"
                 >
@@ -175,27 +174,16 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
               </div>
             ) : notifications.length === 0 ? (
               <div className="px-4 py-8 text-center">
-                <p className="text-sm text-gray-500">No notifications yet</p>
+                <p className="text-sm text-gray-500">No unread notifications</p>
               </div>
             ) : (
               notifications.map((notification) => (
                 <div
-                  key={notification.id}
-                  className="px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-b-0 transition-colors duration-150"
+                  key={notification._id}
+                  className="px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-b-0 transition-colors duration-150 relative"
                 >
-                  <div className="flex items-start space-x-3">
-                    <button
-                      onClick={() => handleNotificationClick(notification.id)}
-                      className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center transition-colors duration-150 flex-shrink-0 ${
-                        notification.isRead
-                          ? "bg-green-500 border-green-500 text-white"
-                          : "border-gray-300 hover:border-green-400 hover:bg-green-50"
-                      }`}
-                    >
-                      {notification.isRead && <Check className="h-3 w-3" />}
-                    </button>
-
-                    <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0 pr-8">
                       <p className="text-sm font-medium text-gray-900">
                         {notification.title}
                       </p>
@@ -206,6 +194,14 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                         {formatDate(notification.createdAt)}
                       </p>
                     </div>
+
+                    <button
+                      onClick={() => handleNotificationClick(notification._id)}
+                      className="absolute top-3 right-3 p-1 hover:bg-gray-100 rounded-full transition-colors duration-150"
+                      title="Mark as read"
+                    >
+                      <Check className="h-4 w-4 text-gray-400 hover:text-green-500" />
+                    </button>
                   </div>
                 </div>
               ))

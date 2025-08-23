@@ -54,7 +54,6 @@ export const usePaginatedList = <T>(
       setData(response.data);
       setTotalPages(response.totalPages);
 
-      // Set overview if it exists in the response
       if (response.overview) {
         setOverview(response.overview);
       }

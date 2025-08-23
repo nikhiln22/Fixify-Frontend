@@ -1,22 +1,25 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "../../../layouts/AdminLayout";
-import { getBookings } from "../../../services/commonServices";
+import { getBookings } from "../../../services/bookingService";
 import SelectField from "../../../components/common/SelectField";
 import { Search } from "lucide-react";
 import { getBookingsColumns } from "../../../constants/tablecolumns/BookingsColumn";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
-import useBookings from "../../../hooks/useBookings";
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";
+import { useNavigate } from "react-router-dom";
 
 export const BookingsListPage: React.FC = () => {
+  const navigate = useNavigate();
   const [inputValue, setInputValue] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
 
   const itemsPerPage = 6;
 
-  const { handleViewDetails } = useBookings("admin");
+  const handleViewDetails = (bookingId: string) => {
+    navigate(`/admin/bookings/${bookingId}`);
+  };
 
   const filterOptions = [
     { value: "", label: "All Bookings" },
@@ -25,28 +28,20 @@ export const BookingsListPage: React.FC = () => {
     { value: "Cancelled", label: "Cancelled Bookings" },
   ];
 
-  const fetchBookingsWithFilters = useCallback(
-    async (page: number) => {
-      console.log("Fetching bookings with filters:", {
-        page,
-        searchQuery,
-        filterStatus,
-      });
-
-      return await getBookings(page, "admin", searchQuery, filterStatus);
-    },
-    [searchQuery, filterStatus]
-  );
-
   const {
     data: bookings,
-    setData: setBookings,
     currentPage,
     totalPages,
     setCurrentPage,
     loading,
     error,
-  } = usePaginatedList(fetchBookingsWithFilters);
+  } = usePaginatedList(
+    getBookings,
+    "admin",
+    searchQuery,
+    filterStatus,
+    itemsPerPage
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);

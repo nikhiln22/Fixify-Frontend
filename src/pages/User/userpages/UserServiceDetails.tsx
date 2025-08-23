@@ -76,6 +76,11 @@ export const UserServiceDetails: React.FC = () => {
         return;
       }
 
+      if (!address.latitude || !address.longitude) {
+        console.log("Address coordinates not available");
+        return;
+      }
+
       try {
         setIsLoadingTechnicians(true);
         console.log("Starting to fetch technicians...");
@@ -135,31 +140,6 @@ export const UserServiceDetails: React.FC = () => {
   const handleRelatedServiceSelect = useCallback((service: any) => {
     console.log("Selected related service:", service);
   }, []);
-
-  const handleBookService = useCallback(() => {
-    if (!selectedAddress) {
-      alert("Please select a service address");
-      return;
-    }
-    if (!selectedTechnician) {
-      alert("Please select a technician");
-      return;
-    }
-
-    console.log("Booking service with:", {
-      service: serviceData,
-      address: selectedAddress,
-      technician: selectedTechnician,
-    });
-
-    navigate("/user/booking", {
-      state: {
-        service: serviceData,
-        address: selectedAddress,
-        technician: selectedTechnician,
-      },
-    });
-  }, [selectedAddress, selectedTechnician, serviceData, navigate]);
 
   return (
     <UserLayout>

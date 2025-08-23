@@ -1,6 +1,7 @@
 import axiosInstance from "../config/axios.config";
 import { getApiRoute } from "../constants/apiRoutes";
 import { ISubscriptionPlan } from "../models/subscriptionPlan";
+import { ISubscriptionPlanHistory } from "../models/subscriptionPlanHistory";
 
 export const addSubscriptionPlan = async (
   subscriptionPlanData: {
@@ -131,5 +132,67 @@ export const updateSubscriptionPlan = async (
   } catch (error) {
     console.log("Error occurred while updating the subscription plan:", error);
     throw error;
+  }
+};
+
+export const getAllSubscriptionPlansHistory = async (
+  page: number | null,
+  role: string,
+  search?: string,
+  filterStatus?: string,
+  limit?: number | null
+): Promise<{
+  data: ISubscriptionPlanHistory[];
+  totalPages: number;
+  currentPage: number;
+  total: number;
+}> => {
+  try {
+    console.log("fetching the subscription plans for the admin");
+
+    let queryParams = "";
+
+    if (
+      page !== undefined &&
+      page !== null &&
+      limit !== undefined &&
+      limit !== null
+    ) {
+      queryParams += `page=${page}&limit=${limit}`;
+
+      if (search && search.trim() !== "") {
+        queryParams += `&search=${encodeURIComponent(search)}`;
+      }
+
+      if (filterStatus && filterStatus.trim() !== "") {
+        queryParams += `&filterStatus=${encodeURIComponent(filterStatus)}`;
+      }
+    }
+
+    const apiRoute = getApiRoute(role);
+
+    const url = queryParams
+      ? `${apiRoute}/subscriptionhistory?${queryParams}`
+      : `${apiRoute}/subscriptionhistory`;
+
+    const response = await axiosInstance.get(url);
+    console.log(
+      "response in the fetchning all the subscription plans history:",
+      response
+    );
+    return {
+      data: response.data.data?.subscriptionPlanHistory || [],
+      totalPages: response.data.data?.pagination?.pages || 1,
+      currentPage: response.data.data?.pagination?.page || page || 1,
+      total: response.data.data?.pagination?.total || 0,
+    };
+  } catch (error) {
+    console.log("Error occurred while fetching subscription plans:", error);
+    return {
+      data: [],
+      totalPages: 0,
+      currentPage: page || 1,
+      total: 0,
+    };
   }
 };

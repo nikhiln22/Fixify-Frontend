@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, Send } from "lucide-react";
-import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
+import { IBooking } from "../../models/booking";
+import { IChat } from "../../models/chat";
 
 interface ChatModalProps {
   isOpen: boolean;
   onClose: () => void;
-  booking: any;
-  messages: any[];
+  booking: IBooking | null;
+  messages: IChat[];
   loading: boolean;
   onSendMessage: (message: string) => void;
   sending: boolean;
@@ -39,7 +40,6 @@ export const ChatModal: React.FC<ChatModalProps> = ({
   }
 
   const chatPartnerName = partnerDetails?.username || "User";
-  const chatPartnerPhoto = partnerDetails?.image || null;
 
   const bookingId = booking?._id?.slice(-8).toUpperCase() || "N/A";
   const serviceName =
@@ -63,8 +63,10 @@ export const ChatModal: React.FC<ChatModalProps> = ({
     }
   };
 
-  const formatTimestamp = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString("en-US", {
+  const formatTimestamp = (timestamp: string | Date) => {
+    const date =
+      typeof timestamp === "string" ? new Date(timestamp) : timestamp;
+    return date.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
@@ -133,28 +135,11 @@ export const ChatModal: React.FC<ChatModalProps> = ({
                 exit="exit"
                 onClick={(e) => e.stopPropagation()}
               >
-
                 <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
                   <div className="flex items-center space-x-3">
-                    {chatPartnerPhoto ? (
-                      <div>
-                        <img
-                          src={buildCloudinaryUrl(chatPartnerPhoto)}
-                          alt={chatPartnerName}
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                        <div
-                          className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-medium"
-                          style={{ display: "none" }}
-                        >
-                          {chatPartnerName.charAt(0).toUpperCase()}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-medium">
-                        {chatPartnerName.charAt(0).toUpperCase()}
-                      </div>
-                    )}
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-medium">
+                      {chatPartnerName.charAt(0).toUpperCase()}
+                    </div>
                     <div>
                       <h3 className="font-medium text-lg text-gray-800">
                         {chatPartnerName}

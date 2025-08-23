@@ -124,7 +124,6 @@ axiosInstance.interceptors.response.use(
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    console.log("config in adding the token to the request:", config);
     const accessToken = Cookies.get(`access_token`);
 
     if (accessToken) {
@@ -142,8 +141,8 @@ const login = async (formData: LoginFormData, role: Role) => {
   const response = await axiosInstance.post<LoginResponse>(
     getAuthUrl(role, "login"),
     formData,
-    { withCredentials: true }
   );
+  console.log("response in the login function in the auth service:",response);
   return response.data;
 };
 
@@ -155,7 +154,7 @@ const register = async (formData: RegisterFormData, role: UserLikeRoles) => {
   return response.data;
 };
 
-// Simplified verifyOtp - no more role-specific payload logic needed
+
 const verifyOtp = async (
   data: OTPVerification,
   role: UserLikeRoles,

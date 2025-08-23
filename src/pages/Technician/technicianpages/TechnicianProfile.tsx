@@ -8,19 +8,19 @@ import { TechnicianCertificatesSection } from "../../../components/technician/Ce
 import { getTechnicianProfile } from "../../../services/technicianServices";
 import { getReviews } from "../../../services/technicianServices";
 import { Itechnician } from "../../../models/technician";
-import { updateTechnicianData } from "../../../redux/slices/technicianslice";
-import { useDispatch } from "react-redux";
+// import { updateTechnicianData } from "../../../redux/slices/technicianslice";
+// import { useDispatch } from "react-redux";
 import { showToast } from "../../../utils/toast";
 import { ReviewSection } from "../../../components/technician/ReviewSection";
 import { IRating } from "../../../models/IRating";
 import { buildCloudinaryUrl } from "../../../utils/cloudinary/cloudinary";
 
 export const TechnicianProfile: React.FC = () => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const [technicianData, setTechnicianData] = useState<Itechnician | null>(
     null
   );
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 
   const [reviews, setReviews] = useState<IRating[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
@@ -81,112 +81,112 @@ export const TechnicianProfile: React.FC = () => {
     }
   };
 
-  const handleProfileSave = async (formData: FormData) => {
-    setIsLoading(true);
+  // const handleProfileSave = async (formData: FormData) => {
+  //   setIsLoading(true);
 
-    try {
-      const response = await editTechnicianProfile(formData);
-      console.log("Technician profile updated successfully:", response);
+  //   try {
+  //     const response = await editTechnicianProfile(formData);
+  //     console.log("Technician profile updated successfully:", response);
 
-      if (response && technicianData) {
-        setTechnicianData((prevTechnicianData) => ({
-          ...prevTechnicianData!,
-          username: response.username || prevTechnicianData!.username,
-          phone: response.phone || prevTechnicianData!.phone,
-          image:
-            response.image !== undefined
-              ? response.image
-              : prevTechnicianData!.image,
-          designation: response.designation || prevTechnicianData!.Designation,
-          yearsOfExperience:
-            response.yearsOfExperience || prevTechnicianData!.yearsOfExperience,
-        }));
+  //     if (response && technicianData) {
+  //       setTechnicianData((prevTechnicianData) => ({
+  //         ...prevTechnicianData!,
+  //         username: response.username || prevTechnicianData!.username,
+  //         phone: response.phone || prevTechnicianData!.phone,
+  //         image:
+  //           response.image !== undefined
+  //             ? response.image
+  //             : prevTechnicianData!.image,
+  //         designation: response.designation || prevTechnicianData!.Designation,
+  //         yearsOfExperience:
+  //           response.yearsOfExperience || prevTechnicianData!.yearsOfExperience,
+  //       }));
 
-        const updatedTechnicianData = {
-          username: response.username || technicianData.username,
-          phone: response.phone || technicianData.phone,
-          image:
-            response.image !== undefined
-              ? response.image
-              : technicianData.image,
-          designation: response.designation || technicianData.Designation,
-          yearsOfExperience:
-            response.yearsOfExperience || technicianData.yearsOfExperience,
-        };
+  //       const updatedTechnicianData = {
+  //         username: response.username || technicianData.username,
+  //         phone: response.phone || technicianData.phone,
+  //         image:
+  //           response.image !== undefined
+  //             ? response.image
+  //             : technicianData.image,
+  //         designation: response.designation || technicianData.Designation,
+  //         yearsOfExperience:
+  //           response.yearsOfExperience || technicianData.yearsOfExperience,
+  //       };
 
-        dispatch(updateTechnicianData(updatedTechnicianData));
+  //       dispatch(updateTechnicianData(updatedTechnicianData));
 
-        showToast({
-          message: "Profile updated successfully",
-          type: "success",
-        });
-      }
-    } catch (error) {
-      console.error("Error updating technician profile:", error);
-      showToast({
-        message: "Failed to update profile",
-        type: "error",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //       showToast({
+  //         message: "Profile updated successfully",
+  //         type: "success",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating technician profile:", error);
+  //     showToast({
+  //       message: "Failed to update profile",
+  //       type: "error",
+  //     });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
-  const handleAboutSave = async (aboutText: string) => {
-    setIsLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append("About", aboutText);
+  // const handleAboutSave = async (aboutText: string) => {
+  //   setIsLoading(true);
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("About", aboutText);
 
-      const response = await editTechnicianProfile(formData);
-      if (response) {
-        setTechnicianData((prev) =>
-          prev ? { ...prev, About: aboutText } : null
-        );
-        showToast({
-          message: "About section updated successfully",
-          type: "success",
-        });
-      }
-    } catch (error) {
-      console.error("Error updating about section:", error);
-      showToast({
-        message: "Failed to update about section",
-        type: "error",
-      });
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     const response = await editTechnicianProfile(formData);
+  //     if (response) {
+  //       setTechnicianData((prev) =>
+  //         prev ? { ...prev, About: aboutText } : null
+  //       );
+  //       showToast({
+  //         message: "About section updated successfully",
+  //         type: "success",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating about section:", error);
+  //     showToast({
+  //       message: "Failed to update about section",
+  //       type: "error",
+  //     });
+  //     throw error;
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
-  const handleCertificatesUpdate = async (files: File[]) => {
-    setIsLoading(true);
-    try {
-      const formData = new FormData();
-      files.forEach((file, index) => {
-        formData.append(`certificate_${index}`, file);
-      });
+  // const handleCertificatesUpdate = async (files: File[]) => {
+  //   setIsLoading(true);
+  //   try {
+  //     const formData = new FormData();
+  //     files.forEach((file, index) => {
+  //       formData.append(`certificate_${index}`, file);
+  //     });
 
-      const response = await editTechnicianProfile(formData);
-      if (response) {
-        await fetchTechnicianProfile();
-        showToast({
-          message: "Certificates added successfully",
-          type: "success",
-        });
-      }
-    } catch (error) {
-      console.error("Error adding certificates:", error);
-      showToast({
-        message: "Failed to add certificates",
-        type: "error",
-      });
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     const response = await editTechnicianProfile(formData);
+  //     if (response) {
+  //       await fetchTechnicianProfile();
+  //       showToast({
+  //         message: "Certificates added successfully",
+  //         type: "success",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error adding certificates:", error);
+  //     showToast({
+  //       message: "Failed to add certificates",
+  //       type: "error",
+  //     });
+  //     throw error;
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   if (!technicianData) {
     return (
@@ -221,16 +221,16 @@ export const TechnicianProfile: React.FC = () => {
                   : "/default-profile.jpg"
               }
               role="technician"
-              Designation={technicianData.Designation}
+              Designation={technicianData.Designation?.designation}
               yearsOfExperience={technicianData.yearsOfExperience}
               isEditable={true}
-              onSave={handleProfileSave}
+              // onSave={handleProfileSave}
             />
 
             <TechnicianAboutSection
               initialAbout={technicianData.About}
-              onSave={handleAboutSave}
-              isLoading={isLoading}
+              // onSave={handleAboutSave}
+              // isLoading={isLoading}
               isEditable
             />
 
@@ -238,8 +238,8 @@ export const TechnicianProfile: React.FC = () => {
               certificates={technicianData.certificates?.map((cert) =>
                 buildCloudinaryUrl(cert)
               )}
-              onCertificatesUpdate={handleCertificatesUpdate}
-              isLoading={isLoading}
+              // onCertificatesUpdate={handleCertificatesUpdate}
+              // isLoading={isLoading}
               isEditable
             />
 

@@ -1,10 +1,9 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import TechnicianLayout from "../../../layouts/TechnicianLayout";
 import { TechnicianProfileSidebar } from "../../../components/technician/TechnicianProfileSidebar";
 import { getBookingsColumns } from "../../../constants/tablecolumns/BookingsColumn";
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";
-import useBookings from "../../../hooks/useBookings";
 import Modal from "../../../components/common/Modal";
 import OTPInput from "../../../components/common/OtpInput";
 import { TechnicianCancellationPolicy } from "../../../components/technician/TechnicianCancellationPolicy";
@@ -17,7 +16,7 @@ import {
 import { showToast } from "../../../utils/toast";
 import { ChatModal } from "../../../components/common/ChatModal";
 import SelectField from "../../../components/common/SelectField";
-import { getBookings } from "../../../services/commonServices";
+import { getBookings } from "../../../services/bookingService";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
 import {
   connectSocket,
@@ -31,9 +30,11 @@ import { IChat } from "../../../models/chat";
 import {
   getChatMessages,
   sendChatMessage,
-} from "../../../services/commonServices";
+} from "../../../services/chatService";
+import { useNavigate } from "react-router-dom";
 
 export const TechnicianJobListing: React.FC = () => {
+  const navigate = useNavigate();
   const itemsPerPage = 6;
   const [filterStatus, setFilterStatus] = useState<string>("");
 
@@ -63,18 +64,6 @@ export const TechnicianJobListing: React.FC = () => {
     { value: "cancelled", label: "Cancelled Jobs" },
   ];
 
-  const fetchJobsWithFilter = useCallback(
-    async (page: number) => {
-      console.log("Fetching jobs with filter:", {
-        page,
-        filterStatus,
-      });
-
-      return await getBookings(page, "technician", "", filterStatus);
-    },
-    [filterStatus]
-  );
-
   const {
     data: bookings,
     setData: setBookings,
@@ -83,9 +72,17 @@ export const TechnicianJobListing: React.FC = () => {
     setCurrentPage,
     loading,
     error,
-  } = usePaginatedList(fetchJobsWithFilter);
+  } = usePaginatedList(
+    getBookings,
+    "technician",
+    "",
+    filterStatus,
+    itemsPerPage
+  );
 
-  const { handleViewDetails } = useBookings("technician");
+  const handleViewDetails = (bookingId: string) => {
+    navigate(`/technician/jobdetails/${bookingId}`);
+  };
 
   useEffect(() => {
     connectSocket();
@@ -116,7 +113,6 @@ export const TechnicianJobListing: React.FC = () => {
     setCurrentPage(1);
   };
 
-  // Complete Booking Handler
   const handleCompleteBooking = async (bookingId: string) => {
     const booking = bookings.find((b) => b._id === bookingId);
     if (booking) {
@@ -124,7 +120,6 @@ export const TechnicianJobListing: React.FC = () => {
       setOtp("");
       setIsOtpModalOpen(true);
 
-      // Generate OTP in background
       try {
         await generateCompletionOtp(bookingId);
         showToast({
@@ -140,7 +135,6 @@ export const TechnicianJobListing: React.FC = () => {
     }
   };
 
-  // Verify OTP and complete booking
   const handleVerifyOtp = async () => {
     if (!selectedCompletionBooking || otp.length !== 4) {
       showToast({
@@ -158,7 +152,6 @@ export const TechnicianJobListing: React.FC = () => {
       );
 
       if (response.success) {
-        // Update booking status in the local state
         setBookings(
           bookings.map((booking) =>
             booking._id === selectedCompletionBooking._id
@@ -523,7 +516,6 @@ export const TechnicianJobListing: React.FC = () => {
             isOpen={isChatModalOpen}
             onClose={handleChatModalClose}
             booking={selectedChatBooking}
-            user={selectedChatBooking?.userId}
             messages={messages}
             loading={chatLoading}
             onSendMessage={handleSendMessage}

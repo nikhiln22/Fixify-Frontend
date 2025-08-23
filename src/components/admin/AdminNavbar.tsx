@@ -3,8 +3,7 @@ import { Logo } from "../common/Logo";
 import { Dropdown } from "../common/DropDown";
 import { NotificationDropdown } from "../common/NotificationDropDown";
 import {
-  getAllNotifications,
-  getUnreadNotificationsCount,
+  getAllUnreadNotifications,
   markNotificationRead,
 } from "../../services/notificationService";
 import { INotification } from "../../models/notification";
@@ -25,37 +24,19 @@ const AdminNavbar: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("🔧 AdminNavbar useEffect running");
-    console.log("📝 AdminData:", adminData);
-
     const socket = connectSocket();
-    console.log("🔌 Socket connection:", socket?.connected, "ID:", socket?.id);
 
     if (socket && adminData?._id) {
-      console.log("🔐 Authenticating admin with ID:", adminData._id);
-      console.log("🏠 Will join room:", `admin_${adminData._id}`);
-
       authenticateUser(adminData._id, "admin");
 
-      console.log("👂 Setting up notification listener");
       listenForNotifications((newNotification) => {
-        console.log("🔔 NEW NOTIFICATION RECEIVED:", newNotification);
-        console.log("📬 Current notification count before:", unreadCount);
         handleNewNotification(newNotification);
-      });
-    } else {
-      console.log("❌ Cannot authenticate - Missing:", {
-        hasSocket: !!socket,
-        hasAdminId: !!adminData?._id,
-        adminId: adminData?._id,
       });
     }
 
     fetchNotifications();
-    fetchUnreadCount();
 
     return () => {
-      console.log("🧹 Cleaning up notification listeners");
       stopListeningForNotifications();
     };
   }, [adminData?._id]);
@@ -63,14 +44,16 @@ const AdminNavbar: React.FC = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await getAllNotifications("admin");
+      const response = await getAllUnreadNotifications("admin");
+      console.log(
+        "response in the get all notitificatios in the admin navabr:",
+        response
+      );
 
       if (response && response.success) {
         setNotifications(response.data || []);
 
-        const unread =
-          response.data?.filter((notif: INotification) => !notif.isRead)
-            .length || 0;
+        const unread = response.data.length;
         setUnreadCount(unread);
       }
     } catch (error) {
@@ -80,27 +63,14 @@ const AdminNavbar: React.FC = () => {
     }
   };
 
-  const fetchUnreadCount = async () => {
-    try {
-      const response = await getUnreadNotificationsCount("admin");
-
-      if (response && response.success) {
-        setUnreadCount(response.data?.unreadCount || 0);
-      }
-    } catch (error) {
-      console.error("Error fetching unread count:", error);
-    }
-  };
-
   const handleNotificationClick = async (notificationId: string) => {
     try {
       const response = await markNotificationRead(notificationId, "admin");
+      console.log("response from the handle notification click:", response);
 
       if (response && response.success) {
         setNotifications((prev) =>
-          prev.map((notif) =>
-            notif.id === notificationId ? { ...notif, isRead: true } : notif
-          )
+          prev.filter((notif) => notif._id !== notificationId)
         );
 
         setUnreadCount((prev) => Math.max(0, prev - 1));
@@ -112,37 +82,33 @@ const AdminNavbar: React.FC = () => {
     }
   };
 
-  const handleMarkAllRead = async () => {
-    try {
-      const unreadNotifications = notifications.filter(
-        (notif) => !notif.isRead
-      );
+  // const handleMarkAllRead = async () => {
+  //   try {
+  //     const unreadNotifications = notifications.filter(
+  //       (notif) => !notif.isRead
+  //     );
 
-      const markAllPromises = unreadNotifications.map((notif) =>
-        markNotificationRead(notif.id, "admin")
-      );
+  //     const markAllPromises = unreadNotifications.map((notif) =>
+  //       markNotificationRead(notif._id, "admin")
+  //     );
 
-      await Promise.all(markAllPromises);
+  //     await Promise.all(markAllPromises);
 
-      setNotifications((prev) =>
-        prev.map((notif) => ({ ...notif, isRead: true }))
-      );
+  //     setNotifications((prev) =>
+  //       prev.map((notif) => ({ ...notif, isRead: true }))
+  //     );
 
-      setUnreadCount(0);
+  //     setUnreadCount(0);
 
-      console.log("All notifications marked as read");
-    } catch (error) {
-      console.error("Error marking all notifications as read:", error);
-    }
-  };
+  //     console.log("All notifications marked as read");
+  //   } catch (error) {
+  //     console.error("Error marking all notifications as read:", error);
+  //   }
+  // };
 
   const handleNewNotification = (newNotification: INotification) => {
-    console.log("📝 Adding notification to list:", newNotification);
-    console.log("📊 Unread count before:", unreadCount);
-
     setNotifications((prev) => [newNotification, ...prev]);
     setUnreadCount((prev) => {
-      console.log("📊 Unread count after:", prev + 1);
       return prev + 1;
     });
   };
@@ -162,7 +128,7 @@ const AdminNavbar: React.FC = () => {
                 unreadCount={unreadCount}
                 loading={loading}
                 onNotificationClick={handleNotificationClick}
-                onMarkAllRead={handleMarkAllRead}
+                // onMarkAllRead={handleMarkAllRead}
                 onNewNotification={handleNewNotification}
                 userType="admin"
               />

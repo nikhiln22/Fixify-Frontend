@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Edit, Save, X, Upload } from "lucide-react";
+import { Edit, Save, X, Camera } from "lucide-react";
 import { useFormik } from "formik";
 import Button from "../common/Button";
 import { ProfileCardProps } from "../../types/component.types";
@@ -31,15 +31,13 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
       yearsOfExperience: yearsOfExperience || 0,
     },
     validationSchema: profileCardSchema,
-    validationContext: { role },
     validate: isEditing ? undefined : () => ({}),
     onSubmit: async (values) => {
-      if (!isEditing || !onSave) {
+      if (!onSave) {
         return;
       }
 
       try {
-
         const formData = new FormData();
 
         formData.append("username", values.name || "");
@@ -97,10 +95,10 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
       : formik.values.image
     : image;
 
-  const handleEditClick = (e: React.MouseEvent) => {
+  const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     console.log("Edit button clicked");
     setIsEditing(true);
     formik.setValues({
@@ -116,10 +114,10 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
     formik.setErrors({});
   };
 
-  const handleCancelEdit = (e: React.MouseEvent) => {
+  const handleCancelEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     console.log("Cancel button clicked");
     setIsEditing(false);
     formik.setValues({
@@ -138,7 +136,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
     }
   };
 
-  const handleSaveClick = async (e: React.FormEvent) => {
+  const handleSaveClick = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Save button clicked, submitting form");
     formik.handleSubmit(e);
@@ -202,7 +200,10 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
                 }`}
                 onClick={isEditing && isEditable ? triggerFileInput : undefined}
               >
-                {currentPhoto ? (
+                {currentPhoto &&
+                currentPhoto !== "undefined" &&
+                currentPhoto !== "" &&
+                currentPhoto !== "default/image" ? (
                   <div className="relative w-full h-full">
                     <img
                       src={currentPhoto}
@@ -225,12 +226,16 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
                   </div>
                 ) : (
                   <div className="w-full h-full bg-gray-50 flex flex-col items-center justify-center">
-                    <div className="rounded-full bg-gray-100 p-3 mb-2">
-                      <Upload className="w-8 h-8 text-gray-500" />
+                    <div className="rounded-full bg-blue-100 p-3 mb-2">
+                      <Camera className="w-8 h-8 text-blue-500" />
                     </div>
-                    {isEditing && isEditable && (
-                      <p className="text-sm text-gray-500 text-center px-2">
-                        Click to upload photo
+                    {isEditing && isEditable ? (
+                      <p className="text-sm text-blue-600 text-center px-2 font-medium">
+                        Click to add photo
+                      </p>
+                    ) : (
+                      <p className="text-sm text-gray-500 text-center px-2 font-medium">
+                        No photo
                       </p>
                     )}
                   </div>

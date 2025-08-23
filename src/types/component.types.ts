@@ -13,7 +13,6 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
   variant?: "primary" | "outline";
   isLoading?: boolean;
-  onClick?: () => void;
 }
 
 export interface InputFieldProps

@@ -15,7 +15,6 @@ export const Dropdown: React.FC<UserDropdownProps> = ({ role }) => {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  // Get data based on role
   const userData = useAppSelector((state) => state.user.userData);
   const technicianData = useAppSelector(
     (state) => state.technician.technicianData
@@ -29,21 +28,20 @@ export const Dropdown: React.FC<UserDropdownProps> = ({ role }) => {
           username: userData?.username || "User",
           email: userData?.email || "",
           image: userData?.image,
-          isVerified: true, // Users don't have verification
+          isVerified: true,
         };
       case "technician":
         return {
           username: technicianData?.username || "Technician",
           email: technicianData?.email || "",
           image: technicianData?.image,
-          isVerified: technicianData?.is_verified || false,
         };
       case "admin":
         return {
           username: "Admin",
           email: adminData?.email || "admin@fixify.com",
-          image: null, // Admin doesn't have image
-          isVerified: true, // Admin is always "verified"
+          image: null,
+          isVerified: true,
         };
       default:
         return {
@@ -62,7 +60,7 @@ export const Dropdown: React.FC<UserDropdownProps> = ({ role }) => {
       case "technician":
         return "/technician/profile";
       case "admin":
-        return null; // Admin doesn't have profile
+        return null;
       default:
         return null;
     }
@@ -123,25 +121,10 @@ export const Dropdown: React.FC<UserDropdownProps> = ({ role }) => {
                     {currentUser.username}
                   </p>
                   <p className="text-xs text-gray-500">{currentUser.email}</p>
-                  {/* Show verification status for technician */}
-                  {role === "technician" && (
-                    <p
-                      className={`text-xs font-medium ${
-                        currentUser.isVerified
-                          ? "text-green-500"
-                          : "text-orange-500"
-                      }`}
-                    >
-                      {currentUser.isVerified
-                        ? "Verified"
-                        : "Pending Verification"}
-                    </p>
-                  )}
                 </div>
               </div>
             </div>
 
-            {/* Profile link - only for user and technician */}
             {profileLink && (
               <Link
                 to={profileLink}

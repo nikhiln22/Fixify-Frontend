@@ -6,11 +6,16 @@ import { Logo } from "../common/Logo";
 import { Dropdown } from "../common/DropDown";
 import { NotificationDropdown } from "../common/NotificationDropDown";
 import {
-  getAllNotifications,
-  getUnreadNotificationsCount,
+  getAllUnreadNotifications,
   markNotificationRead,
 } from "../../services/notificationService";
 import { INotification } from "../../models/notification";
+import {
+  connectSocket,
+  authenticateUser,
+  listenForNotifications,
+  stopListeningForNotifications,
+} from "../../utils/socket/socket";
 
 export const TechnicianNavbar: React.FC = () => {
   const technicianData = useAppSelector(
@@ -25,23 +30,37 @@ export const TechnicianNavbar: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const socket = connectSocket();
+
+    if (socket && technicianData?._id && isVerified) {
+      authenticateUser(technicianData._id, "technician");
+
+      listenForNotifications((newNotification) => {
+        handleNewNotification(newNotification);
+      });
+    }
+
     if (isVerified) {
       fetchNotifications();
-      fetchUnreadCount();
     }
-  }, [isVerified]);
+
+    return () => {
+      stopListeningForNotifications();
+    };
+  }, [technicianData?._id, isVerified]);
 
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await getAllNotifications("technician");
+      const response = await getAllUnreadNotifications("technician");
+      console.log(
+        "response in the get all notifications in the technician navbar:",
+        response
+      );
 
       if (response && response.success) {
         setNotifications(response.data || []);
-
-        const unread =
-          response.data?.filter((notif: INotification) => !notif.isRead)
-            .length || 0;
+        const unread = response.data.length;
         setUnreadCount(unread);
       }
     } catch (error) {
@@ -51,27 +70,14 @@ export const TechnicianNavbar: React.FC = () => {
     }
   };
 
-  const fetchUnreadCount = async () => {
-    try {
-      const response = await getUnreadNotificationsCount("technician");
-
-      if (response && response.success) {
-        setUnreadCount(response.data?.unreadCount || 0);
-      }
-    } catch (error) {
-      console.error("Error fetching unread count:", error);
-    }
-  };
-
   const handleNotificationClick = async (notificationId: string) => {
     try {
       const response = await markNotificationRead(notificationId, "technician");
+      console.log("response from the handle notification click:", response);
 
       if (response && response.success) {
         setNotifications((prev) =>
-          prev.map((notif) =>
-            notif.id === notificationId ? { ...notif, isRead: true } : notif
-          )
+          prev.filter((notif) => notif._id !== notificationId)
         );
 
         setUnreadCount((prev) => Math.max(0, prev - 1));
@@ -83,29 +89,26 @@ export const TechnicianNavbar: React.FC = () => {
     }
   };
 
-  const handleMarkAllRead = async () => {
-    try {
-      const unreadNotifications = notifications.filter(
-        (notif) => !notif.isRead
-      );
+  // const handleMarkAllRead = async () => {
+  //   try {
+  //     const unreadNotifications = notifications.filter(
+  //       (notif) => !notif.isRead
+  //     );
 
-      const markAllPromises = unreadNotifications.map((notif) =>
-        markNotificationRead(notif.id, "technician")
-      );
+  //     const markAllPromises = unreadNotifications.map((notif) =>
+  //       markNotificationRead(notif._id, "technician")
+  //     );
 
-      await Promise.all(markAllPromises);
+  //     await Promise.all(markAllPromises);
 
-      setNotifications((prev) =>
-        prev.map((notif) => ({ ...notif, isRead: true }))
-      );
+  //     setNotifications([]);
+  //     setUnreadCount(0);
 
-      setUnreadCount(0);
-
-      console.log("All notifications marked as read");
-    } catch (error) {
-      console.error("Error marking all notifications as read:", error);
-    }
-  };
+  //     console.log("All notifications marked as read");
+  //   } catch (error) {
+  //     console.error("Error marking all notifications as read:", error);
+  //   }
+  // };
 
   const handleNewNotification = (newNotification: INotification) => {
     setNotifications((prev) => [newNotification, ...prev]);
@@ -143,7 +146,7 @@ export const TechnicianNavbar: React.FC = () => {
                 unreadCount={unreadCount}
                 loading={loading}
                 onNotificationClick={handleNotificationClick}
-                onMarkAllRead={handleMarkAllRead}
+                // onMarkAllRead={handleMarkAllRead}
                 onNewNotification={handleNewNotification}
                 disabled={!isVerified}
                 userType="technician"

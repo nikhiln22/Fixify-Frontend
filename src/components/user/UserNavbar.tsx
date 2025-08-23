@@ -5,13 +5,20 @@ import { NotificationDropdown } from "../../components/common/NotificationDropDo
 import { Dropdown } from "../../components/common/DropDown";
 import { Logo } from "../common/Logo";
 import {
-  getAllNotifications,
-  getUnreadNotificationsCount,
+  getAllUnreadNotifications,
   markNotificationRead,
 } from "../../services/notificationService";
 import { INotification } from "../../models/notification";
+import { useAppSelector } from "../../hooks/useRedux";
+import {
+  authenticateUser,
+  connectSocket,
+  listenForNotifications,
+  stopListeningForNotifications,
+} from "../../utils/socket/socket";
 
 export const UserNavbar: React.FC = () => {
+  const userData = useAppSelector((state) => state.user.userData);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
@@ -20,21 +27,36 @@ export const UserNavbar: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const socket = connectSocket();
+
+    if (socket && userData?._id) {
+      authenticateUser(userData._id, "user");
+
+      listenForNotifications((newNotification) => {
+        handleNewNotification(newNotification);
+      });
+    }
+
     fetchNotifications();
-    fetchUnreadCount();
+
+    return () => {
+      stopListeningForNotifications();
+    };
+  }, [userData?._id]);
+
+  useEffect(() => {
+    fetchNotifications();
   }, []);
 
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await getAllNotifications("user");
+      const response = await getAllUnreadNotifications("user");
 
       if (response && response.success) {
         setNotifications(response.data || []);
 
-        const unread =
-          response.data?.filter((notif: INotification) => !notif.isRead)
-            .length || 0;
+        const unread = response.data.length;
         setUnreadCount(unread);
       }
     } catch (error) {
@@ -44,27 +66,13 @@ export const UserNavbar: React.FC = () => {
     }
   };
 
-  const fetchUnreadCount = async () => {
-    try {
-      const response = await getUnreadNotificationsCount("user");
-
-      if (response && response.success) {
-        setUnreadCount(response.data?.unreadCount || 0);
-      }
-    } catch (error) {
-      console.error("Error fetching unread count:", error);
-    }
-  };
-
   const handleNotificationClick = async (notificationId: string) => {
     try {
       const response = await markNotificationRead(notificationId, "user");
 
       if (response && response.success) {
         setNotifications((prev) =>
-          prev.map((notif) =>
-            notif.id === notificationId ? { ...notif, isRead: true } : notif
-          )
+          prev.filter((notif) => notif._id !== notificationId)
         );
 
         setUnreadCount((prev) => Math.max(0, prev - 1));
@@ -76,29 +84,29 @@ export const UserNavbar: React.FC = () => {
     }
   };
 
-  const handleMarkAllRead = async () => {
-    try {
-      const unreadNotifications = notifications.filter(
-        (notif) => !notif.isRead
-      );
+  // const handleMarkAllRead = async () => {
+  //   try {
+  //     const unreadNotifications = notifications.filter(
+  //       (notif) => !notif.isRead
+  //     );
 
-      const markAllPromises = unreadNotifications.map((notif) =>
-        markNotificationRead(notif.id, "user")
-      );
+  //     const markAllPromises = unreadNotifications.map((notif) =>
+  //       markNotificationRead(notif.id, "user")
+  //     );
 
-      await Promise.all(markAllPromises);
+  //     await Promise.all(markAllPromises);
 
-      setNotifications((prev) =>
-        prev.map((notif) => ({ ...notif, isRead: true }))
-      );
+  //     setNotifications((prev) =>
+  //       prev.map((notif) => ({ ...notif, isRead: true }))
+  //     );
 
-      setUnreadCount(0);
+  //     setUnreadCount(0);
 
-      console.log("All notifications marked as read");
-    } catch (error) {
-      console.error("Error marking all notifications as read:", error);
-    }
-  };
+  //     console.log("All notifications marked as read");
+  //   } catch (error) {
+  //     console.error("Error marking all notifications as read:", error);
+  //   }
+  // };
 
   const handleNewNotification = (newNotification: INotification) => {
     setNotifications((prev) => [newNotification, ...prev]);
@@ -148,7 +156,7 @@ export const UserNavbar: React.FC = () => {
                 unreadCount={unreadCount}
                 loading={loading}
                 onNotificationClick={handleNotificationClick}
-                onMarkAllRead={handleMarkAllRead}
+                // onMarkAllRead={handleMarkAllRead}
                 onNewNotification={handleNewNotification}
               />
 

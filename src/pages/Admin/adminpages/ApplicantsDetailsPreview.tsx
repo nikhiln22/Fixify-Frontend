@@ -33,6 +33,10 @@ export const ApplicantDetailsPreview: React.FC = () => {
 
       try {
         const response = await getTechnicianProfile("admin", applicantId);
+        console.log(
+          "response from the applicant details preview page:",
+          response
+        );
         setApplicant(response);
       } catch (err) {
         console.error("Error fetching applicant details:", err);
@@ -103,9 +107,7 @@ export const ApplicantDetailsPreview: React.FC = () => {
 
   return (
     <AdminLayout>
-      {/* Match the structure from TechnicianProfile - same spacing and width */}
       <div className="space-y-8">
-        {/* Header section - same as TechnicianProfile */}
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-900">{pageTitle}</h1>
           <Button onClick={handleBack} variant="outline" className="px-6 py-2">
@@ -123,7 +125,7 @@ export const ApplicantDetailsPreview: React.FC = () => {
               : "/default-profile.jpg"
           }
           role="technician"
-          Designation={applicant.Designation}
+          Designation={applicant.Designation?.designation}
           yearsOfExperience={applicant.yearsOfExperience}
           isEditable={false}
           onSave={() => {}}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import UserLayout from "../../../layouts/UserLayout";
 import { UserProfileSidebar } from "../../../components/user/UserProfileSidebar";
@@ -8,12 +8,13 @@ import {
   verifyWalletSession,
   walletBalance,
   getWalletTransactions,
-} from "../../../services/userServices";
+} from "../../../services/walletService";
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";
 import { getWalletTransactionsColumns } from "../../../constants/tablecolumns/WalletTransactionsColumn";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
 import { showToast } from "../../../utils/toast";
+import { IWalletTransaction } from "../../../models/walletTransaction";
 
 export const UserWallet: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -27,7 +28,7 @@ export const UserWallet: React.FC = () => {
   const fetchWalletBalance = async () => {
     try {
       setIsLoadingBalance(true);
-      const response = await walletBalance();
+      const response = await walletBalance("user");
       setBalance(response.data.balance);
     } catch (error) {
       console.error("Error fetching wallet balance:", error);
@@ -40,13 +41,6 @@ export const UserWallet: React.FC = () => {
     }
   };
 
-  const fetchWalletTransactionsWithPagination = useCallback(
-    async (page: number) => {
-      return await getWalletTransactions(page);
-    },
-    []
-  );
-
   const {
     data: transactions,
     setData: setTransactions,
@@ -54,7 +48,14 @@ export const UserWallet: React.FC = () => {
     totalPages,
     setCurrentPage,
     loading: transactionsLoading,
-  } = usePaginatedList(fetchWalletTransactionsWithPagination);
+    error,
+  } = usePaginatedList<IWalletTransaction>(
+    getWalletTransactions,
+    "user",
+    "",
+    "",
+    itemsPerPage
+  );
 
   useEffect(() => {
     fetchWalletBalance();
@@ -67,7 +68,7 @@ export const UserWallet: React.FC = () => {
       setSearchParams(searchParams);
 
       setIsVerifying(true);
-      verifyWalletSession(sessionId)
+      verifyWalletSession("user", sessionId)
         .then((res) => {
           if (res?.success) {
             showToast({
@@ -109,7 +110,7 @@ export const UserWallet: React.FC = () => {
 
   const handleAddMoney = async (amount: number) => {
     try {
-      const response = await addMoney(amount);
+      const response = await addMoney("user", amount);
       console.log("response after adding the money to the wallet:", response);
       if (
         response.success &&
@@ -127,6 +128,10 @@ export const UserWallet: React.FC = () => {
     }
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   const columns = getWalletTransactionsColumns();
 
   return (
@@ -135,9 +140,7 @@ export const UserWallet: React.FC = () => {
         <UserProfileSidebar />
         <div className="flex-1 p-8">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Wallet
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Wallet</h1>
             <p className="text-gray-600">
               Manage your wallet balance and view transaction history
             </p>
@@ -154,6 +157,12 @@ export const UserWallet: React.FC = () => {
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
                 Recent Wallet Transactions
               </h3>
+
+              {error && (
+                <div className="flex justify-center items-center py-20">
+                  <p className="text-lg text-red-600">{error}</p>
+                </div>
+              )}
 
               {transactionsLoading ? (
                 <div className="bg-white rounded-lg shadow">
@@ -180,23 +189,25 @@ export const UserWallet: React.FC = () => {
                   <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
-                    onPageChange={setCurrentPage}
+                    onPageChange={handlePageChange}
                   />
                 </>
               ) : (
-                <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
-                      <span className="text-gray-400 text-2xl">₹</span>
+                !transactionsLoading && (
+                  <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <span className="text-gray-400 text-2xl">₹</span>
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        No transactions yet
+                      </h3>
+                      <p className="text-gray-500">
+                        Your wallet transactions will appear here
+                      </p>
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      No transactions yet
-                    </h3>
-                    <p className="text-gray-500">
-                      Your wallet transactions will appear here
-                    </p>
                   </div>
-                </div>
+                )
               )}
             </div>
           </div>

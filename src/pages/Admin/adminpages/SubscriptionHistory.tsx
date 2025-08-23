@@ -1,11 +1,11 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "../../../layouts/AdminLayout";
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";
 import SelectField from "../../../components/common/SelectField";
 import { Search } from "lucide-react";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
-import { getAllSubscriptionPlansHistory } from "../../../services/adminServices";
+import { getAllSubscriptionPlansHistory } from "../../../services/subscriptionPlanService";
 import { getSubscriptionPlanHistoryColumns } from "../../../constants/tablecolumns/SubscriptionPlanHistoryColumn";
 import Button from "../../../components/common/Button";
 import { useNavigate } from "react-router-dom";
@@ -25,26 +25,6 @@ export const SubscriptionHistory: React.FC = () => {
     { value: "Expired", label: "Expired Plans" },
   ];
 
-  const fetchSubscriptionPlansHistoryWithFilters = useCallback(
-    async (page: number) => {
-      console.log("Fetching subscription plans with filters:", {
-        page,
-        searchQuery,
-        filterStatus,
-      });
-
-      const result = await getAllSubscriptionPlansHistory(
-        page,
-        searchQuery,
-        filterStatus
-      );
-
-      console.log("API Response:", result);
-      return result;
-    },
-    [searchQuery, filterStatus]
-  );
-
   const handleBackClick = () => {
     navigate("/admin/subscriptionplans");
   };
@@ -55,7 +35,13 @@ export const SubscriptionHistory: React.FC = () => {
     totalPages,
     setCurrentPage,
     loading,
-  } = usePaginatedList(fetchSubscriptionPlansHistoryWithFilters);
+  } = usePaginatedList(
+    getAllSubscriptionPlansHistory,
+    "admin",
+    searchQuery,
+    filterStatus,
+    itemsPerPage
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -84,41 +70,44 @@ export const SubscriptionHistory: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="p-4">
-        <h1 className="text-3xl font-semibold mb-4">
-          Technician Subscription History
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          Subscription History
         </h1>
-        <div className="flex justify-between items-center mb-4">
-          <div className="w-full md:w-1/3 relative">
-            <input
-              type="text"
-              placeholder="Search subscription plans..."
-              value={inputValue}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <p className="text-gray-600">
+          Manage and monitor Subscription Histories
+        </p>
+      </div>
+      <div className="flex justify-between items-center mb-4">
+        <div className="w-full md:w-1/3 relative">
+          <input
+            type="text"
+            placeholder="Search subscription plans..."
+            value={inputValue}
+            onChange={handleInputChange}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-48">
+            <SelectField
+              label=""
+              name="statusFilter"
+              value={filterStatus}
+              onChange={handleStatusFilterChange}
+              options={statusOptions}
+              placeholder="Filter by status"
+              className="mb-0"
             />
-            <Search className="w-5 h-5 text-gray-500 absolute right-3 top-2.5" />
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-48">
-              <SelectField
-                label=""
-                name="statusFilter"
-                value={filterStatus}
-                onChange={handleStatusFilterChange}
-                options={statusOptions}
-                placeholder="Filter by status"
-                className="mb-0"
-              />
-            </div>
-            <Button
-              variant="primary"
-              onClick={handleBackClick}
-              className="h-10 px-4 py-2 whitespace-nowrap"
-            >
-              Back to Subscription Plans
-            </Button>
-          </div>
+          <Button
+            variant="primary"
+            onClick={handleBackClick}
+            className="h-10 px-4 py-2 whitespace-nowrap"
+          >
+            Back to Subscription Plans
+          </Button>
         </div>
       </div>
 
