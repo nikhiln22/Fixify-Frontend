@@ -27,7 +27,7 @@ const LandingHero: React.FC<LandingHeroProps> = ({
             <p className="text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto lg:mx-0 mb-8 text-gray-600 leading-relaxed">
               One platform to find the best service professionals for your
               everyday needs.welcome to the world of the fixify and enjoy the
-              services.
+              services.Hope you find soon.
             </p>
             <Button
               onClick={onGetStarted}

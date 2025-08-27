@@ -41,7 +41,7 @@ jobs:
     - name: Deploy to S3
       if: github.ref == 'refs/heads/main'
       run: |
-        aws s3 sync build/ s3://fixify-frontend --delete
+        aws s3 sync dist/ s3://fixify-frontend --delete
     
     - name: Invalidate CloudFront
       if: github.ref == 'refs/heads/main'
