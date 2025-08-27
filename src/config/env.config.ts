@@ -1,12 +1,4 @@
-const getEnvVariable = (key: string): string => {
-  const value = import.meta.env[key as keyof ImportMetaEnv] || "";
-  if (!value) {
-    throw new Error(`Missing environment variable: ${key}`);
-  }
-  return value;
-};
-
 export const envConfig = {
-  apiUrl: getEnvVariable("VITE_API_URL"),
-  cloudinaryBaseUrl: getEnvVariable("VITE_CLOUDINARY_BASE_URL"),
+  apiUrl: import.meta.env.VITE_API_URL || "http://localhost:3000",
+  cloudinaryBaseUrl: import.meta.env.VITE_CLOUDINARY_BASE_URL || "",
 };
