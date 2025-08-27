@@ -66,10 +66,7 @@ export const Otp: React.FC<OtpProps> = ({ role, onVerifyOtp, onResendOtp }) => {
       try {
         setLoading(true);
 
-        const tempId =
-          role.toLowerCase() === "technician" ? tempTechnicianId : tempUserId;
-
-        await onVerifyOtp(values, email, otpPurpose, tempId);
+        await onVerifyOtp(values, email, otpPurpose);
       } catch (err) {
         const error = err as { message?: string };
         setErrors({ otp: error.message || "Verification failed" });

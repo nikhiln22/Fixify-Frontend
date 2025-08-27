@@ -6,7 +6,7 @@ import MultiDatePicker from "../../../components/technician/MultiDatePicker";
 import TimeSelection from "../../../components/technician/TimeSelection";
 import Modal from "../../../components/common/Modal";
 import { Plus, Clock } from "lucide-react";
-import { TimeSlotData } from "../../../types/technicians.types";
+import { ITimeSlotData } from "../../../types/technicians.types";
 import {
   createTimeSlots,
   getTimeSlots,
@@ -156,8 +156,8 @@ export const TechnicianAvailability: React.FC = () => {
         dateTimeSlots: formattedSlots,
       });
 
-      const timeSlotData: TimeSlotData = {
-        dateTimeSlots: formattedSlots as any,
+      const timeSlotData: ITimeSlotData = {
+        dateTimeSlots: formattedSlots,
       };
 
       const response = await createTimeSlots(timeSlotData);

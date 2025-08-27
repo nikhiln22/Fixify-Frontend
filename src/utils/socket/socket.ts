@@ -1,5 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import { envConfig } from "../../config/env.config";
+import { IChat } from "../../models/chat";
 
 export interface ISocketNotificationData {
   _id: string;
@@ -72,9 +73,7 @@ export const sendMessage = (
   }
 };
 
-export const listenForMessages = (
-  callback: (message: string) => void
-): void => {
+export const listenForMessages = (callback: (message: IChat) => void): void => {
   if (socket) {
     socket.on("new_message", callback);
   }

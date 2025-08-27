@@ -2,7 +2,7 @@ import React, { ButtonHTMLAttributes } from "react";
 import { Role } from "./auth.types";
 import { IAddress } from "../models/address";
 import { ITimeSlot } from "../models/timeslot";
-import { TimeSlotData } from "./technicians.types";
+import { ITimeSlotData } from "./technicians.types";
 import { ICoupon } from "../models/coupon";
 import { OfferData } from "./user.types";
 import { CouponData } from "./user.types";
@@ -94,7 +94,7 @@ export interface VerificationBannerProps {
 }
 
 export interface SelectFieldProps {
-  label: string;
+  label?: string;
   name: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -220,7 +220,7 @@ export interface TimeSlotDisplayProps {
 }
 
 export interface TimeSlotFormProps {
-  onSubmit: (data: TimeSlotData) => Promise<void>;
+  onSubmit: (data: ITimeSlotData) => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
 }

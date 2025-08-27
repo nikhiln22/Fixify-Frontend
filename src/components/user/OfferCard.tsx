@@ -14,7 +14,6 @@ interface OfferCardProps {
 }
 
 const OfferCard: React.FC<OfferCardProps> = ({
-  id,
   title,
   description,
   discount_type,
@@ -22,7 +21,6 @@ const OfferCard: React.FC<OfferCardProps> = ({
   max_discount,
   min_booking_amount,
   valid_until,
-  display_discount,
   offer_type = "global",
 }) => {
   const getOfferTypeStyle = () => {
@@ -84,7 +82,9 @@ const OfferCard: React.FC<OfferCardProps> = ({
             {styles.badgeText}
           </span>
           <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-xs font-medium">
-            {isExpired() ? "Expired" : `Valid till ${formatValidUntil(valid_until)}`}
+            {isExpired()
+              ? "Expired"
+              : `Valid till ${formatValidUntil(valid_until)}`}
           </span>
         </div>
 
@@ -116,7 +116,7 @@ const OfferCard: React.FC<OfferCardProps> = ({
             <span className="inline-block w-1 h-1 bg-gray-400 rounded-full mr-2"></span>
             Minimum booking: ₹{min_booking_amount.toLocaleString()}
           </div>
-          
+
           {discount_type === "percentage" && max_discount && (
             <div className="flex items-center text-xs text-gray-500">
               <span className="inline-block w-1 h-1 bg-gray-400 rounded-full mr-2"></span>
@@ -129,15 +129,15 @@ const OfferCard: React.FC<OfferCardProps> = ({
         <div className="text-center">
           <p className="text-xs text-gray-500 bg-gray-50 py-2 px-3 rounded-lg">
             {isExpired() ? (
-              <span className="text-red-500 font-medium">This offer has expired</span>
+              <span className="text-red-500 font-medium">
+                This offer has expired
+              </span>
             ) : (
               <span>Available during service booking</span>
             )}
           </p>
         </div>
       </div>
-
-
     </div>
   );
 };

@@ -24,9 +24,12 @@ export interface TechnicianProfileResponse {
   data?: Itechnician;
 }
 
-export interface TimeSlotData {
-  startTime: string;
-  endTime: string;
+export interface ITimeSlotData {
+  dateTimeSlots: {
+    date: string;
+    startTime: string;
+    endTime: string;
+  }[];
 }
 
 export interface CreateTimeSlotsResponse {

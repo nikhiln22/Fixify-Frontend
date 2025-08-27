@@ -71,7 +71,7 @@ export const BookingStatusChart: React.FC<BookingStatusChartProps> = ({
             cy="50%"
             labelLine={false}
             label={({ status, count, percent }) =>
-              `${status}: ${count} (${(percent * 100).toFixed(0)}%)`
+              `${status}: ${count} (${percent ? (percent * 100).toFixed(0) : "0"}%)`
             }
             outerRadius={120}
             fill="#8884d8"

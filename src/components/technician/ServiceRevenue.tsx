@@ -6,9 +6,9 @@ import {
   ResponsiveContainer,
   Tooltip,
   Legend,
+  PieLabelRenderProps,
 } from "recharts";
 import { Briefcase, Loader2 } from "lucide-react";
-
 
 interface ServiceRevenueData {
   serviceId: string;
@@ -17,7 +17,6 @@ interface ServiceRevenueData {
   jobsCount: number;
   percentage: number;
 }
-
 
 interface ServiceRevenueChartProps {
   data: ServiceRevenueData[];
@@ -36,7 +35,6 @@ const SERVICE_COLORS = [
   "#F97316",
   "#84CC16",
 ];
-
 
 export const ServiceRevenueChart: React.FC<ServiceRevenueChartProps> = ({
   data,
@@ -77,14 +75,14 @@ export const ServiceRevenueChart: React.FC<ServiceRevenueChartProps> = ({
     return null;
   };
 
-
-  const renderLabel = (entry: ServiceRevenueData) => {
-    return `${entry.percentage}%`;
+  const renderLabel = (props: PieLabelRenderProps) => {
+    const data = props as PieLabelRenderProps & ServiceRevenueData;
+    return `${data.percentage}%`;
   };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
-          <div className="mb-6">
+      <div className="mb-6">
         <h3 className="text-xl font-bold text-gray-900 mb-2">
           Revenue by Services Performed
         </h3>
@@ -101,7 +99,6 @@ export const ServiceRevenueChart: React.FC<ServiceRevenueChartProps> = ({
         )}
       </div>
 
-      
       <div className="h-80">
         {loading && (
           <div className="flex items-center justify-center h-full">
@@ -150,7 +147,7 @@ export const ServiceRevenueChart: React.FC<ServiceRevenueChartProps> = ({
                 fill="#8884d8"
                 dataKey="revenue"
               >
-                {data.map((entry, index) => (
+                {data.map((_, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={SERVICE_COLORS[index % SERVICE_COLORS.length]}
@@ -158,10 +155,11 @@ export const ServiceRevenueChart: React.FC<ServiceRevenueChartProps> = ({
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
+
               <Legend
                 verticalAlign="bottom"
                 height={36}
-                formatter={(value, entry) => {
+                formatter={(_, entry) => {
                   const serviceData = entry.payload as ServiceRevenueData;
                   return (
                     <span style={{ color: entry.color }}>
@@ -176,7 +174,6 @@ export const ServiceRevenueChart: React.FC<ServiceRevenueChartProps> = ({
         )}
       </div>
 
-      
       {!loading && !error && data.length > 0 && (
         <div className="mt-4 pt-4 border-t border-gray-200">
           <div className="grid grid-cols-2 gap-4 text-sm">

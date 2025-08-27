@@ -4,7 +4,7 @@ import {
   CreateTimeSlotsResponse,
   GetTimeSlotResponse,
   SubmitTechnicianQualificationResponse,
-  TimeSlotData,
+  ITimeSlotData,
 } from "../types/technicians.types";
 import { getApiRoute, TECHNICIAN_API } from "../constants/apiRoutes";
 import { ISubscriptionPlanHistory } from "../models/subscriptionPlanHistory";
@@ -235,7 +235,7 @@ export const rejectTechnician = async (applicantId: string, role: string) => {
 };
 
 export const createTimeSlots = async (
-  timeSlotData: TimeSlotData
+  timeSlotData: ITimeSlotData
 ): Promise<CreateTimeSlotsResponse> => {
   try {
     const response = await axiosInstance.post<CreateTimeSlotsResponse>(

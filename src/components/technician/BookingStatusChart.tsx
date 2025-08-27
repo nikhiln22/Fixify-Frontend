@@ -6,6 +6,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   Legend,
+  PieLabelRenderProps,
 } from "recharts";
 import {
   TrendingUp,
@@ -81,12 +82,11 @@ export const BookingStatusChart: React.FC<BookingStatusChartProps> = ({
     return null;
   };
 
-  // Custom label for pie slices
-  const renderLabel = (entry: BookingStatusData) => {
-    return `${entry.percentage}%`;
+  const renderLabel = (props: PieLabelRenderProps) => {
+    const data = props as PieLabelRenderProps & BookingStatusData;
+    return `${data.percentage}%`;
   };
 
-  // Prepare data with colors
   const dataWithColors = data.map((item) => ({
     ...item,
     fill: STATUS_COLORS[item.status] || "#6B7280",
