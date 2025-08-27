@@ -1,5 +1,5 @@
 const getEnvVariable = (key: string): string => {
-  const value = import.meta.env[key as keyof ImportMetaEnv];
+  const value = import.meta.env[key as keyof ImportMetaEnv] || "";
   if (!value) {
     throw new Error(`Missing environment variable: ${key}`);
   }
