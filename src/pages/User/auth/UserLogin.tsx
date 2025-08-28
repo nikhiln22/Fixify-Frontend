@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Login } from "../../../components/auth/Login";
@@ -58,6 +58,12 @@ export const UserLogin: React.FC = () => {
       });
     }
   };
+
+  useEffect(() => {
+    console.log("Production API URL:", import.meta.env.VITE_API_URL);
+    console.log("Environment mode:", import.meta.env.MODE);
+    console.log("All env vars:", import.meta.env);
+  }, []);
 
   return <Login role="USER" onsubmit={handleLoginSubmit} />;
 };
