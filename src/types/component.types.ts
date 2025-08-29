@@ -140,12 +140,9 @@ export interface AddServiceProps {
 }
 
 export interface BannerProps {
-  title: string;
-  subtitle?: string;
   backgroundImage?: string;
   backgroundColor?: string;
   height?: string;
-  children?: React.ReactNode;
   className?: string;
 }
 

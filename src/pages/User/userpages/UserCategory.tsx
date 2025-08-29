@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Icategory } from "../../../models/category";
 import { buildCloudinaryUrl } from "../../../utils/cloudinary/cloudinary";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
+import technicianBanner from "../../../assets/technician Banner.png";
 
 export const UserCategory: React.FC = () => {
   const navigate = useNavigate();
@@ -42,11 +43,7 @@ export const UserCategory: React.FC = () => {
   return (
     <UserLayout>
       <div>
-        <Banner
-          title="Explore the services"
-          subtitle="Find the best technicians near you"
-          height="400px"
-        />
+        <Banner backgroundImage={technicianBanner} height="400px" />
         <div className="container mx-auto px-6 max-w-7xl w-full">
           <p className="text-left text-2xl font-bold py-10">
             Choose your services
