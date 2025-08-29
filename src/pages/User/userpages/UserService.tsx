@@ -46,7 +46,7 @@ export const UserService: React.FC = () => {
   return (
     <UserLayout>
       <div>
-        <Banner backgroundImage={technicianBanner} height="400px" />
+        <Banner backgroundImage={technicianBanner} height="600px" />
         <div className="container mx-auto px-6 max-w-7xl w-full">
           <p className="text-left text-2xl font-bold py-10">
             Choose your {categoryName.toLowerCase()}

@@ -322,7 +322,7 @@ export const UserBooking: React.FC = () => {
 
   return (
     <UserLayout>
-      <Banner backgroundImage={technicianBanner} height="400px" />
+      <Banner backgroundImage={technicianBanner} height="600px" />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

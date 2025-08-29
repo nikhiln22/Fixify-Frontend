@@ -144,7 +144,7 @@ export const UserServiceDetails: React.FC = () => {
 
   return (
     <UserLayout>
-      <Banner backgroundImage={technicianBanner} height="400px" />
+      <Banner backgroundImage={technicianBanner} height="600px" />
 
       <div className="container mx-auto px-4 py-8">
         <ServiceHeader service={serviceData} />

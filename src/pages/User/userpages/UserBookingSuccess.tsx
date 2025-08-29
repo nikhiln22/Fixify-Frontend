@@ -58,7 +58,7 @@ export const UserBookingSuccess: React.FC = () => {
   if (isLoading) {
     return (
       <UserLayout>
-        <Banner backgroundImage={technicianBanner} height="400px" />
+        <Banner backgroundImage={technicianBanner} height="600px" />
         <div className="text-center py-10 text-gray-600 text-lg">
           Please wait...
         </div>
