@@ -24,7 +24,7 @@ export const MainBannerCarousel: React.FC<MainBannerCarouselProps> = ({
       description:
         "Professional plumbing, electrical, and home repair services at your doorstep",
       buttonText: "Explore Services",
-      backgroundColor: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      backgroundColor: "linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%)",
     },
 
     ...offers.map((offer, index) => ({
