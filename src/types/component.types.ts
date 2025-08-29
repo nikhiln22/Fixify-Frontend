@@ -140,10 +140,13 @@ export interface AddServiceProps {
 }
 
 export interface BannerProps {
+  className?: string;
   backgroundImage?: string;
   backgroundColor?: string;
   height?: string;
-  className?: string;
+  children?: React.ReactNode;
+  overlay?: boolean;
+  overlayColor?: string;
 }
 
 export interface CardProps {

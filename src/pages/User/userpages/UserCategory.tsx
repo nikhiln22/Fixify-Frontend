@@ -43,60 +43,78 @@ export const UserCategory: React.FC = () => {
   return (
     <UserLayout>
       <div>
-        <Banner backgroundImage={technicianBanner} height="400px" />
+        <Banner
+          backgroundImage={technicianBanner}
+          height="400px"
+          className="mb-0"
+        />
+
         <div className="container mx-auto px-6 max-w-7xl w-full">
-          <p className="text-left text-2xl font-bold py-10">
-            Choose your services
-          </p>
+          <div className="py-16">
+            <h2 className="text-left text-3xl font-bold mb-12 text-gray-800">
+              Choose your services
+            </h2>
 
-          {error && (
-            <div className="flex justify-center items-center py-20">
-              <p className="text-lg text-red-600">{error}</p>
-            </div>
-          )}
-
-          {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <p className="text-lg text-gray-600">Loading categories...</p>
-            </div>
-          ) : categories.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12 mb-12">
-                {categories.map((category) => (
-                  <Card
-                    key={category._id}
-                    image={
-                      category.image
-                        ? buildCloudinaryUrl(category.image)
-                        : "/default-category-image.jpg"
-                    }
-                    title={category.name}
-                    type="category"
-                    buttonLabel="Book Now"
-                    onClick={() => handleCategoryClick(category)}
-                  />
-                ))}
-              </div>
-
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-
-              <div className="text-center py-12">
-                <h3 className="text-2xl font-bold mb-2">
-                  Ready to Get Started? Choose Your Service and Let's Go!
-                </h3>
-              </div>
-            </>
-          ) : (
-            !loading && (
+            {error && (
               <div className="flex justify-center items-center py-20">
-                <p className="text-lg text-gray-600">No categories found</p>
+                <p className="text-lg text-red-600">{error}</p>
               </div>
-            )
-          )}
+            )}
+
+            {loading ? (
+              <div className="flex justify-center items-center py-20">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                  <p className="text-lg text-gray-600">Loading categories...</p>
+                </div>
+              </div>
+            ) : categories.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mb-12">
+                  {categories.map((category) => (
+                    <Card
+                      key={category._id}
+                      image={
+                        category.image
+                          ? buildCloudinaryUrl(category.image)
+                          : "/default-category-image.jpg"
+                      }
+                      title={category.name}
+                      type="category"
+                      buttonLabel="Book Now"
+                      onClick={() => handleCategoryClick(category)}
+                    />
+                  ))}
+                </div>
+
+                <div className="flex justify-center mb-12">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+
+                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                  <h3 className="text-2xl font-bold mb-4 text-gray-800">
+                    Ready to Get Started?
+                  </h3>
+                  <p className="text-lg text-gray-600">
+                    Choose Your Service and Let's Go!
+                  </p>
+                </div>
+              </>
+            ) : (
+              !loading && (
+                <div className="flex justify-center items-center py-20">
+                  <div className="text-center">
+                    <div className="text-6xl text-gray-300 mb-4">📋</div>
+                    <p className="text-lg text-gray-600">No categories found</p>
+                  </div>
+                </div>
+              )
+            )}
+          </div>
         </div>
       </div>
     </UserLayout>
