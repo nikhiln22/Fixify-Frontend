@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* Custom animations for login page */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -52,7 +51,6 @@
   }
 }
 
-/* Custom Tailwind utility classes */
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-out;
 }
@@ -73,7 +71,6 @@
   animation: glow 2s ease-in-out infinite;
 }
 
-/* Custom shadow effects */
 .shadow-3xl {
   box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
 }
@@ -86,17 +83,33 @@
   box-shadow: 0 0 30px rgba(20, 184, 166, 0.5);
 }
 
-/* Backdrop blur utilities */
 .backdrop-blur-glass {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 
-/* Custom gradient backgrounds */
 .bg-gradient-brand {
   background: linear-gradient(135deg, #14b8a6 0%, #0891b2 50%, #0ea5e9 100%);
 }
 
 .bg-gradient-soft {
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }

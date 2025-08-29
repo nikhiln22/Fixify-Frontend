@@ -103,9 +103,15 @@ export const MainBannerCarousel: React.FC<MainBannerCarouselProps> = ({
             background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
           }}
         >
+          {/* Animated background elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-white opacity-5 rounded-full animate-pulse"></div>
+            <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-white opacity-5 rounded-full animate-pulse delay-1000"></div>
+          </div>
+
           <div className="relative z-10 text-center px-6 md:px-12 max-w-4xl">
             <div className="space-y-4 text-white">
-              <h1 className="text-4xl md:text-6xl font-bold mb-4">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
                 Welcome to Fixify
               </h1>
               <h2 className="text-xl md:text-2xl font-medium opacity-90">
@@ -124,36 +130,118 @@ export const MainBannerCarousel: React.FC<MainBannerCarouselProps> = ({
   }
 
   return (
-    <div className="relative w-full h-[600px] overflow-hidden rounded-lg shadow-lg">
+    <div className="relative w-full h-[600px] overflow-hidden rounded-lg shadow-2xl">
       <div
         className="w-full h-full flex items-center justify-center relative transition-all duration-500 ease-in-out"
         style={{
           background:
             currentSlideData.type === "hero"
               ? currentSlideData.backgroundColor
-              : currentSlideData.backgroundColor,
+              : `linear-gradient(135deg, ${getBrandColor((currentSlideData as any).offer_type)}15 0%, ${getBrandColor((currentSlideData as any).offer_type)}25 100%)`,
         }}
       >
+        {/* Enhanced background animations */}
+        <div className="absolute inset-0 overflow-hidden">
+          {currentSlideData.type === "hero" && (
+            <>
+              {/* Floating circles */}
+              <div className="absolute top-20 left-20 w-32 h-32 bg-white opacity-10 rounded-full animate-bounce delay-500"></div>
+              <div className="absolute bottom-32 right-16 w-24 h-24 bg-white opacity-10 rounded-full animate-bounce delay-1000"></div>
+              <div className="absolute top-1/2 right-32 w-16 h-16 bg-white opacity-10 rounded-full animate-bounce delay-1500"></div>
+
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse"></div>
+
+              {/* Tool icons pattern */}
+              <div className="absolute top-16 right-20 text-white/10 text-4xl animate-pulse">
+                🔧
+              </div>
+              <div className="absolute bottom-20 left-16 text-white/10 text-4xl animate-pulse delay-700">
+                🔨
+              </div>
+              <div className="absolute top-32 left-1/3 text-white/10 text-3xl animate-pulse delay-1400">
+                ⚡
+              </div>
+            </>
+          )}
+
+          {currentSlideData.type === "offer" && (
+            <>
+              {/* Offer background elements */}
+              <div
+                className="absolute top-10 left-10 w-40 h-40 border-2 border-current opacity-10 rounded-full animate-spin-slow"
+                style={{
+                  color: getBrandColor((currentSlideData as any).offer_type),
+                }}
+              ></div>
+              <div
+                className="absolute bottom-10 right-10 w-32 h-32 border-2 border-current opacity-10 rounded-full animate-spin-slow delay-1000"
+                style={{
+                  color: getBrandColor((currentSlideData as any).offer_type),
+                }}
+              ></div>
+
+              {/* Floating percentage symbols */}
+              <div
+                className="absolute top-1/4 left-1/4 text-6xl opacity-5 animate-float"
+                style={{
+                  color: getBrandColor((currentSlideData as any).offer_type),
+                }}
+              >
+                %
+              </div>
+              <div
+                className="absolute bottom-1/4 right-1/4 text-4xl opacity-5 animate-float delay-500"
+                style={{
+                  color: getBrandColor((currentSlideData as any).offer_type),
+                }}
+              >
+                ₹
+              </div>
+            </>
+          )}
+        </div>
+
         <div className="relative z-10 text-center px-6 md:px-12 max-w-4xl">
           {currentSlideData.type === "hero" && (
-            <div className="space-y-4 text-white">
-              <h1 className="text-4xl md:text-6xl font-bold mb-4">
-                {currentSlideData.title}
-              </h1>
-              <h2 className="text-xl md:text-2xl font-medium opacity-90">
-                {currentSlideData.subtitle}
-              </h2>
-              <p className="text-lg md:text-xl opacity-80 max-w-2xl mx-auto">
-                {currentSlideData.description}
-              </p>
+            <div className="space-y-6 text-white">
+              <div className="space-y-4">
+                <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-2xl tracking-tight">
+                  {currentSlideData.title}
+                </h1>
+                <h2 className="text-xl md:text-2xl font-medium opacity-90 drop-shadow-lg">
+                  {currentSlideData.subtitle}
+                </h2>
+                <p className="text-lg md:text-xl opacity-80 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
+                  {currentSlideData.description}
+                </p>
+              </div>
+
+              {/* Enhanced CTA button */}
+              <div className="pt-6">
+                <button className="bg-white text-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-50 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl">
+                  {currentSlideData.buttonText}
+                </button>
+              </div>
             </div>
           )}
 
           {currentSlideData.type === "offer" && (
             <div className="space-y-6 text-gray-800">
-              <div className="inline-block">
+              <div className="inline-block relative">
+                {/* Glowing effect for offer text */}
                 <div
-                  className="text-6xl md:text-8xl font-black mb-2"
+                  className="absolute inset-0 blur-lg opacity-30"
+                  style={{
+                    color: getBrandColor((currentSlideData as any).offer_type),
+                  }}
+                >
+                  <div className="text-6xl md:text-8xl font-black">
+                    {currentSlideData.title}
+                  </div>
+                </div>
+                <div
+                  className="relative text-6xl md:text-8xl font-black mb-2 drop-shadow-xl"
                   style={{
                     color: getBrandColor((currentSlideData as any).offer_type),
                   }}
@@ -162,7 +250,7 @@ export const MainBannerCarousel: React.FC<MainBannerCarouselProps> = ({
                 </div>
               </div>
 
-              <h2 className="text-2xl md:text-4xl font-bold text-gray-900">
+              <h2 className="text-2xl md:text-4xl font-bold text-gray-900 drop-shadow-lg">
                 {currentSlideData.subtitle}
               </h2>
 
@@ -170,22 +258,37 @@ export const MainBannerCarousel: React.FC<MainBannerCarouselProps> = ({
                 {currentSlideData.description}
               </p>
 
-              <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-sm text-gray-500">
+              <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-sm">
                 {(currentSlideData as any).min_booking_amount && (
-                  <span className="bg-gray-100 px-3 py-1 rounded-full">
+                  <span className="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-gray-200">
                     Min. booking: ₹
                     {(currentSlideData as any).min_booking_amount}
                   </span>
                 )}
+
+                {/* Offer code */}
+                <span
+                  className="px-4 py-2 rounded-full font-mono font-bold shadow-lg border-2"
+                  style={{
+                    backgroundColor: `${getBrandColor((currentSlideData as any).offer_type)}15`,
+                    borderColor: getBrandColor(
+                      (currentSlideData as any).offer_type
+                    ),
+                    color: getBrandColor((currentSlideData as any).offer_type),
+                  }}
+                >
+                  Code: {(currentSlideData as any).offerCode}
+                </span>
               </div>
             </div>
           )}
         </div>
       </div>
 
+      {/* Enhanced navigation arrows */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-300"
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/30 backdrop-blur-sm hover:bg-black/50 text-white p-3 rounded-full transition-all duration-300 hover:scale-110 shadow-lg"
         aria-label="Previous slide"
       >
         <ChevronLeft size={24} />
@@ -193,30 +296,31 @@ export const MainBannerCarousel: React.FC<MainBannerCarouselProps> = ({
 
       <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-300"
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/30 backdrop-blur-sm hover:bg-black/50 text-white p-3 rounded-full transition-all duration-300 hover:scale-110 shadow-lg"
         aria-label="Next slide"
       >
         <ChevronRight size={24} />
       </button>
 
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+      {/* Enhanced slide indicators */}
+      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-3">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+            className={`transition-all duration-300 rounded-full ${
               index === currentSlide
-                ? "bg-white scale-110"
-                : "bg-white bg-opacity-50 hover:bg-opacity-75"
+                ? "w-8 h-3 bg-white shadow-lg scale-110"
+                : "w-3 h-3 bg-white/60 hover:bg-white/80 hover:scale-105"
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}
       </div>
 
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-white bg-opacity-20">
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-black/20">
         <div
-          className="h-full bg-white transition-all duration-300 ease-linear"
+          className="h-full bg-gradient-to-r from-white to-white/80 transition-all duration-300 ease-linear shadow-sm"
           style={{
             width: `${((currentSlide + 1) / slides.length) * 100}%`,
           }}
