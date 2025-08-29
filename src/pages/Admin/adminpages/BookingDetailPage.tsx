@@ -17,7 +17,6 @@ import { ScheduleInfoCard } from "../../../components/common/ScheduledInfoCard";
 import { CustomerInfoCard } from "../../../components/technician/CustomerInfoCard";
 import { CancellationCard } from "../../../components/common/CancellationCard";
 import { RevenueDetailCard } from "../../../components/admin/RevenueDetailCard";
-import { DollarSign } from "lucide-react";
 import { RatingCard } from "../../../components/common/RatingCard";
 import { IRating } from "../../../models/IRating";
 // import { technicianReviews } from "../../../services/adminServices";
@@ -158,9 +157,7 @@ export const BookingDetailPage: React.FC = () => {
     : null;
 
   const shouldShowRevenueDetails =
-    booking.bookingStatus === "Completed" &&
-    booking.technicianId &&
-    booking.paymentId?.paymentStatus === "Paid";
+    booking.bookingStatus !== "Cancelled" && booking.technicianId;
 
   return (
     <AdminLayout>
@@ -188,7 +185,7 @@ export const BookingDetailPage: React.FC = () => {
               serviceImage={booking.serviceId.image}
             />
 
-            {shouldShowRevenueDetails ? (
+            {shouldShowRevenueDetails && (
               <RevenueDetailCard
                 totalAmount={
                   booking.paymentId?.amountPaid || booking.bookingAmount
@@ -198,56 +195,6 @@ export const BookingDetailPage: React.FC = () => {
                 technicianPaid={booking.paymentId?.technicianPaid || false}
                 technicianPaidAt={booking.paymentId?.technicianPaidAt}
               />
-            ) : (
-              <div className="bg-white rounded-lg shadow">
-                <div className="p-6 border-b border-gray-200">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center h-10 w-10 bg-gray-100 rounded-full">
-                      <DollarSign className="h-6 w-6 text-gray-400" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-semibold text-gray-900">
-                        Revenue Details
-                      </h2>
-                      <p className="text-sm text-gray-500">Not available yet</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="text-center py-8">
-                    <div className="text-gray-400 mb-4">
-                      <DollarSign className="h-16 w-16 mx-auto" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-500 mb-2">
-                      Revenue Details Not Available
-                    </h3>
-                    <p className="text-sm text-gray-400 max-w-sm mx-auto">
-                      Revenue breakdown will be available once the booking is
-                      completed, payment is processed.
-                    </p>
-                    <div className="mt-4 text-xs text-gray-400">
-                      <p>
-                        Current Status:{" "}
-                        <span className="font-medium">
-                          {booking.bookingStatus}
-                        </span>
-                      </p>
-                      <p>
-                        Payment Status:{" "}
-                        <span className="font-medium">
-                          {booking.paymentId?.paymentStatus || "N/A"}
-                        </span>
-                      </p>
-                      <p>
-                        Technician:{" "}
-                        <span className="font-medium">
-                          {booking.technicianId ? "Assigned" : "Not Assigned"}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
             )}
           </div>
 
