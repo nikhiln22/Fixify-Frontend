@@ -9,18 +9,27 @@ const Banner: React.FC<BannerProps> = ({
 }) => {
   return (
     <div
-      className={`w-full ${className}`}
+      className={`w-full relative ${className}`}
       style={{
         backgroundImage: backgroundImage
           ? `url(${backgroundImage})`
           : undefined,
         backgroundColor: backgroundImage ? undefined : backgroundColor,
-        backgroundSize: "contain",
-        backgroundPosition: "center",
+        backgroundSize: "cover",
+        backgroundPosition: "center right",
         backgroundRepeat: "no-repeat",
         height,
       }}
-    />
+    >
+      {backgroundImage && (
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+          }}
+        />
+      )}
+    </div>
   );
 };
 
