@@ -233,8 +233,8 @@ export const MainBannerCarousel: React.FC<MainBannerCarouselProps> = ({
             onClick={() => goToSlide(index)}
             className={`transition-all duration-300 rounded-full ${
               index === currentSlide
-                ? "w-8 h-3 bg-white shadow-lg scale-110"
-                : "w-3 h-3 bg-white/60 hover:bg-white/80 hover:scale-105"
+                ? "w-8 h-3 bg-black shadow-lg scale-110"
+                : "w-3 h-3 bg-black/60 hover:bg-black/80 hover:scale-105"
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />
