@@ -13,7 +13,6 @@ export const UserHome: React.FC = () => {
   const [servicesLoading, setServicesLoading] = useState(true);
   const [servicesError, setServicesError] = useState<string | null>(null);
 
-
   const fetchMostBookedServices = async () => {
     try {
       setServicesLoading(true);
@@ -54,10 +53,8 @@ export const UserHome: React.FC = () => {
 
   return (
     <UserLayout>
-      <div className="space-y-8">
-        <div>
-          <MainBannerCarousel offers={offers} />
-        </div>
+      <div>
+        <MainBannerCarousel offers={offers} />
 
         <ServiceCategories />
 
