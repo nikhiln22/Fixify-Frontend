@@ -16,7 +16,7 @@ const Banner: React.FC<BannerProps> = ({
           : undefined,
         backgroundColor: backgroundImage ? undefined : backgroundColor,
         backgroundSize: "cover",
-        backgroundPosition: "center right",
+        backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         height,
       }}
@@ -25,7 +25,7 @@ const Banner: React.FC<BannerProps> = ({
         <div
           className="absolute inset-0"
           style={{
-            backgroundColor: "rgba(0, 0, 0, 0.4)",
+            backgroundColor: "rgba(0, 0, 0, 0.2)",
           }}
         />
       )}
