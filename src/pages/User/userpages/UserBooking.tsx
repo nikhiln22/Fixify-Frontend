@@ -33,6 +33,7 @@ import {
   removeCoupon as removeCouponAction,
   clearCouponData,
 } from "../../../redux/slices/couponSlice";
+import technicianBanner from "../../../assets/technician Banner.png";
 
 export const UserBooking: React.FC = () => {
   const location = useLocation();
@@ -321,7 +322,7 @@ export const UserBooking: React.FC = () => {
 
   return (
     <UserLayout>
-      <Banner title="Booking Confirmation" height="400px" />
+      <Banner backgroundImage={technicianBanner} height="400px" />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
