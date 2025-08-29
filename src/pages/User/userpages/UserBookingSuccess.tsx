@@ -7,6 +7,7 @@ import { verifyPaymentSession } from "../../../services/bookingService";
 import { showToast } from "../../../utils/toast";
 import dayjs from "dayjs";
 import { IBooking } from "../../../models/booking";
+import technicianBanner from "../../../assets/technician Banner.png";
 
 export const UserBookingSuccess: React.FC = () => {
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ export const UserBookingSuccess: React.FC = () => {
   if (isLoading) {
     return (
       <UserLayout>
-        <Banner title="Verifying Payment..." height="400px" />
+        <Banner backgroundImage={technicianBanner} height="400px" />
         <div className="text-center py-10 text-gray-600 text-lg">
           Please wait...
         </div>
@@ -68,7 +69,7 @@ export const UserBookingSuccess: React.FC = () => {
   if (!booking) {
     return (
       <UserLayout>
-        <Banner title="Booking Confirmation" height="400px" />
+        <Banner backgroundImage={technicianBanner} height="400px" />
         <div className="text-center py-10 text-red-500 text-lg">
           <p className="mb-4">Booking not found or verification failed.</p>
           <Button
@@ -85,7 +86,7 @@ export const UserBookingSuccess: React.FC = () => {
 
   return (
     <UserLayout>
-      <Banner title="Booking Confirmation" height="400px" />
+      <Banner backgroundImage={technicianBanner} height="400px" />
 
       <div className="min-h-screen bg-white py-8">
         <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-xl p-8 text-center">

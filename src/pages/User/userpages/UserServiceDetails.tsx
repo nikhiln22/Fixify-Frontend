@@ -13,6 +13,7 @@ import {
 import { IService } from "../../../models/service";
 import { IAddress } from "../../../models/address";
 import { getServiceDetails } from "../../../services/serviceService";
+import technicianBanner from "../../../assets/technician Banner.png";
 
 export const UserServiceDetails: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState<IAddress | null>(null);
@@ -143,11 +144,7 @@ export const UserServiceDetails: React.FC = () => {
 
   return (
     <UserLayout>
-      <Banner
-        title="Professional Home Services"
-        subtitle="Find the best service providers near you"
-        height="400px"
-      />
+      <Banner backgroundImage={technicianBanner} height="400px" />
 
       <div className="container mx-auto px-4 py-8">
         <ServiceHeader service={serviceData} />

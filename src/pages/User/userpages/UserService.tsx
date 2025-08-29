@@ -8,6 +8,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { IService } from "../../../models/service";
 import { buildCloudinaryUrl } from "../../../utils/cloudinary/cloudinary";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
+import technicianBanner from "../../../assets/technician Banner.png";
 
 export const UserService: React.FC = () => {
   const navigate = useNavigate();
@@ -45,11 +46,7 @@ export const UserService: React.FC = () => {
   return (
     <UserLayout>
       <div>
-        <Banner
-          title={`Explore ${categoryName}`}
-          subtitle="Find the best service providers near you"
-          height="400px"
-        />
+        <Banner backgroundImage={technicianBanner} height="400px" />
         <div className="container mx-auto px-6 max-w-7xl w-full">
           <p className="text-left text-2xl font-bold py-10">
             Choose your {categoryName.toLowerCase()}
@@ -87,11 +84,11 @@ export const UserService: React.FC = () => {
                 ))}
               </div>
 
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
 
               <div className="text-center py-12">
                 <h3 className="text-2xl font-bold mb-2">
