@@ -14,6 +14,17 @@ export const submitTechnicianQualification = async (
   formdata: FormData
 ): Promise<SubmitTechnicianQualificationResponse> => {
   try {
+    // Add these logs
+    console.log("🚀 Sending request to:", `${TECHNICIAN_API}/qualifications`);
+    console.log("📝 FormData contents:");
+    for (let [key, value] of formdata.entries()) {
+      console.log(`  ${key}:`, value);
+    }
+
+    console.log("🔧 Request config:");
+    console.log("  Method: PATCH");
+    console.log("  URL:", `${TECHNICIAN_API}/qualifications`);
+    console.log("  Headers: Content-Type: multipart/form-data");
     const response =
       await axiosInstance.patch<SubmitTechnicianQualificationResponse>(
         `${TECHNICIAN_API}/qualifications`,
@@ -24,6 +35,7 @@ export const submitTechnicianQualification = async (
           },
         }
       );
+    console.log("✅ Response received:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error submitting qualification:", error);

@@ -40,6 +40,7 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
     validationSchema: professionQualificationSchema,
     onSubmit: async (values) => {
       try {
+        console.log("🔥 FORM SUBMIT TRIGGERED!");
         console.log("values:", values);
         await onSubmit(values);
       } catch (error) {
