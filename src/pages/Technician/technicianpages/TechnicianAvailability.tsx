@@ -219,7 +219,6 @@ export const TechnicianAvailability: React.FC = () => {
             </div>
 
             <div className="space-y-6">
-              {/* Tab Headers */}
               <div className="border-b border-gray-200">
                 <nav className="-mb-px flex space-x-8">
                   <button
@@ -263,8 +262,7 @@ export const TechnicianAvailability: React.FC = () => {
                   />
                   <div className="mt-4 p-4 bg-blue-50 rounded-lg">
                     <p className="text-blue-800">
-                      Coming soon: Days selection, time settings, and recurring
-                      pattern setup!
+                      Days selection, time settings, and recurring slots
                     </p>
                   </div>
                 </div>
