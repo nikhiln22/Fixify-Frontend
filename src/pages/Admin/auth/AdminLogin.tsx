@@ -1,7 +1,7 @@
 import React from "react";
 import { Login } from "../../../components/auth/Login";
 import { useNavigate } from "react-router-dom";
-import authService from "../../../services/authServices";
+import { authService } from "../../../services/authServices";
 import { showToast } from "../../../utils/toast";
 import Cookies from "js-cookie";
 import { LoginFormData } from "../../../types/auth.types";

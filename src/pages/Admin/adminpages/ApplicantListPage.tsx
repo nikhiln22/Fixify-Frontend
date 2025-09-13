@@ -3,7 +3,7 @@ import { getApplicantsColumns } from "../../../constants/tablecolumns/Applicants
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
-import { getAllPendingTechnicians } from "../../../services/technicianServices";
+import { getAllApplicants } from "../../../services/applicantService";
 import { useNavigate } from "react-router-dom";
 
 export const ApplicantListPage: React.FC = () => {
@@ -12,7 +12,7 @@ export const ApplicantListPage: React.FC = () => {
   const navigate = useNavigate();
   const handleViewDetails = (applicantId: string) => {
     console.log("View details of:", applicantId);
-    navigate(`/admin/applicant/${applicantId}`);
+    navigate(`/admin/applicants/${applicantId}`);
   };
 
   const {
@@ -22,14 +22,7 @@ export const ApplicantListPage: React.FC = () => {
     setCurrentPage,
     loading,
     error,
-  } = usePaginatedList(
-    getAllPendingTechnicians,
-    "admin",
-    "",
-    "",
-    itemsPerPage,
-    ""
-  );
+  } = usePaginatedList(getAllApplicants, "", "", itemsPerPage, "");
 
   const columns = getApplicantsColumns(handleViewDetails);
 

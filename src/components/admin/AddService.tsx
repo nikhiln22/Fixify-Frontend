@@ -20,7 +20,11 @@ export const AddService: React.FC<AddServiceProps> = ({
   const formik = useFormik({
     initialValues: initialValues || {
       serviceName: "",
+      serviceType: "fixed",
       servicePrice: "",
+      hourlyRate: "",
+      estimatedTime: "",
+      maxHours: "",
       description: "",
       serviceImage: null as File | null,
       categoryId: "",
@@ -31,10 +35,21 @@ export const AddService: React.FC<AddServiceProps> = ({
       try {
         const formData = new FormData();
         formData.append("name", values.serviceName || "");
-        formData.append("price", values.servicePrice?.toString() || "0");
+        formData.append("serviceType", values.serviceType || "fixed");
         formData.append("description", values.description || "");
         formData.append("categoryId", values.categoryId || "");
         formData.append("designationId", values.designationId || "");
+
+        if (values.serviceType === "fixed") {
+          formData.append("price", values.servicePrice?.toString() || "0");
+          formData.append(
+            "estimatedTime",
+            values.estimatedTime?.toString() || "0"
+          );
+        } else {
+          formData.append("hourlyRate", values.hourlyRate?.toString() || "0");
+          formData.append("maxHours", values.maxHours?.toString() || "0");
+        }
 
         if (values.serviceImage && values.serviceImage instanceof File) {
           formData.append("image", values.serviceImage);
@@ -77,6 +92,11 @@ export const AddService: React.FC<AddServiceProps> = ({
     return buildCloudinaryUrl(formik.values.serviceImage);
   };
 
+  const serviceTypeOptions = [
+    { value: "fixed", label: "Fixed Price Service" },
+    { value: "hourly", label: "Hourly Rate Service" },
+  ];
+
   return (
     <form
       onSubmit={formik.handleSubmit}
@@ -99,22 +119,108 @@ export const AddService: React.FC<AddServiceProps> = ({
         />
       </div>
 
-      <div className="mb-6">
-        <InputField
-          label="Service Price"
-          name="servicePrice"
-          value={formik.values.servicePrice}
+      <div className="mb-6 text-left">
+        <SelectField
+          label="Service Type"
+          name="serviceType"
+          value={formik.values.serviceType}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          placeholder="Enter service price"
+          options={serviceTypeOptions}
+          placeholder="Select service type"
           error={
-            formik.touched.servicePrice && formik.errors.servicePrice
-              ? formik.errors.servicePrice
+            formik.touched.serviceType && formik.errors.serviceType
+              ? formik.errors.serviceType?.toString()
               : undefined
           }
-          touched={formik.touched.servicePrice}
+          touched={formik.touched.serviceType}
         />
       </div>
+
+      {formik.values.serviceType === "fixed" ? (
+        <div className="mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <InputField
+              label="Service Price (₹)"
+              name="servicePrice"
+              type="number"
+              value={formik.values.servicePrice}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Enter fixed price"
+              error={
+                formik.touched.servicePrice && formik.errors.servicePrice
+                  ? formik.errors.servicePrice
+                  : undefined
+              }
+              touched={formik.touched.servicePrice}
+              style={{ appearance: "textfield" }}
+              className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+
+            <InputField
+              label="Estimated Time (minutes)"
+              name="estimatedTime"
+              type="number"
+              value={formik.values.estimatedTime}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="e.g., 120 for 2 hours"
+              error={
+                formik.touched.estimatedTime && formik.errors.estimatedTime
+                  ? formik.errors.estimatedTime
+                  : undefined
+              }
+              touched={formik.touched.estimatedTime}
+              style={{ appearance: "textfield" }}
+              className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <InputField
+              label="Hourly Rate (₹/hour)"
+              name="hourlyRate"
+              type="text"
+              value={formik.values.hourlyRate}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Enter hourly rate"
+              error={
+                formik.touched.hourlyRate && formik.errors.hourlyRate
+                  ? formik.errors.hourlyRate
+                  : undefined
+              }
+              touched={formik.touched.hourlyRate}
+              style={{ appearance: "textfield" }}
+              className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+
+            <InputField
+              label="Maximum Hours"
+              name="maxHours"
+              type="text"
+              value={formik.values.maxHours}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="e.g., 8 hours max"
+              style={{
+                MozAppearance: "textfield",
+                WebkitAppearance: "none",
+              }}
+              className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              error={
+                formik.touched.maxHours && formik.errors.maxHours
+                  ? formik.errors.maxHours
+                  : undefined
+              }
+              touched={formik.touched.maxHours}
+            />
+          </div>
+        </div>
+      )}
 
       <div className="mb-6 text-left">
         <label

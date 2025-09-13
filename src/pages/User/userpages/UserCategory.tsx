@@ -21,13 +21,7 @@ export const UserCategory: React.FC = () => {
     setCurrentPage,
     loading,
     error,
-  } = usePaginatedList<Icategory>(
-    getAllCategories,
-    "user",
-    "",
-    "",
-    itemsPerPage
-  );
+  } = usePaginatedList<Icategory>(getAllCategories, "", "", itemsPerPage);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

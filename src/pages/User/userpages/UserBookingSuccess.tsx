@@ -34,7 +34,7 @@ export const UserBookingSuccess: React.FC = () => {
       if (sessionId && !hasVerified.current) {
         hasVerified.current = true;
         try {
-          const res = await verifyPaymentSession(sessionId, "user");
+          const res = await verifyPaymentSession(sessionId);
           if (res.success && res.data) {
             setBooking(res.data);
             showToast({ type: "success", message: "Payment Verified!" });
@@ -114,12 +114,12 @@ export const UserBookingSuccess: React.FC = () => {
           </p>
 
           <div className="text-left mb-6 space-y-2">
-            {/* <div className="flex justify-between">
+            <div className="flex justify-between">
               <span className="text-gray-500">Payment Method</span>
               <span className="text-gray-900 font-medium">
                 {booking.paymentId.paymentMethod}
               </span>
-            </div> */}
+            </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Total Amount</span>
               <span className="text-gray-900 font-medium">

@@ -6,10 +6,6 @@ export type Role = "USER" | "ADMIN" | "TECHNICIAN";
 export type UserLikeRoles = Extract<Role, "USER" | "TECHNICIAN">;
 export type OtpPurpose = "REGISTRATION" | "PASSWORD_RESET";
 
-export interface GenericEntity {
-  [key: string]: any;
-}
-
 export interface LoginProps {
   role: Role;
   onsubmit: (values: LoginFormData) => Promise<void>;
@@ -72,16 +68,15 @@ export interface RegisterFormData {
   email: string;
   phone: string;
   password: string;
-  confirmPassword: string;
+  role: UserLikeRoles;
 }
 
 export interface RegisterResponse {
   success: boolean;
-  data?: {
+  message: string;
+  data: {
     email: string;
   };
-  message: string;
-  status: number;
 }
 
 export interface ResetPasswordData {

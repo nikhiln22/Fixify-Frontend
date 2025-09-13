@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
-import authService from "../services/authServices";
+import { authService } from "../services/authServices";
 import { Role } from "../types/auth.types";
 import { showToast } from "../utils/toast";
 import { useDispatch } from "react-redux";

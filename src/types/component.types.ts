@@ -128,8 +128,12 @@ export interface AddServiceProps {
   initialValues?: {
     _id?: string;
     serviceName?: string;
-    servicePrice?: string | number;
+    serviceType: "fixed" | "hourly";
+    servicePrice?: number;
     description?: string;
+    hourlyRate?: number;
+    estimatedTime?: number;
+    maxHours?: number;
     serviceImage?: File | string | null;
     categoryId?: string;
     designationId?: string;
@@ -153,6 +157,9 @@ export interface CardProps {
   image?: string;
   title?: string;
   price?: number;
+  serviceType?: string;
+  estimatedTime?: number;
+  hourlyRate?: number;
   type: "category" | "service";
   onClick?: () => void;
   buttonLabel?: string;

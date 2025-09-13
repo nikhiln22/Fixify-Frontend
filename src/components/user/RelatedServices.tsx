@@ -81,6 +81,9 @@ const RelatedServices: React.FC<RelatedServicesProps> = ({
                   image={buildCloudinaryUrl(service.image)}
                   title={service.name}
                   price={service.price}
+                  serviceType={service.serviceType}
+                  hourlyRate={service.hourlyRate}
+                  estimatedTime={service.estimatedTime}
                   type="service"
                   onClick={() => handleServiceClick(service)}
                   buttonLabel="Book Now"

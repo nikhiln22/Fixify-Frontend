@@ -14,12 +14,16 @@ import { showToast } from "../../../utils/toast";
 import { ReviewSection } from "../../../components/technician/ReviewSection";
 import { IRating } from "../../../models/IRating";
 import { buildCloudinaryUrl } from "../../../utils/cloudinary/cloudinary";
+import { getAddresses } from "../../../services/addressService";
+import { IAddress } from "../../../models/address";
 
 export const TechnicianProfile: React.FC = () => {
   // const dispatch = useDispatch();
   const [technicianData, setTechnicianData] = useState<Itechnician | null>(
     null
   );
+  const [technicianAddress, setTechnicianAddress] = useState<IAddress[]>([]);
+  const [addressLoading, setAddressLoading] = useState(false);
   // const [isLoading, setIsLoading] = useState(false);
 
   const [reviews, setReviews] = useState<IRating[]>([]);
@@ -64,13 +68,16 @@ export const TechnicianProfile: React.FC = () => {
 
   const fetchTechnicianProfile = async () => {
     try {
-      const response = await getTechnicianProfile("technician");
+      const response = await getTechnicianProfile();
       console.log(
         "technician profile response in the technician profile page:",
         response
       );
+
       if (response) {
         setTechnicianData(response);
+        // Fetch address for the current technician
+        fetchTechnicianAddress();
       }
     } catch (err) {
       console.error("Error fetching technician profile:", err);
@@ -78,6 +85,29 @@ export const TechnicianProfile: React.FC = () => {
         message: "Failed to load technician profile",
         type: "error",
       });
+    }
+  };
+
+  const fetchTechnicianAddress = async () => {
+    try {
+      setAddressLoading(true);
+      const response = await getAddresses();
+      console.log("Address response:", response);
+
+      if (!response.data) {
+        return;
+      }
+
+      if (response && response.data) {
+        setTechnicianAddress(response.data);
+      } else {
+        setTechnicianAddress([]);
+      }
+    } catch (err) {
+      console.error("Error fetching technician address:", err);
+      setTechnicianAddress([]);
+    } finally {
+      setAddressLoading(false);
     }
   };
 
@@ -251,33 +281,69 @@ export const TechnicianProfile: React.FC = () => {
               totalReviews={totalReviews}
             />
 
-            {technicianData.address && (
-              <div className="bg-white rounded-3xl shadow-md p-8">
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                  Work Location
-                </h2>
+            <div className="bg-white rounded-3xl shadow-md p-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                Work Locations
+              </h2>
+
+              {addressLoading ? (
+                <div className="flex items-center justify-center p-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <span className="ml-3 text-gray-600">
+                    Loading addresses...
+                  </span>
+                </div>
+              ) : technicianAddress && technicianAddress.length > 0 ? (
+                <div className="space-y-4">
+                  {technicianAddress.map((address, index) => (
+                    <div
+                      key={address._id || index}
+                      className="flex items-start p-4 bg-gray-50 rounded-xl border border-gray-200"
+                    >
+                      <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full mr-4">
+                        <MapPin className="w-5 h-5 text-black" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900 mb-2">
+                          Service Area{" "}
+                          {technicianAddress.length > 1 ? `${index + 1}` : ""}
+                        </h4>
+                        <p className="text-gray-600 leading-relaxed mb-3">
+                          {address.fullAddress || "Address not specified"}
+                        </p>
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <p className="text-sm text-blue-800">
+                            <span className="font-medium">Coverage Area:</span>{" "}
+                            You can accept service requests within 10 km radius
+                            from this location
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
                 <div className="flex items-start p-4 bg-gray-50 rounded-xl border border-gray-200">
                   <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full mr-4">
-                    <MapPin className="w-5 h-5 text-black" />
+                    <MapPin className="w-5 h-5 text-gray-400" />
                   </div>
                   <div className="flex-1">
                     <h4 className="font-semibold text-gray-900 mb-2">
                       Service Area
                     </h4>
-                    <p className="text-gray-600 leading-relaxed mb-3">
-                      {technicianData.address}
+                    <p className="text-gray-500 leading-relaxed mb-3">
+                      No addresses specified. Please update your work locations.
                     </p>
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                      <p className="text-sm text-blue-800">
-                        <span className="font-medium">Coverage Area:</span> You
-                        can accept service requests within 10 km radius from
-                        this location
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                      <p className="text-sm text-yellow-800">
+                        <span className="font-medium">Note:</span> Add your work
+                        locations to receive service requests in your areas.
                       </p>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

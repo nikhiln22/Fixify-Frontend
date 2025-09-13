@@ -37,7 +37,7 @@ export const TechnicianBookingDetail: React.FC = () => {
   const fetchBookingDetails = async () => {
     try {
       setLoading(true);
-      const response = await bookingDetails(bookingId!, "technician");
+      const response = await bookingDetails(bookingId!);
 
       if (response.success && response.data) {
         setBooking(response.data);
@@ -66,7 +66,7 @@ export const TechnicianBookingDetail: React.FC = () => {
 
   const fetchRating = async () => {
     try {
-      const ratingResponse = await getBookingRating(bookingId!, "technician");
+      const ratingResponse = await getBookingRating(bookingId!);
       console.log("Rating response:", ratingResponse);
 
       if (ratingResponse.success) {

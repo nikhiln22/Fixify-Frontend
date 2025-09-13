@@ -10,6 +10,7 @@ import { store, persistor } from "./redux/store";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { ScrollToTop } from "./components/common/ScrollToTop";
+import { PageNotFound } from "./components/common/PageNotFound";
 
 function App() {
   return (
@@ -32,12 +33,21 @@ function App() {
           />
 
           <Routes>
+            {/* Landing page */}
             <Route path="/" element={<LandingPage />} />
-          </Routes>
 
-          <UserRoutes />
-          <TechnicianRoutes />
-          <AdminRoutes />
+            {/* User routes */}
+            <Route path="/user/*" element={<UserRoutes />} />
+
+            {/* Technician routes */}
+            <Route path="/technician/*" element={<TechnicianRoutes />} />
+
+            {/* Admin routes */}
+            <Route path="/admin/*" element={<AdminRoutes />} />
+
+            {/* Catch all unmatched routes */}
+            <Route path="*" element={<PageNotFound />} />
+          </Routes>
         </BrowserRouter>
       </PersistGate>
     </Provider>

@@ -44,7 +44,7 @@ const AdminNavbar: React.FC = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await getAllUnreadNotifications("admin");
+      const response = await getAllUnreadNotifications();
       console.log(
         "response in the get all notitificatios in the admin navabr:",
         response
@@ -65,7 +65,7 @@ const AdminNavbar: React.FC = () => {
 
   const handleNotificationClick = async (notificationId: string) => {
     try {
-      const response = await markNotificationRead(notificationId, "admin");
+      const response = await markNotificationRead(notificationId);
       console.log("response from the handle notification click:", response);
 
       if (response && response.success) {

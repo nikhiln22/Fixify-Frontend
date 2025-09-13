@@ -60,9 +60,9 @@ export const AdminDashboard: React.FC = () => {
       case "daily":
         return 7;
       case "weekly":
-        return 56; // 8 weeks = 56 days
+        return 56;
       case "monthly":
-        return 365; // 12 months = 365 days
+        return 365;
       default:
         return 30;
     }
@@ -82,7 +82,6 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Handle time period change
   const handleTimePeriodChange = (period: string) => {
     setTimePeriod(period);
     fetchRevenueTrends(period);

@@ -1,10 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Register } from "../../../components/auth/Register";
-import {
-  RegisterFormData,
-} from "../../../types/auth.types";
-import authService from "../../../services/authServices";
+import { RegisterFormData } from "../../../types/auth.types";
+import { authService } from "../../../services/authServices";
 import { showToast } from "../../../utils/toast";
 
 export const TechnicianRegister: React.FC = () => {
@@ -27,7 +25,7 @@ export const TechnicianRegister: React.FC = () => {
         });
 
         const stateData = {
-          email: response?.data?.email,
+          email: response.data.email,
           action: "register",
           role: "TECHNICIAN",
         };

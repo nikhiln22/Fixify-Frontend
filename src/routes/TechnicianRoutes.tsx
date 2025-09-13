@@ -21,42 +21,32 @@ export const TechnicianRoutes: React.FC = () => {
   const user = useAppSelector(
     (state) => state.technician.technicianData?.username
   );
+
   return (
     <Routes>
       <Route element={<TechnicianPublicRoute />}>
-        <Route path="/technician/login" element={<TechnicianLogin />} />
-        <Route path="/technician/register" element={<TechnicianRegister />} />
-        <Route path="/technician/otp" element={<TechnicianOtp />} />
-        <Route
-          path="/technician/forgotpassword"
-          element={<TechnicianForgotPassword />}
-        />
-        <Route
-          path="/technician/resetpassword"
-          element={<TechnicianResetPassword />}
-        />
+        <Route path="login" element={<TechnicianLogin />} />
+        <Route path="register" element={<TechnicianRegister />} />
+        <Route path="otp" element={<TechnicianOtp />} />
+        <Route path="forgotpassword" element={<TechnicianForgotPassword />} />
+        <Route path="resetpassword" element={<TechnicianResetPassword />} />
       </Route>
 
       <Route element={<TechnicianPrivateRoute />}>
-        <Route path="/technician/portal" element={<TechnicianPortal />} />
-        <Route path="/technician/profile" element={<TechnicianProfile />} />
+        <Route path="portal" element={<TechnicianPortal />} />
+        <Route path="profile" element={<TechnicianProfile />} />
+        <Route path="availability" element={<TechnicianAvailability />} />
+        <Route path="earnings" element={<TechnicianEarnings />} />
+        <Route path="jobs" element={<TechnicianJobListing />} />
         <Route
-          path="/technician/availability"
-          element={<TechnicianAvailability />}
-        />
-        <Route path="/technician/earnings" element={<TechnicianEarnings />} />
-        <Route path="/technician/jobs" element={<TechnicianJobListing />} />
-        <Route
-          path="/technician/jobdetails/:bookingId"
+          path="jobdetails/:bookingId"
           element={<TechnicianBookingDetail />}
         />
-        <Route
-          path="/technician/subscription"
-          element={<TechnicianSubscription />}
-        />
+        <Route path="subscription" element={<TechnicianSubscription />} />
       </Route>
+
       <Route
-        path="/technician/*"
+        path="*"
         element={<PageNotFound userName={user} userRole="technician" />}
       />
     </Routes>

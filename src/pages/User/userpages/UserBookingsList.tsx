@@ -61,7 +61,7 @@ export const UserBookingsList: React.FC = () => {
     setCurrentPage,
     loading,
     error,
-  } = usePaginatedList(getBookings, "user", "", "", itemsPerPage);
+  } = usePaginatedList(getBookings, "", "", itemsPerPage);
 
   const handleViewDetails = (bookingId: string) => {
     navigate(`/user/bookings/${bookingId}`);
@@ -101,7 +101,7 @@ export const UserBookingsList: React.FC = () => {
   const fetchChatMessages = async (bookingId: string) => {
     setChatLoading(true);
     try {
-      const response = await getChatMessages(bookingId, "user");
+      const response = await getChatMessages(bookingId);
       console.log(
         "response in the userbooking list page for the chat:",
         response
@@ -214,8 +214,7 @@ export const UserBookingsList: React.FC = () => {
       const response = await createBookingRating(
         selectedRatingBooking._id,
         rating,
-        review,
-        "user"
+        review
       );
 
       if (response.success) {
@@ -262,8 +261,7 @@ export const UserBookingsList: React.FC = () => {
       try {
         const response = await cancelBooking(
           selectedBooking._id,
-          cancellationReason,
-          "user"
+          cancellationReason
         );
 
         if (response.success) {

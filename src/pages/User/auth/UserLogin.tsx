@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Login } from "../../../components/auth/Login";
-import authService from "../../../services/authServices";
+import { authService } from "../../../services/authServices";
 import { showToast } from "../../../utils/toast";
 import Cookies from "js-cookie";
 import { setUserData } from "../../../redux/slices/userSlice";

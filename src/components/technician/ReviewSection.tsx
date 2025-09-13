@@ -12,7 +12,7 @@ import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 
 interface ReviewSectionProps {
   reviews: IRating[];
-  loading: boolean;
+  loading?: boolean;
   error?: string | null;
   averageRating?: number;
   totalReviews?: number;

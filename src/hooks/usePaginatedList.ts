@@ -13,20 +13,20 @@ interface PaginatedResponse<T> {
 
 type FetchFunction<T> = (
   page: number | null,
-  role: string,
   searchQuery?: string,
   filterStatus?: string,
   limit?: number | null,
-  filterDesignation?: string
+  filterDesignation?: string,
+  serviceType?: string
 ) => Promise<PaginatedResponse<T>>;
 
 export const usePaginatedList = <T>(
   fetchFunction: FetchFunction<T>,
-  role: string,
   searchQuery: string,
   filterStatus: string,
   limit?: number | null,
-  filterDesignation?: string
+  filterDesignation?: string,
+  serviceType?: string
 ) => {
   const [data, setData] = useState<T[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -45,11 +45,11 @@ export const usePaginatedList = <T>(
     try {
       const response = await fetchFunction(
         currentPage,
-        role,
         searchQuery,
         filterStatus,
         limit,
-        filterDesignation || ""
+        filterDesignation || "",
+        serviceType || ""
       );
       setData(response.data);
       setTotalPages(response.totalPages);
@@ -65,11 +65,11 @@ export const usePaginatedList = <T>(
     }
   }, [
     currentPage,
-    role,
     searchQuery,
     filterStatus,
     filterDesignation,
     limit,
+    serviceType,
     fetchFunction,
   ]);
 

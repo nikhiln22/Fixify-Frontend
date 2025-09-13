@@ -29,19 +29,19 @@ const AdminSidebar: React.FC = () => {
       id: "users",
       label: "Users",
       icon: Users,
-      path: "/admin/userslist",
+      path: "/admin/users",
     },
     {
       id: "technicians",
       label: "Technicians",
       icon: UserCog,
-      path: "/admin/technicianlist",
+      path: "/admin/technicians",
     },
     {
       id: "applicants",
       label: "Applicants",
       icon: FileText,
-      path: "/admin/applicantslist",
+      path: "/admin/applicants",
     },
     {
       id: "jobdesignations",
@@ -93,6 +93,12 @@ const AdminSidebar: React.FC = () => {
     }
     if (item.id === "subscription Plans") {
       return location.pathname.startsWith("/admin/subscription");
+    }
+    if (item.id === "applicants") {
+      return location.pathname.startsWith("/admin/applicants");
+    }
+    if (item.id === "technicians") {
+      return location.pathname.startsWith("/admin/technicians");
     }
     return location.pathname === item.path;
   };

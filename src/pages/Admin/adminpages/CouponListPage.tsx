@@ -43,7 +43,6 @@ export const CouponListPage: React.FC = () => {
     loading,
   } = usePaginatedList(
     getAllCoupons,
-    "admin",
     searchQuery,
     filterStatus,
     itemsPerPage
@@ -94,7 +93,6 @@ export const CouponListPage: React.FC = () => {
         const response = await updateCoupon(
           selectedCoupon._id,
           couponData,
-          "admin"
         );
         if (response && coupons) {
           setCoupons(
@@ -108,7 +106,7 @@ export const CouponListPage: React.FC = () => {
           });
         }
       } else {
-        const response = await addCoupon(couponData, "admin");
+        const response = await addCoupon(couponData);
         if (response && coupons) {
           const firstPageItems = [
             response.data,
@@ -144,7 +142,7 @@ export const CouponListPage: React.FC = () => {
 
   const handleStatusToggle = async (couponId: string) => {
     try {
-      const result = await toggleCouponStatus(couponId, "admin");
+      const result = await toggleCouponStatus(couponId);
       console.log("result from toggling the coupon status:", result);
       if (result) {
         setCoupons((prevCoupons) =>

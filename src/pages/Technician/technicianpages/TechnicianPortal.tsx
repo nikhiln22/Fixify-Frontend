@@ -61,7 +61,6 @@ export const TechnicianPortal: React.FC = () => {
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [showQualificationForm, setShowQualificationForm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [designations, setDesignations] = useState<
@@ -108,7 +107,7 @@ export const TechnicianPortal: React.FC = () => {
   const fetchDesignations = async () => {
     try {
       setDesignationsLoading(true);
-      const response = await getAllDesignations(null, "technician", "", "");
+      const response = await getAllDesignations(null, "", "");
       console.log("Designations response in portal:", response);
 
       const designationsData = Array.isArray(response)
@@ -247,7 +246,7 @@ export const TechnicianPortal: React.FC = () => {
     const fetchTechnicianProfile = async () => {
       try {
         setIsLoading(true);
-        const response = await getTechnicianProfile("technician");
+        const response = await getTechnicianProfile();
         console.log(
           "technician profile in the technician portal page:",
           response
@@ -255,9 +254,7 @@ export const TechnicianPortal: React.FC = () => {
 
         if (response) {
           const isVerifiedFromDB = response.is_verified || false;
-          const isEmailVerifiedFromDB = response.email_verified || false;
           setIsVerified(isVerifiedFromDB);
-          setIsEmailVerified(isEmailVerifiedFromDB);
 
           const hasQualifications = !!(
             response.yearsOfExperience ||
@@ -334,7 +331,6 @@ export const TechnicianPortal: React.FC = () => {
           About: response.technician.About,
           image: response.technician.image,
           certificates: response.technician.certificates,
-          emailemail_verified: response.technician.email_verified,
         };
         console.log("Dispatching updateTechnicianData with:", technicianData);
         dispatch(updateTechnicianData(technicianData));
@@ -419,31 +415,28 @@ export const TechnicianPortal: React.FC = () => {
         </div>
       )}
 
-      {!isLoading &&
-        isEmailVerified &&
-        !isVerified &&
-        !showQualificationForm && (
-          <div className="flex flex-col items-center">
-            <h1 className="text-3xl font-bold text-center mb-12">
-              Welcome to Technician Portal
-            </h1>
+      {!isLoading && !isVerified && !showQualificationForm && (
+        <div className="flex flex-col items-center">
+          <h1 className="text-3xl font-bold text-center mb-12">
+            Welcome to Technician Portal
+          </h1>
 
-            <VerificationBanner
-              isVerified={isVerified}
-              isSubmitted={isSubmitted}
-              onStartVerification={handleStartVerification}
-            />
+          <VerificationBanner
+            isVerified={isVerified}
+            isSubmitted={isSubmitted}
+            onStartVerification={handleStartVerification}
+          />
 
-            {!isSubmitted && (
-              <div className="mt-8 text-center max-w-2xl">
-                <p className="text-gray-700">
-                  Complete your verification to access all features of the
-                  technician portal.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
+          {!isSubmitted && (
+            <div className="mt-8 text-center max-w-2xl">
+              <p className="text-gray-700">
+                Complete your verification to access all features of the
+                technician portal.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </TechnicianLayout>
   );
 };

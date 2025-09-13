@@ -37,7 +37,6 @@ export const SubscriptionHistory: React.FC = () => {
     loading,
   } = usePaginatedList(
     getAllSubscriptionPlansHistory,
-    "admin",
     searchQuery,
     filterStatus,
     itemsPerPage

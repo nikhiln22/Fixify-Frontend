@@ -71,19 +71,76 @@ export const addServiceSchema = Yup.object().shape({
     .min(2, "Service name must be at least 2 characters")
     .max(50, "Service name must not exceed 50 characters")
     .matches(
-      /^[a-zA-Z0-9\s-]+$/,
-      "Service name can only contain letters, numbers, spaces, and hyphens"
+      /^[a-zA-Z0-9\s\-&\/\\]+$/,
+      "Service name can only contain letters, numbers, spaces, hyphens, ampersands (&), and slashes"
     ),
 
-  servicePrice: Yup.number()
-    .required("Service price is required")
-    .typeError("Price must be a number")
-    .positive("Price must be a positive number")
-    .test(
-      "maxDigits",
-      "Price cannot exceed 6 digits",
-      (value) => !value || String(value).replace(/[.-]/g, "").length <= 6
+  serviceType: Yup.string()
+    .required("Service type is required")
+    .oneOf(
+      ["fixed", "hourly"],
+      "Service type must be either 'fixed' or 'hourly'"
     ),
+
+  servicePrice: Yup.number().when("serviceType", {
+    is: "fixed",
+    then: (schema) =>
+      schema
+        .required("Service price is required for fixed price services")
+        .typeError("Price must be a number")
+        .positive("Price must be a positive number")
+        .test(
+          "maxDigits",
+          "Price cannot exceed 6 digits",
+          (value) => !value || String(value).replace(/[.-]/g, "").length <= 6
+        ),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+
+  estimatedTime: Yup.number().when("serviceType", {
+    is: "fixed",
+    then: (schema) =>
+      schema
+        .required("Estimated time is required for fixed price services")
+        .typeError("Estimated time must be a number")
+        .positive("Estimated time must be a positive number")
+        .min(1, "Estimated time must be at least 1 minute")
+        .max(43200, "Estimated time cannot exceed 30 days (43200 minutes)")
+        .integer("Estimated time must be a whole number"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+
+  hourlyRate: Yup.number().when("serviceType", {
+    is: "hourly",
+    then: (schema) =>
+      schema
+        .required("Hourly rate is required for hourly rate services")
+        .typeError("Hourly rate must be a number")
+        .positive("Hourly rate must be a positive number")
+        .test(
+          "maxDigits",
+          "Hourly rate cannot exceed 6 digits",
+          (value) => !value || String(value).replace(/[.-]/g, "").length <= 6
+        ),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+
+  maxHours: Yup.number().when("serviceType", {
+    is: "hourly",
+    then: (schema) =>
+      schema
+        .required("Maximum hours is required for hourly rate services")
+        .typeError("Maximum hours must be a number")
+        .positive("Maximum hours must be a positive number")
+        .min(1, "Maximum hours must be at least 1 hour")
+        .max(168, "Maximum hours cannot exceed 168 hours (1 week)")
+        .test(
+          "decimal",
+          "Maximum hours can have at most 2 decimal places",
+          (value) => !value || /^\d+(\.\d{1,2})?$/.test(String(value))
+        ),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 
   description: Yup.string()
     .trim()
@@ -92,6 +149,7 @@ export const addServiceSchema = Yup.object().shape({
     .max(500, "Description must not exceed 500 characters"),
 
   categoryId: Yup.string().required("Category selection is required"),
+
   designationId: Yup.string().required("Job designation is required"),
 
   serviceImage: Yup.mixed()

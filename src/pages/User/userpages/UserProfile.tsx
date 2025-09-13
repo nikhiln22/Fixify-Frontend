@@ -6,10 +6,10 @@ import { AddressManager } from "../../../components/user/AddressManager";
 import { getUserProfile, editProfile } from "../../../services/userServices";
 import {
   addAddress,
-  getUserAddresses,
+  getAddresses,
   updateAddress,
   deleteAddress,
-} from "../../../services/userServices";
+} from "../../../services/addressService";
 import { Iuser } from "../../../models/user";
 import { IAddress } from "../../../models/address";
 import { updateUserData } from "../../../redux/slices/userSlice";
@@ -46,7 +46,7 @@ export const UserProfile: React.FC = () => {
 
   const fetchUserAddresses = async () => {
     try {
-      const addresses = await getUserAddresses();
+      const addresses = await getAddresses();
       console.log("address fetched in the userprofile component:", addresses);
 
       setUserAddresses(addresses.data || []);

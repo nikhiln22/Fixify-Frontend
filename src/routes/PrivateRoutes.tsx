@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import authService from "../services/authServices";
+import { authService } from "../services/authServices";
 import { PrivateRouteProps } from "../types/component.types";
 import cookie from "js-cookie";
 

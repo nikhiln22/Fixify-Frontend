@@ -48,13 +48,7 @@ export const OfferListPage: React.FC = () => {
     totalPages,
     setCurrentPage,
     loading,
-  } = usePaginatedList(
-    getAllOffers,
-    "admin",
-    searchQuery,
-    filterStatus,
-    itemsPerPage
-  );
+  } = usePaginatedList(getAllOffers, searchQuery, filterStatus, itemsPerPage);
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -62,7 +56,7 @@ export const OfferListPage: React.FC = () => {
       setServiceError(null);
 
       try {
-        const servicesResponse = await getAllCategories(null, "admin", "", "");
+        const servicesResponse = await getAllCategories(null, "", "");
         console.log("Services response:", servicesResponse);
 
         const serviceOptions = servicesResponse.data.map(
@@ -125,11 +119,7 @@ export const OfferListPage: React.FC = () => {
     setIsLoading(true);
     try {
       if (selectedOffer) {
-        const response = await updateOffer(
-          selectedOffer._id,
-          offerData,
-          "admin"
-        );
+        const response = await updateOffer(selectedOffer._id, offerData);
         if (response && offers) {
           setOffers(
             offers.map((offer) =>
@@ -142,7 +132,7 @@ export const OfferListPage: React.FC = () => {
           });
         }
       } else {
-        const response = await addOffer(offerData, "admin");
+        const response = await addOffer(offerData);
         if (response && offers) {
           const firstPageItems = [
             response.data,
@@ -178,7 +168,7 @@ export const OfferListPage: React.FC = () => {
 
   const handleStatusToggle = async (offerId: string) => {
     try {
-      const result = await toggleOfferStatus(offerId, "admin");
+      const result = await toggleOfferStatus(offerId);
       console.log("result from toggling the offer status:", result);
       if (result) {
         setOffers((prevOffers) =>

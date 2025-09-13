@@ -12,14 +12,7 @@ export const Otp: React.FC<OtpProps> = ({ role, onVerifyOtp, onResendOtp }) => {
   const location = useLocation();
 
   const email = location.state?.email || "";
-  const tempUserId = location.state?.tempUserId || "";
-  const tempTechnicianId = location.state?.tempTechnicianId || "";
   const actionFromState = location.state?.action || "register";
-
-  console.log("email in the otp component:", email);
-  console.log("tempUserId in the otp component:", tempUserId);
-  console.log("tempTechnicianId in the otp component:", tempTechnicianId);
-  console.log("actionFromState in the otp component:", actionFromState);
 
   const otpPurpose: OtpPurpose =
     actionFromState === "forgot" ? "PASSWORD_RESET" : "REGISTRATION";

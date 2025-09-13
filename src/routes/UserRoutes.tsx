@@ -25,35 +25,33 @@ export const UserRoutes: React.FC = () => {
 
   return (
     <Routes>
-      {/* user public routes */}
       <Route element={<UserPublicRoute />}>
-        <Route path="/user/login" element={<UserLogin />} />
-        <Route path="/user/register" element={<UserRegister />} />
-        <Route path="/user/otp" element={<UserOtp />} />
-        <Route path="/user/forgotpassword" element={<UserForgotPassword />} />
-        <Route path="/user/resetpassword" element={<UserResetPassword />} />
+        <Route path="login" element={<UserLogin />} />
+        <Route path="register" element={<UserRegister />} />
+        <Route path="otp" element={<UserOtp />} />
+        <Route path="forgotpassword" element={<UserForgotPassword />} />
+        <Route path="resetpassword" element={<UserResetPassword />} />
       </Route>
 
-      {/* user private routes */}
       <Route element={<UserPrivateRoute />}>
-        <Route path="/user/home" element={<UserHome />} />
-        <Route path="/user/categories" element={<UserCategory />} />
-        <Route path="/user/services/:categoryId" element={<UserService />} />
+        <Route path="home" element={<UserHome />} />
+        <Route path="categories" element={<UserCategory />} />
+        <Route path="services" element={<UserService />} />
+        <Route path="services/:categoryId" element={<UserService />} />
         <Route
-          path="/user/servicedetails/:serviceId"
+          path="servicedetails/:serviceId"
           element={<UserServiceDetails />}
         />
-        <Route path="/user/profile" element={<UserProfile />} />
-        <Route path="/user/booking" element={<UserBooking />} />
-        <Route path="/user/bookingsuccess" element={<UserBookingSuccess />} />
-        <Route path="/user/bookings" element={<UserBookingsList />} />
-        <Route path="/user/bookings/:id" element={<BookingDetailsPage />} />
-        <Route path="/user/wallet" element={<UserWallet />} />
+        <Route path="profile" element={<UserProfile />} />
+        <Route path="booking" element={<UserBooking />} />
+        <Route path="bookingsuccess" element={<UserBookingSuccess />} />
+        <Route path="bookings" element={<UserBookingsList />} />
+        <Route path="bookings/:id" element={<BookingDetailsPage />} />
+        <Route path="wallet" element={<UserWallet />} />
       </Route>
 
-      {/* page not found */}
       <Route
-        path="/user/*"
+        path="*"
         element={<PageNotFound userName={user?.username} userRole="user" />}
       />
     </Routes>

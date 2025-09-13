@@ -37,7 +37,6 @@ export const BookingsListPage: React.FC = () => {
     error,
   } = usePaginatedList(
     getBookings,
-    "admin",
     searchQuery,
     filterStatus,
     itemsPerPage

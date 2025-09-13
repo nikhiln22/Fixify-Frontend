@@ -1,9 +1,17 @@
 export const USER_API = "/api/user";
 export const ADMIN_API = "/api/admin";
 export const TECHNICIAN_API = "/api/technician";
-
-export const getApiRoute = (role: string) => {
-  if (role === "user") return USER_API;
-  if (role === "technician") return TECHNICIAN_API;
-  if (role === "admin") return ADMIN_API;
-};
+export const APPLICANTS_API = "/api/applicants";
+export const AUTH_API = "/api/auth";
+export const ADDRESSES_API = "/api/addresses";
+export const WALLET_API = "/api/wallet";
+export const NOTIFICATIONS_API = "/api/notifications";
+export const CHAT_API = "/api/chats";
+export const CATEGORIES_API = "/api/categories";
+export const SERVICES_API = "/api/services";
+export const BOOKINGS_API = "/api/bookings";
+export const DESIGNATIONS_API = "/api/designations";
+export const TIMESLOTS_API = "/api/timeslots";
+export const OFFERS_API = "/api/offers";
+export const COUPONS_API = "/api/coupons";
+export const SUBSCRIPTION_PLANS_API = "/api/subscription-plans";

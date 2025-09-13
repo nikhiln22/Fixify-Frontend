@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { MapPin } from "lucide-react";
 import AdminLayout from "../../../layouts/AdminLayout";
 import { useNavigate, useParams } from "react-router-dom";
-import { getTechnicianProfile } from "../../../services/technicianServices";
 import { Itechnician } from "../../../models/technician";
 import { ProfileCard } from "../../../components/common/ProfileCard";
 import { TechnicianAboutSection } from "../../../components/technician/AboutSection";
@@ -10,17 +9,20 @@ import { TechnicianCertificatesSection } from "../../../components/technician/Ce
 import Modal from "../../../components/common/Modal";
 import Button from "../../../components/common/Button";
 import {
-  approveTechnicians,
-  rejectTechnician,
-} from "../../../services/technicianServices";
+  applicantDetails,
+  approveApplicant,
+  rejectApplicant,
+} from "../../../services/applicantService";
 import { showToast } from "../../../utils/toast";
 import { buildCloudinaryUrl } from "../../../utils/cloudinary/cloudinary";
+import { IAddress } from "../../../models/address";
 
-export const ApplicantDetailsPreview: React.FC = () => {
+export const ApplicantDetails: React.FC = () => {
   const [selectedCertificate, setSelectedCertificate] = useState<string | null>(
     null
   );
   const [applicant, setApplicant] = useState<Itechnician | null>(null);
+  const [applicantAddress, setApplicantAddress] = useState<IAddress[]>([]);
 
   const navigate = useNavigate();
   const { applicantId } = useParams<{ applicantId: string }>();
@@ -32,14 +34,21 @@ export const ApplicantDetailsPreview: React.FC = () => {
       }
 
       try {
-        const response = await getTechnicianProfile("admin", applicantId);
+        const response = await applicantDetails(applicantId);
         console.log(
           "response from the applicant details preview page:",
           response
         );
-        setApplicant(response);
+        if (response.success && response.data) {
+          setApplicant(response.data);
+          setApplicantAddress(response.data.addresses || []);
+        }
       } catch (err) {
         console.error("Error fetching applicant details:", err);
+        showToast({
+          message: "Failed to load applicant details",
+          type: "error",
+        });
       }
     };
 
@@ -50,12 +59,12 @@ export const ApplicantDetailsPreview: React.FC = () => {
     if (!applicantId) return;
 
     try {
-      await approveTechnicians(applicantId, "admin");
+      await approveApplicant(applicantId);
       showToast({
         message: "Technician approved successfully",
         type: "success",
       });
-      navigate("/admin/technicianlist");
+      navigate("/admin/technicians");
     } catch (error) {
       console.error("Error approving technician:", error);
       showToast({
@@ -69,7 +78,7 @@ export const ApplicantDetailsPreview: React.FC = () => {
     if (!applicantId) return;
 
     try {
-      await rejectTechnician(applicantId, "admin");
+      await rejectApplicant(applicantId);
       showToast({
         message: "Applicant application rejected",
         type: "success",
@@ -101,15 +110,13 @@ export const ApplicantDetailsPreview: React.FC = () => {
     );
   }
 
-  const pageTitle = applicant.is_verified
-    ? "Technician Details"
-    : "Technician Application Details";
-
   return (
     <AdminLayout>
       <div className="space-y-8">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">{pageTitle}</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Applicant Details
+          </h1>
           <Button onClick={handleBack} variant="outline" className="px-6 py-2">
             Back
           </Button>
@@ -147,33 +154,63 @@ export const ApplicantDetailsPreview: React.FC = () => {
           isEditable={false}
         />
 
-        {applicant.address && (
-          <div className="bg-white rounded-3xl shadow-md p-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
-              Work Location
-            </h2>
+        <div className="bg-white rounded-3xl shadow-md p-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">
+            Work Locations
+          </h2>
+
+          {applicantAddress && applicantAddress.length > 0 ? (
+            <div className="space-y-4">
+              {applicantAddress.map((address, index) => (
+                <div
+                  key={address._id || index}
+                  className="flex items-start p-4 bg-gray-50 rounded-xl border border-gray-200"
+                >
+                  <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full mr-4">
+                    <MapPin className="w-5 h-5 text-black" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900 mb-2">
+                      Service Area{" "}
+                      {applicantAddress.length > 1 ? `${index + 1}` : ""}
+                    </h4>
+                    <p className="text-gray-600 leading-relaxed mb-3">
+                      {address.fullAddress || "Address not specified"}
+                    </p>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <p className="text-sm text-blue-800">
+                        <span className="font-medium">Coverage Area:</span> This
+                        technician can accept service requests within 10 km
+                        radius from this location
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
             <div className="flex items-start p-4 bg-gray-50 rounded-xl border border-gray-200">
               <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full mr-4">
-                <MapPin className="w-5 h-5 text-black" />
+                <MapPin className="w-5 h-5 text-gray-400" />
               </div>
               <div className="flex-1">
                 <h4 className="font-semibold text-gray-900 mb-2">
                   Service Area
                 </h4>
-                <p className="text-gray-600 leading-relaxed mb-3">
-                  {applicant.address}
+                <p className="text-gray-500 leading-relaxed mb-3">
+                  This applicant has not specified any work locations yet.
                 </p>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <p className="text-sm text-blue-800">
-                    <span className="font-medium">Coverage Area:</span> This
-                    technician can accept service requests within 10 km radius
-                    from this location
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <p className="text-sm text-yellow-800">
+                    <span className="font-medium">Note:</span> This applicant
+                    has not added work locations. They will need to add
+                    locations to receive service requests.
                   </p>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {!applicant.is_verified && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

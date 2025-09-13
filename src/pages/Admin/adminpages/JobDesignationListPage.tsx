@@ -41,7 +41,6 @@ export const JobDesignationListPage: React.FC = () => {
     loading,
   } = usePaginatedList<Idesignation>(
     getAllDesignations,
-    "admin",
     searchQuery,
     filterStatus,
     itemsPerPage,
@@ -50,7 +49,7 @@ export const JobDesignationListPage: React.FC = () => {
 
   const handleStatusToggle = async (designationId: string) => {
     try {
-      const result = await toggleDesignationStatus(designationId, "admin");
+      const result = await toggleDesignationStatus(designationId);
       console.log("result from the job designation list page:", result);
       if (result) {
         setDesignations((prevDesignations) =>
@@ -104,7 +103,7 @@ export const JobDesignationListPage: React.FC = () => {
   const handleSubmitDesignation = async (designation: string) => {
     setIsSubmitting(true);
     try {
-      const newDesignation = await addJobDesignation(designation, "admin");
+      const newDesignation = await addJobDesignation(designation);
 
       console.log(
         "added new designation in the job designation listing page:",

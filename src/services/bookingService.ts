@@ -1,5 +1,5 @@
 import axiosInstance from "../config/axios.config";
-import { getApiRoute } from "../constants/apiRoutes";
+import { BOOKINGS_API } from "../constants/apiRoutes";
 import { IBooking } from "../models/booking";
 import {
   BookingDetailsResponse,
@@ -8,15 +8,10 @@ import {
 } from "../types/user.types";
 
 export const bookService = async (
-  bookingData: CreateBookingRequest,
-  role: string
+  bookingData: CreateBookingRequest
 ): Promise<BookServiceResponse> => {
   try {
-    const apiRoute = getApiRoute(role);
-    const response = await axiosInstance.post(
-      `${apiRoute}/bookservice`,
-      bookingData
-    );
+    const response = await axiosInstance.post(`${BOOKINGS_API}`, bookingData);
     return response.data;
   } catch (error) {
     console.log("error occured while booking the service by the user:", error);
@@ -24,11 +19,10 @@ export const bookService = async (
   }
 };
 
-export const verifyPaymentSession = async (sessionId: string, role: string) => {
+export const verifyPaymentSession = async (sessionId: string) => {
   try {
-    const apiRoute = getApiRoute(role);
     const response = await axiosInstance.get(
-      `${apiRoute}/verifypayment/${sessionId}`
+      `${BOOKINGS_API}/${sessionId}/verify-payment`
     );
     return response.data;
   } catch (error) {
@@ -40,13 +34,11 @@ export const verifyPaymentSession = async (sessionId: string, role: string) => {
 export const createBookingRating = async (
   bookingId: string,
   rating: number,
-  review: string,
-  role: string
+  review: string
 ) => {
   try {
-    const apiRoute = getApiRoute(role);
     const response = await axiosInstance.post(
-      `${apiRoute}/rateservice/${bookingId}`,
+      `${BOOKINGS_API}/${bookingId}/rate`,
       { rating, review }
     );
     return response.data;
@@ -58,13 +50,11 @@ export const createBookingRating = async (
 
 export const cancelBooking = async (
   bookingId: string,
-  cancellationReason: string,
-  role: string
+  cancellationReason: string
 ) => {
   try {
-    const apiRoute = getApiRoute(role);
     const response = await axiosInstance.put(
-      `${apiRoute}/cancelbooking/${bookingId}`,
+      `${BOOKINGS_API}/${bookingId}/cancel`,
       {
         cancellationReason,
       }
@@ -80,7 +70,6 @@ export const cancelBooking = async (
 
 export const getBookings = async (
   page: number | null,
-  role: string,
   search?: string,
   filterStatus?: string,
   limit?: number | null
@@ -91,7 +80,7 @@ export const getBookings = async (
   total: number;
 }> => {
   try {
-    console.log(`fetching the bookings for ${role}`);
+    console.log(`fetching the bookings`);
 
     let queryParams = "";
     if (page !== null && limit !== null) {
@@ -107,8 +96,8 @@ export const getBookings = async (
     }
 
     const url = queryParams
-      ? `${getApiRoute(role)}/bookings?${queryParams}`
-      : `${getApiRoute(role)}/bookings`;
+      ? `${BOOKINGS_API}?${queryParams}`
+      : `${BOOKINGS_API}`;
 
     const response = await axiosInstance.get(url);
 
@@ -119,7 +108,7 @@ export const getBookings = async (
       total: response.data.data?.pagination?.total || 0,
     };
   } catch (error) {
-    console.error(`error fetching the bookings for ${role}:`, error);
+    console.error(`error fetching the bookings`, error);
     return {
       data: [],
       totalPages: 0,
@@ -130,14 +119,10 @@ export const getBookings = async (
 };
 
 export const bookingDetails = async (
-  bookingId: string,
-  role: string
+  bookingId: string
 ): Promise<BookingDetailsResponse> => {
   try {
-    let apiRoute = getApiRoute(role);
-    const response = await axiosInstance.get(
-      `${apiRoute}/bookingdetails/${bookingId}`
-    );
+    const response = await axiosInstance.get(`${BOOKINGS_API}/${bookingId}`);
     return response.data;
   } catch (error) {
     console.log("error occured while booking the service by the user:", error);
@@ -145,17 +130,39 @@ export const bookingDetails = async (
   }
 };
 
-export const getBookingRating = async (bookingId: string, role: string) => {
+export const getBookingRating = async (bookingId: string) => {
   try {
     const response = await axiosInstance.get(
-      `${getApiRoute(role)}/rating/${bookingId}`
+      `${BOOKINGS_API}/${bookingId}/rating`
     );
     return response.data;
   } catch (error) {
-    console.error(
-      `error occured while fetching the rating for ${role}:`,
-      error
+    console.error(`error occured while fetching the rating`, error);
+    throw error;
+  }
+};
+
+export const generateCompletionOtp = async (bookingId: string) => {
+  try {
+    const response = await axiosInstance.post(
+      `${BOOKINGS_API}/${bookingId}/generate-completion-otp`
     );
+    return response;
+  } catch (error) {
+    console.log("error occured while genertaing the completion otp:", error);
+    throw error;
+  }
+};
+
+export const verifyCompletionOtp = async (bookingId: string, otp: string) => {
+  try {
+    const response = await axiosInstance.post(
+      `${BOOKINGS_API}/${bookingId}/verify-completion-otp`,
+      { otp }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occured while veryfying the completion otp:", error);
     throw error;
   }
 };

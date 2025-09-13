@@ -2,20 +2,13 @@ import axiosInstance from "../config/axios.config";
 import { Itechnician } from "../models/technician";
 import { Iuser } from "../models/user";
 import { GetTimeSlotResponse } from "../types/technicians.types";
-import {
-  UserProfileResponse,
-  AddAddressData,
-  AddAddressResponse,
-  UpdateAddressResponse,
-  DeleteAddressResponse,
-  getAddressResponse,
-} from "../types/user.types";
-import { getApiRoute, USER_API } from "../constants/apiRoutes";
+import { UserProfileResponse } from "../types/user.types";
+import { USER_API } from "../constants/apiRoutes";
 
 export const getUserProfile = async (): Promise<UserProfileResponse> => {
   try {
     console.log("fetching the profile of the user in user service:");
-    const response = await axiosInstance.get(`${USER_API}/profile`);
+    const response = await axiosInstance.get(`${USER_API}/me`);
     return response.data;
   } catch (error) {
     console.log("error occured while fetching the user profile:", error);
@@ -25,73 +18,14 @@ export const getUserProfile = async (): Promise<UserProfileResponse> => {
 
 export const editProfile = async (formData: FormData): Promise<Iuser> => {
   try {
-    const response = await axiosInstance.put(
-      `${USER_API}/updateprofile`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await axiosInstance.put(`${USER_API}/me`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response.data.user;
   } catch (error) {
     console.log("error occurred while updating the user profile:", error);
-    throw error;
-  }
-};
-
-export const addAddress = async (
-  addressData: Partial<AddAddressData>
-): Promise<AddAddressResponse> => {
-  try {
-    const response = await axiosInstance.post(
-      `${USER_API}/addaddress`,
-      addressData
-    );
-    return response.data;
-  } catch (error) {
-    console.log("error occurred while adding address:", error);
-    throw error;
-  }
-};
-
-export const getUserAddresses = async (): Promise<getAddressResponse> => {
-  try {
-    const response = await axiosInstance.get(`${USER_API}/address`);
-    return response.data;
-  } catch (error) {
-    console.log("error occurred while fetching addresses:", error);
-    throw error;
-  }
-};
-
-export const updateAddress = async (
-  addressId: string,
-  addressData: Partial<AddAddressData>
-): Promise<UpdateAddressResponse> => {
-  try {
-    const response = await axiosInstance.put(
-      `${USER_API}/updateaddress/${addressId}`,
-      addressData
-    );
-    return response.data;
-  } catch (error) {
-    console.log("error occurred while updating address:", error);
-    throw error;
-  }
-};
-
-export const deleteAddress = async (
-  addressId: string
-): Promise<DeleteAddressResponse> => {
-  try {
-    const response = await axiosInstance.delete(
-      `${USER_API}/deleteaddress/${addressId}`
-    );
-    return response.data;
-  } catch (error) {
-    console.log("error occurred while deleting address:", error);
     throw error;
   }
 };
@@ -138,58 +72,8 @@ export const getTimeSlots = async (
   }
 };
 
-export const getAllOffers = async () => {
-  try {
-    const response = await axiosInstance.get(`${USER_API}/offers`);
-    return response.data;
-  } catch (error) {
-    console.log("error occured while fetching all the offers:", error);
-  }
-};
-
-export const applyBestOffer = async (
-  serviceId: string,
-  totalAmount: number
-) => {
-  try {
-    const response = await axiosInstance.post(`${USER_API}/applybestoffer`, {
-      serviceId,
-      totalAmount,
-    });
-    return response.data;
-  } catch (error) {
-    console.log("error occured while applying the best offer:", error);
-  }
-};
-
-export const getEligibleCoupons = async (serviceId: string) => {
-  try {
-    const response = await axiosInstance.get(`${USER_API}/coupons`, {
-      params: {
-        serviceId: serviceId,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.log("error fetching while fetching the coupons:", error);
-  }
-};
-
-export const applyCoupon = async (serviceId: string, couponId: string) => {
-  try {
-    const response = await axiosInstance.post(`${USER_API}/applycoupon`, {
-      serviceId,
-      couponId,
-    });
-    return response.data;
-  } catch (error) {
-    console.log("error occured while applying the coupons:", error);
-  }
-};
-
 export const getAllUsers = async (
   page: number | null,
-  role: string,
   search?: string,
   filterStatus?: string,
   limit?: number | null
@@ -200,7 +84,6 @@ export const getAllUsers = async (
   total: number;
 }> => {
   try {
-    let apiRoute = getApiRoute(role);
     let queryParams = "";
     if (
       page !== undefined &&
@@ -217,9 +100,7 @@ export const getAllUsers = async (
         queryParams += `&status=${encodeURIComponent(filterStatus)}`;
       }
     }
-    const url = queryParams
-      ? `${apiRoute}/userslist?${queryParams}`
-      : `${apiRoute}/userslist`;
+    const url = queryParams ? `${USER_API}/?${queryParams}` : `${USER_API}`;
     const response = await axiosInstance.get(url);
     console.log("users response:", response);
     return {
@@ -239,12 +120,9 @@ export const getAllUsers = async (
   }
 };
 
-export const toggleUserStatus = async (userId: string, role: string) => {
+export const toggleUserStatus = async (userId: string) => {
   try {
-    const apiRoute = getApiRoute(role);
-    const response = await axiosInstance.patch(
-      `${apiRoute}/blockuser/${userId}`
-    );
+    const response = await axiosInstance.patch(`${USER_API}/${userId}/block`);
     return response.data;
   } catch (error) {
     console.log("error toggling user status:", error);

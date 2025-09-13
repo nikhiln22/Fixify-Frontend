@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Otp } from "../../../components/auth/Otp";
-import authService from "../../../services/authServices";
+import { authService } from "../../../services/authServices";
 import { showToast } from "../../../utils/toast";
 import { OtpPurpose, OTPVerification } from "../../../types/auth.types";
 
@@ -19,6 +19,8 @@ export const UserOtp: React.FC = () => {
         otp: values.otp,
         purpose,
       };
+
+      console.log("data in the userotp page:",data);
 
       const response = await authService.verifyOtp(data, "USER", purpose);
 
