@@ -82,7 +82,7 @@ export const UserServiceDetails: React.FC = () => {
         console.log("Starting to fetch technicians...");
 
         const techniciansList = await getNearbyTechnicians(
-          serviceData.designation,
+          serviceData.designation._id,
           address.latitude,
           address.longitude,
           10
