@@ -144,7 +144,6 @@ export const QualificationForm: React.FC<QualificationFormProps> = ({
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 placeholder="e.g. 5"
-                required={true}
                 error={
                   formik.touched.experience && formik.errors.experience
                     ? formik.errors.experience

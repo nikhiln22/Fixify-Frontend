@@ -22,7 +22,11 @@ export const Register: React.FC<RegisterProps> = ({ role, onSubmit }) => {
     validationSchema: registerValidationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        await onSubmit(values);
+        const formData = {
+          ...values,
+          role: role,
+        };
+        await onSubmit(formData);
       } catch (error) {
         console.error("Registration error:", error);
       } finally {
@@ -143,7 +147,6 @@ export const Register: React.FC<RegisterProps> = ({ role, onSubmit }) => {
               error={formik.errors.confirmPassword}
               touched={formik.touched.confirmPassword}
               onBlur={formik.handleBlur}
-              required
               showToggle
             />
           </motion.div>

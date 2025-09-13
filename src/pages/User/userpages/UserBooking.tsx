@@ -14,12 +14,12 @@ import {
   PaymentMethod,
 } from "../../../components/user/PaymentMethodSelector";
 import Button from "../../../components/common/Button";
+import { getTimeSlots } from "../../../services/userServices";
+import { applyBestOffer } from "../../../services/offerService";
 import {
-  applyBestOffer,
-  getTimeSlots,
   getEligibleCoupons,
   applyCoupon,
-} from "../../../services/userServices";
+} from "../../../services/couponService";
 import { bookService } from "../../../services/bookingService";
 import { ITimeSlot } from "../../../models/timeslot";
 import {
@@ -281,7 +281,7 @@ export const UserBooking: React.FC = () => {
 
       console.log("Sending booking data to backend:", bookingData);
 
-      const response = await bookService(bookingData, "user");
+      const response = await bookService(bookingData);
 
       if (response.success && response.data) {
         dispatch(clearCouponData());

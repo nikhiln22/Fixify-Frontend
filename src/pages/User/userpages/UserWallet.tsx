@@ -28,7 +28,7 @@ export const UserWallet: React.FC = () => {
   const fetchWalletBalance = async () => {
     try {
       setIsLoadingBalance(true);
-      const response = await walletBalance("user");
+      const response = await walletBalance();
       setBalance(response.data.balance);
     } catch (error) {
       console.error("Error fetching wallet balance:", error);
@@ -51,7 +51,6 @@ export const UserWallet: React.FC = () => {
     error,
   } = usePaginatedList<IWalletTransaction>(
     getWalletTransactions,
-    "user",
     "",
     "",
     itemsPerPage
@@ -68,7 +67,7 @@ export const UserWallet: React.FC = () => {
       setSearchParams(searchParams);
 
       setIsVerifying(true);
-      verifyWalletSession("user", sessionId)
+      verifyWalletSession(sessionId)
         .then((res) => {
           if (res?.success) {
             showToast({
@@ -110,7 +109,7 @@ export const UserWallet: React.FC = () => {
 
   const handleAddMoney = async (amount: number) => {
     try {
-      const response = await addMoney("user", amount);
+      const response = await addMoney(amount);
       console.log("response after adding the money to the wallet:", response);
       if (
         response.success &&

@@ -5,12 +5,12 @@ import { TechnicianProfileSidebar } from "../../../components/technician/Technic
 import { CurrentSubscriptionPlan } from "../../../components/technician/CurrentSubscriptionPlan";
 import SubscriptionPlansModal from "../../../components/technician/SubscriptionPlansModal";
 import {
-  getActiveSubscriptionPlan,
-  getSubscriptionHistory,
+  getTechnicianActiveSubscriptionPlan,
+  getAllSubscriptionPlansHistory,
   getAllSubscriptionPlans,
   purchaseSubscription,
   verifyPurchase,
-} from "../../../services/technicianServices";
+} from "../../../services/subscriptionPlanService";
 import Table from "../../../components/common/Table";
 import Pagination from "../../../components/common/Pagination";
 import { getSubscriptionPlanHistoryColumns } from "../../../constants/tablecolumns/SubscriptionPlanHistoryColumn";
@@ -125,7 +125,7 @@ export const TechnicianSubscription: React.FC = () => {
     if (success !== "true") {
       const fetchSubscriptionData = async () => {
         try {
-          const response = await getActiveSubscriptionPlan();
+          const response = await getTechnicianActiveSubscriptionPlan();
           console.log(
             "response in the technician subscription plan page:",
             response
@@ -154,7 +154,7 @@ export const TechnicianSubscription: React.FC = () => {
   const fetchSubscriptionHistory = async (page: number = 1) => {
     try {
       setHistoryLoading(true);
-      const response = await getSubscriptionHistory(page);
+      const response = await getAllSubscriptionPlansHistory(page);
       setHistoryData(response.data);
       setTotalPages(response.totalPages);
       setCurrentPage(response.currentPage);
@@ -169,9 +169,9 @@ export const TechnicianSubscription: React.FC = () => {
     try {
       setPlansLoading(true);
       setPlansError(null);
-      const response = await getAllSubscriptionPlans();
+      const response = await getAllSubscriptionPlans(null);
 
-      if (response.success && response.data) {
+      if (response.data) {
         setAvailablePlans(response.data);
       } else {
         setPlansError("Failed to fetch plans");

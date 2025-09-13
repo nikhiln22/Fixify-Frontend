@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Otp } from "../../../components/auth/Otp";
-import authService from "../../../services/authServices";
+import { authService } from "../../../services/authServices";
 import { showToast } from "../../../utils/toast";
 import { OtpPurpose, OTPVerification } from "../../../types/auth.types";
 

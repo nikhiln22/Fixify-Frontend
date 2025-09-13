@@ -12,7 +12,7 @@ import {
   cancelBooking,
   generateCompletionOtp,
   verifyCompletionOtp,
-} from "../../../services/technicianServices";
+} from "../../../services/bookingService";
 import { showToast } from "../../../utils/toast";
 import { ChatModal } from "../../../components/common/ChatModal";
 import SelectField from "../../../components/common/SelectField";
@@ -72,13 +72,7 @@ export const TechnicianJobListing: React.FC = () => {
     setCurrentPage,
     loading,
     error,
-  } = usePaginatedList(
-    getBookings,
-    "technician",
-    "",
-    filterStatus,
-    itemsPerPage
-  );
+  } = usePaginatedList(getBookings, "", filterStatus, itemsPerPage);
 
   const handleViewDetails = (bookingId: string) => {
     navigate(`/technician/jobdetails/${bookingId}`);
@@ -190,7 +184,7 @@ export const TechnicianJobListing: React.FC = () => {
   const fetchChatMessages = async (bookingId: string) => {
     setChatLoading(true);
     try {
-      const response = await getChatMessages(bookingId, "technician");
+      const response = await getChatMessages(bookingId);
       if (response.success) {
         setMessages(response.data || []);
       } else {

@@ -52,7 +52,7 @@ export const TechnicianNavbar: React.FC = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await getAllUnreadNotifications("technician");
+      const response = await getAllUnreadNotifications();
       console.log(
         "response in the get all notifications in the technician navbar:",
         response
@@ -72,7 +72,7 @@ export const TechnicianNavbar: React.FC = () => {
 
   const handleNotificationClick = async (notificationId: string) => {
     try {
-      const response = await markNotificationRead(notificationId, "technician");
+      const response = await markNotificationRead(notificationId);
       console.log("response from the handle notification click:", response);
 
       if (response && response.success) {

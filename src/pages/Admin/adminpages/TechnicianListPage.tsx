@@ -38,7 +38,7 @@ export const TechnicianListPage: React.FC = () => {
     const fetchDesignations = async () => {
       setLoadingDesignations(true);
       try {
-        const result = await getAllDesignations(null, "admin", "", "", null);
+        const result = await getAllDesignations(null, "", "", null);
 
         if (result && result.data && Array.isArray(result.data)) {
           const designationOptions: { value: string; label: string }[] = [
@@ -78,7 +78,6 @@ export const TechnicianListPage: React.FC = () => {
     error,
   } = usePaginatedList<Itechnician>(
     getAllTechnicians,
-    "admin",
     searchQuery,
     filterStatus,
     itemsPerPage,
@@ -87,7 +86,7 @@ export const TechnicianListPage: React.FC = () => {
 
   const handleStatusToggle = async (technicianId: string) => {
     try {
-      const result = await toggleTechnicianStatus(technicianId, "admin");
+      const result = await toggleTechnicianStatus(technicianId);
       console.log(
         "result of toggling the technician status from the admin side:",
         result
@@ -107,9 +106,8 @@ export const TechnicianListPage: React.FC = () => {
     }
   };
 
-  const handleView = (technician: Itechnician) => {
-    console.log("View technician:", technician);
-    navigate(`/admin/applicant/${technician._id}`);
+  const handleView = (technicianId: string) => {
+    navigate(`/admin/technicians/${technicianId}`);
   };
 
   const columns = getTechniciansColumns(handleStatusToggle, handleView);
@@ -178,7 +176,7 @@ export const TechnicianListPage: React.FC = () => {
             />
           </div>
 
-          <div className="w-40">
+          <div className="w-50">
             <SelectField
               label=""
               name="statusFilter"

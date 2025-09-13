@@ -39,7 +39,7 @@ export const BookingDetailPage: React.FC = () => {
   const fetchBookingDetails = async () => {
     try {
       setLoading(true);
-      const response = await bookingDetails(id!, "admin");
+      const response = await bookingDetails(id!);
 
       if (response.success && response.data) {
         setBooking(response.data);
@@ -68,7 +68,7 @@ export const BookingDetailPage: React.FC = () => {
 
   const fetchRating = async () => {
     try {
-      const ratingResponse = await getBookingRating(id!, "admin");
+      const ratingResponse = await getBookingRating(id!);
       console.log("Rating response:", ratingResponse);
 
       if (ratingResponse.success) {

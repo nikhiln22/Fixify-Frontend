@@ -1,14 +1,10 @@
 import axiosInstance from "../config/axios.config";
-import { getApiRoute } from "../constants/apiRoutes";
+import { OFFERS_API } from "../constants/apiRoutes";
 import { IOffer } from "../models/offer";
 
-export const addOffer = async (offerData: Partial<IOffer>, role: string) => {
+export const addOffer = async (offerData: Partial<IOffer>) => {
   try {
-    const apiRoute = getApiRoute(role);
-    const response = await axiosInstance.post(
-      `${apiRoute}/addoffer`,
-      offerData
-    );
+    const response = await axiosInstance.post(`${OFFERS_API}`, offerData);
     return response.data;
   } catch (error) {
     console.log("Error occured while adding the new offer:", error);
@@ -18,13 +14,11 @@ export const addOffer = async (offerData: Partial<IOffer>, role: string) => {
 
 export const updateOffer = async (
   offerId: string,
-  offerData: Partial<IOffer>,
-  role: string
+  offerData: Partial<IOffer>
 ) => {
   try {
-    const apiRoute = getApiRoute(role);
     const response = await axiosInstance.put(
-      `${apiRoute}/updateoffer/${offerId}`,
+      `${OFFERS_API}/${offerId}`,
       offerData
     );
     return response.data;
@@ -34,11 +28,10 @@ export const updateOffer = async (
   }
 };
 
-export const toggleOfferStatus = async (offerId: string, role: string) => {
+export const toggleOfferStatus = async (offerId: string) => {
   try {
-    const apiRoute = getApiRoute(role);
     const response = await axiosInstance.patch(
-      `${apiRoute}/blockoffer/${offerId}`
+      `${OFFERS_API}/${offerId}/block`
     );
     return response.data;
   } catch (error) {
@@ -49,7 +42,6 @@ export const toggleOfferStatus = async (offerId: string, role: string) => {
 
 export const getAllOffers = async (
   page: number | null,
-  role: string,
   search?: string,
   filterStatus?: string,
   limit?: number | null
@@ -60,8 +52,6 @@ export const getAllOffers = async (
   total: number;
 }> => {
   try {
-    console.log(`fetching the offers for the ${role}`);
-
     let queryParams = "";
 
     if (
@@ -81,11 +71,9 @@ export const getAllOffers = async (
       }
     }
 
-    const apiRoute = getApiRoute(role);
-
     const url = queryParams
-      ? `${apiRoute}/offers?${queryParams}`
-      : `${apiRoute}/offers`;
+      ? `${OFFERS_API}/admin?${queryParams}`
+      : `${OFFERS_API}/admin`;
 
     const response = await axiosInstance.get(url);
 
@@ -103,5 +91,29 @@ export const getAllOffers = async (
       currentPage: page || 1,
       total: 0,
     };
+  }
+};
+
+export const getUserOffers = async () => {
+  try {
+    const response = await axiosInstance.get(`${OFFERS_API}`);
+    return response.data;
+  } catch (error) {
+    console.log("error occured while fetching all the offers:", error);
+  }
+};
+
+export const applyBestOffer = async (
+  serviceId: string,
+  totalAmount: number
+) => {
+  try {
+    const response = await axiosInstance.post(`${OFFERS_API}/apply-best`, {
+      serviceId,
+      totalAmount,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("error occured while applying the best offer:", error);
   }
 };

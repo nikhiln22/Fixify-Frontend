@@ -1,10 +1,9 @@
 import axiosInstance from "../config/axios.config";
-import { getApiRoute } from "../constants/apiRoutes";
+import { CATEGORIES_API } from "../constants/apiRoutes";
 import { Icategory } from "../models/category";
 
 export const getAllCategories = async (
   page: number | null,
-  role: string,
   search?: string,
   filterStatus?: string,
   limit?: number | null
@@ -15,7 +14,7 @@ export const getAllCategories = async (
   total: number;
 }> => {
   try {
-    console.log(`fetching the categories for ${role}`);
+    console.log(`fetching the categories`);
 
     let queryParams = "";
     if (
@@ -33,10 +32,9 @@ export const getAllCategories = async (
       }
     }
 
-    const apiRoute = getApiRoute(role);
     const url = queryParams
-      ? `${apiRoute}/categories?${queryParams}`
-      : `${apiRoute}/categories`;
+      ? `${CATEGORIES_API}?${queryParams}`
+      : `${CATEGORIES_API}`;
 
     const response = await axiosInstance.get(url);
     console.log("response:", response);
@@ -48,7 +46,7 @@ export const getAllCategories = async (
       total: response.data.data?.pagination?.total || 0,
     };
   } catch (error) {
-    console.error(`error fetching the categories for ${role}:`, error);
+    console.error(`error fetching the categories:`, error);
     return {
       data: [],
       totalPages: 0,
@@ -58,18 +56,13 @@ export const getAllCategories = async (
   }
 };
 
-export const createCategory = async (formData: FormData, role: string) => {
+export const createCategory = async (formData: FormData) => {
   try {
-    const apiRoute = getApiRoute(role);
-    const response = await axiosInstance.post(
-      `${apiRoute}/addcategory`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await axiosInstance.post(`${CATEGORIES_API}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error occured while creating category:", error);
@@ -77,14 +70,10 @@ export const createCategory = async (formData: FormData, role: string) => {
   }
 };
 
-export const toggleCategoryStatus = async (
-  categoryId: string,
-  role: string
-) => {
+export const toggleCategoryStatus = async (categoryId: string) => {
   try {
-    const apiRoute = getApiRoute(role);
     const response = await axiosInstance.patch(
-      `${apiRoute}/blockcategory/${categoryId}`
+      `${CATEGORIES_API}/${categoryId}/status`
     );
 
     return response.data;
@@ -96,13 +85,11 @@ export const toggleCategoryStatus = async (
 
 export const updateCategory = async (
   categoryId: string,
-  formData: FormData,
-  role: string
+  formData: FormData
 ) => {
   try {
-    const apiRoute = getApiRoute(role);
     const response = await axiosInstance.put(
-      `${apiRoute}/updatecategory/${categoryId}`,
+      `${CATEGORIES_API}/${categoryId}`,
       formData,
       {
         headers: {

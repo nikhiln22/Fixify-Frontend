@@ -1,10 +1,9 @@
 import axiosInstance from "../config/axios.config";
 import { Idesignation } from "../models/designation";
-import { getApiRoute } from "../constants/apiRoutes";
+import { DESIGNATIONS_API } from "../constants/apiRoutes";
 
 export const getAllDesignations = async (
   page: number | null,
-  role: string,
   search?: string,
   filterStatus?: string,
   limit?: number | null
@@ -31,9 +30,8 @@ export const getAllDesignations = async (
       queryParams += `&status=${encodeURIComponent(filterStatus)}`;
     }
 
-    const apiRoute = getApiRoute(role);
     const response = await axiosInstance.get(
-      `${apiRoute}/jobdesignations?${queryParams}`
+      `${DESIGNATIONS_API}?${queryParams}`
     );
 
     return {
@@ -54,12 +52,10 @@ export const getAllDesignations = async (
 };
 
 export const addJobDesignation = async (
-  designation: string,
-  role: string
+  designation: string
 ): Promise<Idesignation> => {
   try {
-    const apiRoute = getApiRoute(role);
-    const response = await axiosInstance.post(`${apiRoute}/addjobdesignation`, {
+    const response = await axiosInstance.post(`${DESIGNATIONS_API}`, {
       designation,
     });
     return response.data.data;
@@ -69,11 +65,10 @@ export const addJobDesignation = async (
   }
 };
 
-export const toggleDesignationStatus = async (id: string, role: string) => {
+export const toggleDesignationStatus = async (id: string) => {
   try {
-    const apiRoute = getApiRoute(role);
     const response = await axiosInstance.patch(
-      `${apiRoute}/blockjobdesignation/${id}`
+      `${DESIGNATIONS_API}/${id}/status`
     );
     console.log("response from the toggledesignationstatus:", response.data);
     return response.data;

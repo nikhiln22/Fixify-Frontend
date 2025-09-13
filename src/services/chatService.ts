@@ -1,22 +1,19 @@
 import axiosInstance from "../config/axios.config";
-import { getApiRoute } from "../constants/apiRoutes";
+import { CHAT_API } from "../constants/apiRoutes";
 import { IChat } from "../models/chat";
 
 export const getChatMessages = async (
-  bookingId: string,
-  role: string
+  bookingId: string
 ): Promise<{
   data: IChat[];
   success: boolean;
   message?: string;
 }> => {
   try {
-    console.log(`fetching chat messages for ${role}`);
-
-    const apiRoute = getApiRoute(role);
+    console.log(`fetching chat messages`);
 
     const response = await axiosInstance.get(
-      `${apiRoute}/chatmessages/${bookingId}`
+      `${CHAT_API}/${bookingId}/history`
     );
     console.log("chat messages response:", response);
 
@@ -26,7 +23,7 @@ export const getChatMessages = async (
       message: response.data.message,
     };
   } catch (error) {
-    console.error(`error fetching chat messages for ${role}:`, error);
+    console.error(`error fetching chat messages`, error);
     return {
       data: [],
       success: false,
@@ -48,8 +45,7 @@ export const sendChatMessage = async (
   try {
     console.log(`sending chat message for ${role}`);
 
-    const apiRoute = getApiRoute(role);
-    const baseUrl = `${apiRoute}/sendchatmessages/${bookingId}`;
+    const baseUrl = `${CHAT_API}/${bookingId}/send`;
 
     const requestBody = {
       messageText,

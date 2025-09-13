@@ -38,9 +38,8 @@ export const newRefreshToken = async () => {
     }
 
     isRefreshing = true;
-    console.log("Started initiating the new access token");
 
-    const response = await axiosInstance.get(`/api/refreshtoken`);
+    const response = await axiosInstance.get(`/api/auth/refresh-token`);
 
     console.log("Response data:", response.data);
 
@@ -89,13 +88,13 @@ axiosInstance.interceptors.response.use(
       Cookies.remove(`access_token`);
       delete axiosInstance.defaults.headers.common["Authorization"];
 
-      window.location.href = `/${role.toLowerCase()}/login?blocked=true`;
+      window.location.href = `/${role.toLowerCase()}/login`;
       return Promise.reject(error);
     }
 
     if (
       error.response?.status === 401 &&
-      !error.config.url.includes("/api/refreshtoken")
+      !error.config.url.includes("/api/auth/refreshtoken")
     ) {
       try {
         const newAccessToken = await newRefreshToken();
@@ -140,9 +139,9 @@ axiosInstance.interceptors.request.use(
 const login = async (formData: LoginFormData, role: Role) => {
   const response = await axiosInstance.post<LoginResponse>(
     getAuthUrl(role, "login"),
-    formData,
+    formData
   );
-  console.log("response in the login function in the auth service:",response);
+  console.log("response in the login function in the auth service:", response);
   return response.data;
 };
 
@@ -154,7 +153,6 @@ const register = async (formData: RegisterFormData, role: UserLikeRoles) => {
   return response.data;
 };
 
-
 const verifyOtp = async (
   data: OTPVerification,
   role: UserLikeRoles,
@@ -164,13 +162,13 @@ const verifyOtp = async (
 
   const response = await axiosInstance.post<
     RegisterResponse | VerifyResetOtpResponse
-  >(getAuthUrl(role, "verifyotp"), payload);
+  >(getAuthUrl(role, "verify-otp"), payload);
 
   return response.data;
 };
 
 const resendOtp = async (email: string, role: UserLikeRoles) => {
-  const response = await axiosInstance.post(getAuthUrl(role, "resendotp"), {
+  const response = await axiosInstance.post(getAuthUrl(role, "resend-otp"), {
     email,
   });
   return response.data;
@@ -178,7 +176,7 @@ const resendOtp = async (email: string, role: UserLikeRoles) => {
 
 const forgotPassword = async (email: string, role: UserLikeRoles) => {
   const response = await axiosInstance.post(
-    getAuthUrl(role, "forgotpassword"),
+    getAuthUrl(role, "forgot-password"),
     { email }
   );
   return response.data;
@@ -189,10 +187,13 @@ const resetPassword = async (
   password: string,
   role: UserLikeRoles
 ): Promise<{ message: string }> => {
-  const response = await axiosInstance.post(getAuthUrl(role, "resetpassword"), {
-    email,
-    password,
-  });
+  const response = await axiosInstance.post(
+    getAuthUrl(role, "reset-password"),
+    {
+      email,
+      password,
+    }
+  );
   return response.data;
 };
 
@@ -201,7 +202,7 @@ const logOut = async (role: Role) => {
   return response.data;
 };
 
-const authService = {
+export const authService = {
   login,
   register,
   verifyOtp,
@@ -211,5 +212,3 @@ const authService = {
   newRefreshToken,
   logOut,
 };
-
-export default authService;

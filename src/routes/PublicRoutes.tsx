@@ -6,8 +6,6 @@ import cookie from "js-cookie";
 const PublicRoute: React.FC<PublicRouteProps> = ({ role, redirectTo }) => {
   const token = cookie.get("access_token");
 
-  console.log("token in the public route:", token);
-
   if (token) {
     const payload = JSON.parse(atob(token.split(".")[1]));
 

@@ -43,22 +43,10 @@ export const getServicesColumns = (
     ),
   },
   {
-    key: "description",
-    label: "Description",
+    key: "serviceType",
+    label: "Service Type",
     render: (item) => (
-      <div className="text-center">
-        {item?.description ? (
-          <div className="max-w-xs overflow-hidden">
-            <p className="truncate" title={item.description}>
-              {item.description.length > 50
-                ? `${item.description.substring(0, 50)}...`
-                : item.description}
-            </p>
-          </div>
-        ) : (
-          <span className="text-gray-400 italic">No description</span>
-        )}
-      </div>
+      <div className="text-center">{item?.serviceType || "Untitled"}</div>
     ),
   },
   {
@@ -75,10 +63,17 @@ export const getServicesColumns = (
     label: "Price",
     render: (item) => (
       <div className="text-center font-medium">
-        {item?.price ? `${item.price.toFixed(2)}` : "N/A"}
+        {item?.serviceType === "hourly"
+          ? item?.hourlyRate
+            ? `${item.hourlyRate.toFixed(2)} / hr`
+            : "N/A"
+          : item?.price
+            ? `${item.price.toFixed(2)}`
+            : "N/A"}
       </div>
     ),
   },
+
   {
     key: "status",
     label: "Status",

@@ -6,10 +6,8 @@ import ServiceHeader from "../../../components/user/ServiceHeader";
 import TechnicianList from "../../../components/user/TechncianList";
 import AddressSelector from "../../../components/user/AddressSelector";
 import RelatedServices from "../../../components/user/RelatedServices";
-import {
-  getUserAddresses,
-  getNearbyTechnicians,
-} from "../../../services/userServices";
+import { getNearbyTechnicians } from "../../../services/userServices";
+import { getAddresses } from "../../../services/addressService";
 import { IService } from "../../../models/service";
 import { IAddress } from "../../../models/address";
 import { getServiceDetails } from "../../../services/serviceService";
@@ -21,6 +19,7 @@ export const UserServiceDetails: React.FC = () => {
   const [serviceData, setServiceData] = useState<IService | null>(null);
   const [relatedServices, setRelatedServices] = useState<any[]>([]);
   const [userAddresses, setUserAddresses] = useState<IAddress[]>([]);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
   const [technicians, setTechnicians] = useState<any[]>([]);
   const [isLoadingTechnicians, setIsLoadingTechnicians] = useState(false);
 
@@ -31,30 +30,27 @@ export const UserServiceDetails: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoadingAddresses(true);
+
         const [serviceResponse, addressesResponse] = await Promise.all([
-          serviceId
-            ? getServiceDetails(serviceId, "user")
-            : Promise.resolve(null),
-          getUserAddresses(),
+          serviceId ? getServiceDetails(serviceId) : Promise.resolve(null),
+          getAddresses(),
         ]);
 
         if (serviceResponse) {
           setServiceData(serviceResponse.service);
           setRelatedServices(serviceResponse.relatedService || []);
-          console.log("Setting serviceData to:", serviceResponse.service);
-          console.log(
-            "Setting relatedServices to:",
-            serviceResponse.relatedService
-          );
         }
 
         if (addressesResponse) {
           const addresses = addressesResponse.data || [];
           setUserAddresses(addresses);
-          console.log("Setting userAddresses to:", addresses);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+        setUserAddresses([]);
+      } finally {
+        setIsLoadingAddresses(false);
       }
     };
 
@@ -64,7 +60,6 @@ export const UserServiceDetails: React.FC = () => {
   const fetchTechnicians = useCallback(
     async (address: IAddress) => {
       console.log("fetchTechnicians called with address:", address);
-      console.log("serviceData available:", !!serviceData);
       console.log("serviceData:", serviceData);
 
       if (!address) {
@@ -87,7 +82,7 @@ export const UserServiceDetails: React.FC = () => {
         console.log("Starting to fetch technicians...");
 
         const techniciansList = await getNearbyTechnicians(
-          serviceData.designation,
+          serviceData.designation._id,
           address.latitude,
           address.longitude,
           10
@@ -155,6 +150,7 @@ export const UserServiceDetails: React.FC = () => {
               onAddressSelect={handleAddressSelect}
               selectedAddress={selectedAddress}
               addresses={userAddresses}
+              isLoading={isLoadingAddresses}
             />
           </div>
 

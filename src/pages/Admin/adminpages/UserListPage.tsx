@@ -30,7 +30,6 @@ export const UserListPage: React.FC = () => {
     loading,
   } = usePaginatedList(
     getAllUsers,
-    "admin",
     searchQuery,
     filterStatus,
     itemsPerPage
@@ -38,7 +37,7 @@ export const UserListPage: React.FC = () => {
 
   const handleStatusToggle = async (userId: string) => {
     try {
-      const result = await toggleUserStatus(userId, "admin");
+      const result = await toggleUserStatus(userId);
       if (result) {
         setUsers((prevUsers) =>
           prevUsers.map((user) =>

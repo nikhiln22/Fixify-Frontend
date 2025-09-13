@@ -1,23 +1,19 @@
 import axiosInstance from "../config/axios.config";
-import { getApiRoute } from "../constants/apiRoutes";
+import { SUBSCRIPTION_PLANS_API } from "../constants/apiRoutes";
 import { ISubscriptionPlan } from "../models/subscriptionPlan";
 import { ISubscriptionPlanHistory } from "../models/subscriptionPlanHistory";
 
-export const addSubscriptionPlan = async (
-  subscriptionPlanData: {
-    planName: string;
-    monthlyPrice: number;
-    commissionRate: number;
-    WalletCreditDelay: number;
-    profileBoost: string;
-    durationInMonths: number;
-    description: string;
-  },
-  role: string
-) => {
-  const apiRoute = getApiRoute(role);
+export const addSubscriptionPlan = async (subscriptionPlanData: {
+  planName: string;
+  monthlyPrice: number;
+  commissionRate: number;
+  WalletCreditDelay: number;
+  profileBoost: string;
+  durationInMonths: number;
+  description: string;
+}) => {
   const response = await axiosInstance.post(
-    `${apiRoute}/addsubscriptionplan`,
+    `${SUBSCRIPTION_PLANS_API}`,
     subscriptionPlanData
   );
   return response.data;
@@ -25,7 +21,6 @@ export const addSubscriptionPlan = async (
 
 export const getAllSubscriptionPlans = async (
   page: number | null,
-  role: string,
   search?: string,
   filterStatus?: string,
   limit?: number | null
@@ -41,7 +36,7 @@ export const getAllSubscriptionPlans = async (
   };
 }> => {
   try {
-    console.log("fetching the subscription plans for the admin");
+    console.log("fetching the subscription plans");
 
     let queryParams = "";
 
@@ -62,11 +57,9 @@ export const getAllSubscriptionPlans = async (
       }
     }
 
-    const apiRoute = getApiRoute(role);
-
     const url = queryParams
-      ? `${apiRoute}/subscriptionplans?${queryParams}`
-      : `${apiRoute}/subscriptionplans`;
+      ? `${SUBSCRIPTION_PLANS_API}/?${queryParams}`
+      : `${SUBSCRIPTION_PLANS_API}`;
 
     const response = await axiosInstance.get(url);
 
@@ -98,13 +91,11 @@ export const getAllSubscriptionPlans = async (
 };
 
 export const toggleSubscriptionPlanStatus = async (
-  subscriptionPlanId: string,
-  role: string
+  subscriptionPlanId: string
 ) => {
   try {
-    const apiRoute = getApiRoute(role);
     const response = await axiosInstance.patch(
-      `${apiRoute}/blocksubscriptionplan/${subscriptionPlanId}`
+      `${SUBSCRIPTION_PLANS_API}/${subscriptionPlanId}/block`
     );
     return response.data;
   } catch (error) {
@@ -119,13 +110,11 @@ export const updateSubscriptionPlan = async (
     planName: string;
     price: number;
     commissionRate: number;
-  },
-  role: string
+  }
 ) => {
   try {
-    const apiRoute = getApiRoute(role);
     const response = await axiosInstance.put(
-      `${apiRoute}/updatesubscriptionplan/${subscriptionPlanId}`,
+      `${SUBSCRIPTION_PLANS_API}/${subscriptionPlanId}`,
       subscriptionPlanData
     );
     return response.data;
@@ -137,7 +126,6 @@ export const updateSubscriptionPlan = async (
 
 export const getAllSubscriptionPlansHistory = async (
   page: number | null,
-  role: string,
   search?: string,
   filterStatus?: string,
   limit?: number | null
@@ -169,11 +157,9 @@ export const getAllSubscriptionPlansHistory = async (
       }
     }
 
-    const apiRoute = getApiRoute(role);
-
     const url = queryParams
-      ? `${apiRoute}/subscriptionhistory?${queryParams}`
-      : `${apiRoute}/subscriptionhistory`;
+      ? `${SUBSCRIPTION_PLANS_API}/history?${queryParams}`
+      : `${SUBSCRIPTION_PLANS_API}/history`;
 
     const response = await axiosInstance.get(url);
     console.log(
@@ -194,5 +180,45 @@ export const getAllSubscriptionPlansHistory = async (
       currentPage: page || 1,
       total: 0,
     };
+  }
+};
+
+export const purchaseSubscription = async (planId: string) => {
+  try {
+    const response = await axiosInstance.post(
+      `${SUBSCRIPTION_PLANS_API}/purchase`,
+      { planId }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occured while purchasing the plan:", error);
+    throw error;
+  }
+};
+
+export const verifyPurchase = async (sessionId: string) => {
+  try {
+    const response = await axiosInstance.post(
+      `${SUBSCRIPTION_PLANS_API}/${sessionId}/verify-payment`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occurred while verifying the purchase");
+    throw error;
+  }
+};
+
+export const getTechnicianActiveSubscriptionPlan = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `${SUBSCRIPTION_PLANS_API}/active`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(
+      "error occured while fetching the active subscription plan:",
+      error
+    );
+    throw error;
   }
 };

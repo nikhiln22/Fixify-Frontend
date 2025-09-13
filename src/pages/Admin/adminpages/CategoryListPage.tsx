@@ -46,7 +46,6 @@ export const CategoryListPage: React.FC = () => {
     error,
   } = usePaginatedList<Icategory>(
     getAllCategories,
-    "admin",
     searchQuery,
     filterStatus,
     itemsPerPage,
@@ -96,7 +95,6 @@ export const CategoryListPage: React.FC = () => {
         const response = await updateCategory(
           selectedCategory._id,
           formData,
-          "admin"
         );
         if (response && categories) {
           setCategories(
@@ -110,7 +108,7 @@ export const CategoryListPage: React.FC = () => {
           });
         }
       } else {
-        const response = await createCategory(formData, "admin");
+        const response = await createCategory(formData);
         console.log(
           "response from the create category method in the add category "
         );
@@ -149,7 +147,7 @@ export const CategoryListPage: React.FC = () => {
 
   const handleStatusToggle = async (categoryId: string) => {
     try {
-      const result = await toggleCategoryStatus(categoryId, "admin");
+      const result = await toggleCategoryStatus(categoryId);
       if (result) {
         setCategories((prevCategories) =>
           prevCategories.map((category) =>

@@ -3,7 +3,7 @@ import UserLayout from "../../../layouts/UserLayout";
 import MostBookedServices from "../../../components/user/MostBookedServices";
 import { MainBannerCarousel } from "../../../components/user/MainBannerCarousel";
 import ServiceCategories from "../../../components/user/ServiceCategories";
-import { getAllOffers } from "../../../services/userServices";
+import { getUserOffers } from "../../../services/offerService";
 import { getMostBookedServices } from "../../../services/serviceService";
 import { showToast } from "../../../utils/toast";
 
@@ -17,7 +17,7 @@ export const UserHome: React.FC = () => {
     try {
       setServicesLoading(true);
       setServicesError(null);
-      const response = await getMostBookedServices("user");
+      const response = await getMostBookedServices();
       setMostBookedServices(response.data || []);
     } catch (error) {
       console.error("Failed to fetch most booked services:", error);
@@ -33,7 +33,7 @@ export const UserHome: React.FC = () => {
 
   const fetchOffers = async () => {
     try {
-      const response = await getAllOffers();
+      const response = await getUserOffers();
       console.log("response of all offers in user home:", response);
       setOffers(response.data || []);
     } catch (error) {

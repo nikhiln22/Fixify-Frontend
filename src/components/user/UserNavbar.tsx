@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Search, Menu } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { NotificationDropdown } from "../../components/common/NotificationDropDown";
 import { Dropdown } from "../../components/common/DropDown";
 import { Logo } from "../common/Logo";
@@ -8,6 +8,7 @@ import {
   getAllUnreadNotifications,
   markNotificationRead,
 } from "../../services/notificationService";
+import { getAllServices } from "../../services/serviceService";
 import { INotification } from "../../models/notification";
 import { useAppSelector } from "../../hooks/useRedux";
 import {
@@ -19,12 +20,37 @@ import {
 
 export const UserNavbar: React.FC = () => {
   const userData = useAppSelector((state) => state.user.userData);
+  const navigate = useNavigate();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  // Debounced search effect
+  useEffect(() => {
+    if (!searchTerm.trim()) return;
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        setSearchLoading(true);
+
+        await getAllServices(1, searchTerm, "active", 6);
+
+        navigate(`/user/services?search=${encodeURIComponent(searchTerm)}`);
+      } catch (error) {
+        console.error("Search error:", error);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, navigate]);
 
   useEffect(() => {
     const socket = connectSocket();
@@ -51,7 +77,7 @@ export const UserNavbar: React.FC = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await getAllUnreadNotifications("user");
+      const response = await getAllUnreadNotifications();
 
       if (response && response.success) {
         setNotifications(response.data || []);
@@ -68,7 +94,7 @@ export const UserNavbar: React.FC = () => {
 
   const handleNotificationClick = async (notificationId: string) => {
     try {
-      const response = await markNotificationRead(notificationId, "user");
+      const response = await markNotificationRead(notificationId);
 
       if (response && response.success) {
         setNotifications((prev) =>
@@ -84,33 +110,13 @@ export const UserNavbar: React.FC = () => {
     }
   };
 
-  // const handleMarkAllRead = async () => {
-  //   try {
-  //     const unreadNotifications = notifications.filter(
-  //       (notif) => !notif.isRead
-  //     );
-
-  //     const markAllPromises = unreadNotifications.map((notif) =>
-  //       markNotificationRead(notif.id, "user")
-  //     );
-
-  //     await Promise.all(markAllPromises);
-
-  //     setNotifications((prev) =>
-  //       prev.map((notif) => ({ ...notif, isRead: true }))
-  //     );
-
-  //     setUnreadCount(0);
-
-  //     console.log("All notifications marked as read");
-  //   } catch (error) {
-  //     console.error("Error marking all notifications as read:", error);
-  //   }
-  // };
-
   const handleNewNotification = (newNotification: INotification) => {
     setNotifications((prev) => [newNotification, ...prev]);
     setUnreadCount((prev) => prev + 1);
+  };
+
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
   };
 
   return (
@@ -122,11 +128,19 @@ export const UserNavbar: React.FC = () => {
           <div className="relative flex-grow max-w-lg mx-6">
             <div className="relative">
               <input
-                type="search"
+                type="text"
                 placeholder="Search services..."
-                className="w-full px-4 py-3 pl-12 rounded-xl border border-gray-200 bg-gray-50/50 backdrop-blur-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all duration-200"
+                value={searchTerm}
+                onChange={handleSearchInputChange}
+                disabled={searchLoading}
+                className="w-full px-4 py-3 pl-12 rounded-xl border border-gray-200 bg-gray-50/50 backdrop-blur-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all duration-200 disabled:opacity-50"
               />
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              {searchLoading && (
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-500"></div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -156,7 +170,6 @@ export const UserNavbar: React.FC = () => {
                 unreadCount={unreadCount}
                 loading={loading}
                 onNotificationClick={handleNotificationClick}
-                // onMarkAllRead={handleMarkAllRead}
                 onNewNotification={handleNewNotification}
               />
 
@@ -179,9 +192,17 @@ export const UserNavbar: React.FC = () => {
                 <input
                   type="search"
                   placeholder="Search services..."
-                  className="w-full px-4 py-3 pl-12 rounded-xl border border-gray-200 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all duration-200"
+                  value={searchTerm}
+                  onChange={handleSearchInputChange}
+                  disabled={searchLoading}
+                  className="w-full px-4 py-3 pl-12 rounded-xl border border-gray-200 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all duration-200 disabled:opacity-50"
                 />
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                {searchLoading && (
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-500"></div>
+                  </div>
+                )}
               </div>
               <Link
                 to="/user/home"

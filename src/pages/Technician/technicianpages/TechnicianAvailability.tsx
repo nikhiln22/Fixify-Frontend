@@ -12,7 +12,7 @@ import {
   createTimeSlots,
   getTimeSlots,
   blockTimeSlot,
-} from "../../../services/technicianServices";
+} from "../../../services/timeSlotService";
 import { ITimeSlot } from "../../../models/timeslot";
 import { showToast } from "../../../utils/toast";
 

@@ -46,7 +46,6 @@ export const SubscriptionPlan: React.FC = () => {
     overview,
   } = usePaginatedList(
     getAllSubscriptionPlans,
-    "admin",
     searchQuery,
     filterStatus,
     itemsPerPage
@@ -103,7 +102,6 @@ export const SubscriptionPlan: React.FC = () => {
         const response = await updateSubscriptionPlan(
           selectedSubscriptionPlan._id,
           subscriptionPlanData,
-          "admin"
         );
         if (response && subscriptionPlans) {
           setSubscriptionPlans(
@@ -119,7 +117,6 @@ export const SubscriptionPlan: React.FC = () => {
       } else {
         const response = await addSubscriptionPlan(
           subscriptionPlanData,
-          "admin"
         );
         if (response && subscriptionPlans) {
           const firstPageItems = [
@@ -158,7 +155,6 @@ export const SubscriptionPlan: React.FC = () => {
     try {
       const result = await toggleSubscriptionPlanStatus(
         subscriptionPlanId,
-        "admin"
       );
       console.log("result from toggling the subscription plan status:", result);
       if (result) {

@@ -2,7 +2,7 @@ import { Itechnician } from "../../models/technician";
 import { Column } from "../../types/component.types";
 
 export const getApplicantsColumns = (
-  handleViewDetails: (id: string) => void,
+  handleViewDetails: (id: string) => void
 ): Column<Itechnician>[] => [
   {
     key: "_id",

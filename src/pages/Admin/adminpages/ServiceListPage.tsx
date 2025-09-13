@@ -48,8 +48,8 @@ export const ServiceListPage: React.FC = () => {
     setCategoriesLoading(true);
     try {
       const [categoriesResponse, designationsResponse] = await Promise.all([
-        getAllCategories(null, "admin", "", ""),
-        getAllDesignations(null, "admin", "", ""),
+        getAllCategories(null, "", ""),
+        getAllDesignations(null, "", ""),
       ]);
 
       if (categoriesResponse && categoriesResponse.data) {
@@ -99,7 +99,6 @@ export const ServiceListPage: React.FC = () => {
     error,
   } = usePaginatedList(
     getAllServices,
-    "admin",
     searchQuery,
     filterStatus,
     itemsPerPage,
@@ -156,11 +155,7 @@ export const ServiceListPage: React.FC = () => {
     setIsLoading(true);
     try {
       if (selectedService) {
-        const response = await updateService(
-          selectedService._id,
-          formData,
-          "admin"
-        );
+        const response = await updateService(selectedService._id, formData);
         if (response && services) {
           setServices(
             services.map((svc) =>
@@ -173,7 +168,7 @@ export const ServiceListPage: React.FC = () => {
           });
         }
       } else {
-        const response = await createService(formData, "admin");
+        const response = await createService(formData);
         if (response && services) {
           const firstPageItems = [
             response.data,
@@ -209,7 +204,7 @@ export const ServiceListPage: React.FC = () => {
 
   const handleStatusToggle = async (serviceId: string) => {
     try {
-      const result = await toggleServiceStatus(serviceId, "admin");
+      const result = await toggleServiceStatus(serviceId);
       console.log("result from toggling the service status:", result);
       if (result) {
         setServices((prevServices) =>
@@ -326,11 +321,15 @@ export const ServiceListPage: React.FC = () => {
                 ? {
                     _id: selectedService._id,
                     serviceName: selectedService.name,
-                    servicePrice: selectedService.price,
+                    servicePrice: selectedService?.price,
                     description: selectedService.description,
                     serviceImage: selectedService.image || null,
                     categoryId: selectedService.category?._id,
-                    designationId: selectedService.designation,
+                    designationId: selectedService.designation?._id,
+                    serviceType: selectedService.serviceType,
+                    hourlyRate: selectedService?.hourlyRate,
+                    estimatedTime: selectedService?.estimatedTime,
+                    maxHours: selectedService?.maxHours,
                   }
                 : undefined
             }

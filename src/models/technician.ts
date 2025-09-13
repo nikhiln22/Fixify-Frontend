@@ -5,7 +5,6 @@ export interface Itechnician {
   phone: number;
   status?: string;
   is_verified: boolean;
-  email_verified: boolean;
   yearsOfExperience?: number;
   Designation?: {
     _id: string;

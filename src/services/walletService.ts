@@ -1,11 +1,10 @@
 import axiosInstance from "../config/axios.config";
-import { getApiRoute } from "../constants/apiRoutes";
+import { WALLET_API } from "../constants/apiRoutes";
 import { IWalletTransaction } from "../models/walletTransaction";
 
-export const addMoney = async (role: string, amount: number) => {
+export const addMoney = async (amount: number) => {
   try {
-    const apiRoute = getApiRoute(role);
-    const response = await axiosInstance.post(`${apiRoute}/addmoney`, {
+    const response = await axiosInstance.post(`${WALLET_API}/add-money`, {
       amount,
     });
     console.log("response in the add money to wallet api call:", response);
@@ -16,11 +15,10 @@ export const addMoney = async (role: string, amount: number) => {
   }
 };
 
-export const verifyWalletSession = async (role: string, sessionId: string) => {
+export const verifyWalletSession = async (sessionId: string) => {
   try {
-    const apiRoute = getApiRoute(role);
     const response = await axiosInstance.get(
-      `${apiRoute}/verifywalletsession/${sessionId}`
+      `${WALLET_API}/${sessionId}/verify-payment`
     );
     console.log("response in the verifyWalletSession api call:", response);
     return response.data;
@@ -32,11 +30,9 @@ export const verifyWalletSession = async (role: string, sessionId: string) => {
   }
 };
 
-export const walletBalance = async (role: string) => {
+export const walletBalance = async () => {
   try {
-    const apiRoute = getApiRoute(role);
-    const response = await axiosInstance.get(`${apiRoute}/walletbalance`);
-    console.log("response in the wallet balance checking api", response);
+    const response = await axiosInstance.get(`${WALLET_API}/balance`);
     return response.data;
   } catch (error) {
     console.log("error occured while fetching the user balance:", error);
@@ -46,7 +42,6 @@ export const walletBalance = async (role: string) => {
 
 export const getWalletTransactions = async (
   page: number | null,
-  role: string,
   search?: string,
   filterStatus?: string,
   limit?: number | null
@@ -75,15 +70,11 @@ export const getWalletTransactions = async (
       }
     }
 
-    const apiRoute = getApiRoute(role);
     const url = queryParams
-      ? `${apiRoute}/wallettransactions?${queryParams}`
-      : `${apiRoute}/wallettransactions`;
+      ? `${WALLET_API}/transactions?${queryParams}`
+      : `${WALLET_API}/transactions`;
     const response = await axiosInstance.get(url);
-    console.log(
-      `response in the fetching wallet transactions api for ${role}:`,
-      response
-    );
+
     return {
       data: response.data.data?.transactions || [],
       totalPages: response.data.data?.pagination?.pages || 1,

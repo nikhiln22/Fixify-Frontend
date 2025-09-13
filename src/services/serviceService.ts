@@ -1,14 +1,14 @@
 import axiosInstance from "../config/axios.config";
-import { getApiRoute } from "../constants/apiRoutes";
+import { SERVICES_API } from "../constants/apiRoutes";
 import { IService } from "../models/service";
 
 export const getAllServices = async (
   page: number | null,
-  role: string,
   search?: string,
   filterStatus?: string,
   limit?: number | null,
-  categoryId?: string
+  categoryId?: string,
+  serviceType?: string
 ): Promise<{
   data: IService[];
   totalPages: number;
@@ -16,7 +16,7 @@ export const getAllServices = async (
   total: number;
 }> => {
   try {
-    console.log(`fetching the services for ${role}`);
+    console.log(`fetching the service`);
 
     let queryParams = "";
     if (
@@ -38,15 +38,17 @@ export const getAllServices = async (
       if (filterStatus && filterStatus.trim() !== "") {
         queryParams += `&status=${encodeURIComponent(filterStatus)}`;
       }
+
+      if (serviceType && serviceType !== "all" && serviceType.trim() !== "") {
+        queryParams += `&serviceType=${encodeURIComponent(serviceType)}`;
+      }
     }
 
-    const apiRoute = getApiRoute(role);
     const url = queryParams
-      ? `${apiRoute}/services?${queryParams}`
-      : `${apiRoute}/services`;
+      ? `${SERVICES_API}?${queryParams}`
+      : `${SERVICES_API}`;
 
     const response = await axiosInstance.get(url);
-    console.log(`services response for ${role}:`, response);
 
     return {
       data: response.data.data?.services || [],
@@ -55,7 +57,7 @@ export const getAllServices = async (
       total: response.data.data?.pagination?.total || 0,
     };
   } catch (error) {
-    console.error(`Error fetching the services for ${role}:`, error);
+    console.error(`Error fetching the services`, error);
     return {
       data: [],
       totalPages: 0,
@@ -65,18 +67,13 @@ export const getAllServices = async (
   }
 };
 
-export const createService = async (formData: FormData, role: string) => {
+export const createService = async (formData: FormData) => {
   try {
-    const apiRoute = getApiRoute(role);
-    const response = await axiosInstance.post(
-      `${apiRoute}/addservice`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await axiosInstance.post(`${SERVICES_API}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response.data;
   } catch (error) {
     console.log("error occured while creating the service:", error);
@@ -84,11 +81,10 @@ export const createService = async (formData: FormData, role: string) => {
   }
 };
 
-export const toggleServiceStatus = async (serviceId: string, role: string) => {
+export const toggleServiceStatus = async (serviceId: string) => {
   try {
-    const apiRoute = getApiRoute(role);
     const response = await axiosInstance.patch(
-      `${apiRoute}/blockservice/${serviceId}`
+      `${SERVICES_API}/${serviceId}/status`
     );
     return response.data;
   } catch (error) {
@@ -97,15 +93,10 @@ export const toggleServiceStatus = async (serviceId: string, role: string) => {
   }
 };
 
-export const updateService = async (
-  serviceId: string,
-  formData: FormData,
-  role: string
-) => {
+export const updateService = async (serviceId: string, formData: FormData) => {
   try {
-    const apiRoute = getApiRoute(role);
     const response = await axiosInstance.put(
-      `${apiRoute}/updateservice/${serviceId}`,
+      `${SERVICES_API}/${serviceId}`,
       formData,
       {
         headers: {
@@ -120,12 +111,9 @@ export const updateService = async (
   }
 };
 
-export const getServiceDetails = async (serviceId: string, role: string) => {
+export const getServiceDetails = async (serviceId: string) => {
   try {
-    const apiRoute = getApiRoute(role);
-    const response = await axiosInstance.get(
-      `${apiRoute}/servicedetails/${serviceId}`
-    );
+    const response = await axiosInstance.get(`${SERVICES_API}/${serviceId}`);
     return response.data.data;
   } catch (error) {
     console.log("error occured while fetching the servicedetails:", error);
@@ -133,10 +121,9 @@ export const getServiceDetails = async (serviceId: string, role: string) => {
   }
 };
 
-export const getMostBookedServices = async (role: string) => {
+export const getMostBookedServices = async () => {
   try {
-    const apiRoute = getApiRoute(role);
-    const response = await axiosInstance.get(`${apiRoute}/mostbooked`, {
+    const response = await axiosInstance.get(`${SERVICES_API}/most-booked`, {
       params: {
         limit: 6,
         days: 30,

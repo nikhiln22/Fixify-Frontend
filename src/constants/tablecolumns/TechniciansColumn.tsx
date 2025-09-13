@@ -6,7 +6,7 @@ import Button from "../../components/common/Button";
 
 export const getTechniciansColumns = (
   handleStatusToggle: (id: string) => void,
-  handleView: (technician: Itechnician) => void
+  handleView: (id: string) => void
 ): Column<Itechnician>[] => [
   {
     key: "_id",
@@ -73,7 +73,7 @@ export const getTechniciansColumns = (
         };
 
         const handleViewClick = () => {
-          handleView(item);
+          handleView(item._id);
         };
 
         return (

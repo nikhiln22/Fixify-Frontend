@@ -20,7 +20,6 @@ import {
   Loader2,
 } from "lucide-react";
 
-// Types
 interface EarningsData {
   date: string;
   earnings: number;
@@ -48,7 +47,9 @@ interface TechnicianEarningsChartProps {
   selectedPeriod: Period;
 }
 
-export const TechnicianEarningsChart: React.FC<TechnicianEarningsChartProps> = ({
+export const TechnicianEarningsChart: React.FC<
+  TechnicianEarningsChartProps
+> = ({
   earningsData,
   summary,
   loading,
@@ -58,7 +59,6 @@ export const TechnicianEarningsChart: React.FC<TechnicianEarningsChartProps> = (
 }) => {
   const [chartType, setChartType] = useState<ChartType>("line");
 
-  // Period options
   const periodOptions: {
     value: Period;
     label: string;
