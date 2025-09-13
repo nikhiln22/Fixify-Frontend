@@ -17,7 +17,7 @@ export const UserHome: React.FC = () => {
     try {
       setServicesLoading(true);
       setServicesError(null);
-      const response = await getMostBookedServices("user");
+      const response = await getMostBookedServices();
       setMostBookedServices(response.data || []);
     } catch (error) {
       console.error("Failed to fetch most booked services:", error);

@@ -13,7 +13,6 @@ export interface SubmitTechnicianQualificationResponse {
     | "image"
     | "certificates"
     | "address"
-    | "email_verified"
   >;
 }
 

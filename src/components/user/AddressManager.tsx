@@ -84,7 +84,7 @@ export const AddressManager: React.FC<AddressManagerProps> = ({
         landmark: addressData.landmark,
         latitude: addressData.latitude!,
         longitude: addressData.longitude!,
-        userId: userId,
+        ownerId: userId,
         ...(formMode === "edit" &&
           editingAddress?._id && { _id: editingAddress._id }),
       };

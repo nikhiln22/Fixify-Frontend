@@ -21,7 +21,7 @@ export const TechnicianEarnings: React.FC = () => {
   const fetchWalletBalance = async () => {
     try {
       setIsLoadingBalance(true);
-      const response = await walletBalance("technician");
+      const response = await walletBalance();
       console.log("response:", response);
       setBalance(response.data.balance);
     } catch (error) {
@@ -39,7 +39,6 @@ export const TechnicianEarnings: React.FC = () => {
     loading: transactionsLoading,
   } = usePaginatedList<IWalletTransaction>(
     getWalletTransactions,
-    "technician",
     "",
     "",
     itemsPerPage
