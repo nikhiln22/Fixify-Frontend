@@ -14,7 +14,7 @@ import {
   PaymentMethod,
 } from "../../../components/user/PaymentMethodSelector";
 import Button from "../../../components/common/Button";
-import { getTimeSlots } from "../../../services/userServices";
+import { getAvailableTimeSlots } from "../../../services/timeSlotService";
 import { applyBestOffer } from "../../../services/offerService";
 import {
   getEligibleCoupons,
@@ -75,36 +75,43 @@ export const UserBooking: React.FC = () => {
   useEffect(() => {
     const checkOffers = async () => {
       if (service) {
-        try {
-          setIsLoadingOffer(true);
-          console.log(
-            `Checking offers for service ${service.name} with serviceID ${service._id} and price ${service.price}`
-          );
+        if (service.serviceType === "fixed") {
+          try {
+            setIsLoadingOffer(true);
+            console.log(
+              `Checking offers for service ${service.name} with serviceID ${service._id} and price ${service.price}`
+            );
 
-          const offerResponse = await applyBestOffer(
-            service._id,
-            service.price
-          );
-          console.log("Offer response in UserBooking:", offerResponse);
+            const offerResponse = await applyBestOffer(
+              service._id,
+              service.price
+            );
+            console.log("Offer response in UserBooking:", offerResponse);
 
-          if (offerResponse?.success && offerResponse.data) {
-            setOfferData({
-              offerId: offerResponse.data.offerId,
-              offerApplied: offerResponse.data.offerApplied,
-              offerName: offerResponse.data.offerName,
-              discountAmount: offerResponse.data.discountAmount,
-              finalAmount: offerResponse.data.finalAmount,
-              discountValue: offerResponse.data.discountValue,
-              maxDiscount: offerResponse.data.maxDiscount,
-              discountType: offerResponse.data.discountType,
-              offerType: offerResponse.data.offerType,
-              minBookingAmount: offerResponse.data.minBookingAmount,
-            });
+            if (offerResponse?.success && offerResponse.data) {
+              setOfferData({
+                offerId: offerResponse.data.offerId,
+                offerApplied: offerResponse.data.offerApplied,
+                offerName: offerResponse.data.offerName,
+                discountAmount: offerResponse.data.discountAmount,
+                finalAmount: offerResponse.data.finalAmount,
+                discountValue: offerResponse.data.discountValue,
+                maxDiscount: offerResponse.data.maxDiscount,
+                discountType: offerResponse.data.discountType,
+                offerType: offerResponse.data.offerType,
+                minBookingAmount: offerResponse.data.minBookingAmount,
+              });
+            }
+          } catch (error) {
+            console.log("Error occurred while fetching offers:", error);
+          } finally {
+            setIsLoadingOffer(false);
           }
-        } catch (error) {
-          console.log("Error occurred while fetching offers:", error);
-        } finally {
+        } else {
           setIsLoadingOffer(false);
+          console.log(
+            "Skipping offers for HOURLY service - will apply after completion"
+          );
         }
       }
     };
@@ -117,6 +124,15 @@ export const UserBooking: React.FC = () => {
 
     if (!service?._id) {
       console.log("No service ID found");
+      return;
+    }
+
+    if (service.serviceType === "HOURLY") {
+      showToast({
+        message:
+          "Coupons and offers will be applied after service completion for hourly services",
+        type: "info",
+      });
       return;
     }
 
@@ -204,7 +220,7 @@ export const UserBooking: React.FC = () => {
   const fetchTimeSlots = async () => {
     try {
       setIsLoadingSlots(true);
-      const response = await getTimeSlots(technician._id, false);
+      const response = await getAvailableTimeSlots(technician._id, false);
 
       if (response.success) {
         setTimeSlots(response.data || []);
@@ -367,8 +383,7 @@ export const UserBooking: React.FC = () => {
                         </h3>
                       </div>
                       <p className="text-green-800">
-                        {selectedSlot.date} at {selectedSlot.startTime} -{" "}
-                        {selectedSlot.endTime}
+                        {selectedSlot.date} at {selectedSlot.startTime}
                       </p>
                     </div>
                     <Button
@@ -430,7 +445,6 @@ export const UserBooking: React.FC = () => {
         isOpen={isSlotModalOpen}
         onClose={handleCloseSlotModal}
         timeSlots={timeSlots}
-        technicianName={technician.name}
         onSelectSlot={handleSlotSelect}
         selectedSlot={selectedSlot}
       />

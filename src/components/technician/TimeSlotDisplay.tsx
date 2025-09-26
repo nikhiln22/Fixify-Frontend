@@ -216,7 +216,7 @@ export const TimeSlotDisplay: React.FC<TimeSlotDisplayProps & {
                       )}
                     </div>
                     <div className="font-medium text-sm">
-                      {slot.startTime} - {slot.endTime}
+                      {slot.startTime}
                     </div>
 
                     {isBooked && (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Clock, CheckCircle } from "lucide-react";
+import { Clock, CheckCircle } from "lucide-react";
 import { ITimeSlot } from "../../models/timeslot";
 import Modal from "../common/Modal";
 
@@ -7,7 +7,6 @@ interface UserTimeSlotSelectionProps {
   isOpen: boolean;
   onClose: () => void;
   timeSlots: ITimeSlot[];
-  technicianName: string;
   onSelectSlot: (slot: ITimeSlot) => void;
   selectedSlot?: ITimeSlot | null;
 }
@@ -18,8 +17,18 @@ const formatDate = (dateStr: string) => {
 
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
 
   return {
@@ -27,7 +36,7 @@ const formatDate = (dateStr: string) => {
     dayNumber: day,
     monthName: months[date.getMonth()],
     fullDate: dateStr,
-    displayDate: `${days[date.getDay()]}, ${months[date.getMonth()]} ${day}`
+    displayDate: `${days[date.getDay()]}, ${months[date.getMonth()]} ${day}`,
   };
 };
 
@@ -41,7 +50,6 @@ const groupSlotsByDate = (slots: ITimeSlot[]) => {
     grouped[slot.date].push(slot);
   });
 
-  // Sort slots within each date by time
   Object.keys(grouped).forEach((date) => {
     grouped[date].sort((a, b) => {
       const timeA = convertTo24Hour(a.startTime);
@@ -69,13 +77,16 @@ export const UserTimeSlotSelection: React.FC<UserTimeSlotSelectionProps> = ({
   isOpen,
   onClose,
   timeSlots,
-  technicianName,
   onSelectSlot,
-  selectedSlot
+  selectedSlot,
 }) => {
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<ITimeSlot | null>(selectedSlot || null);
-  const [groupedSlots, setGroupedSlots] = useState<{ [key: string]: ITimeSlot[] }>({});
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<ITimeSlot | null>(
+    selectedSlot || null
+  );
+  const [groupedSlots, setGroupedSlots] = useState<{
+    [key: string]: ITimeSlot[];
+  }>({});
   const [availableDates, setAvailableDates] = useState<string[]>([]);
 
   useEffect(() => {
@@ -89,7 +100,7 @@ export const UserTimeSlotSelection: React.FC<UserTimeSlotSelectionProps> = ({
       const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
       return dateA.getTime() - dateB.getTime();
     });
-    
+
     setAvailableDates(datesWithSlots);
 
     if (datesWithSlots.length > 0 && !selectedDate) {
@@ -112,14 +123,10 @@ export const UserTimeSlotSelection: React.FC<UserTimeSlotSelectionProps> = ({
 
   const modalContent = (
     <div className="text-left max-h-[70vh] overflow-y-auto">
-      {/* Header */}
       <div className="mb-6">
         <h3 className="text-xl font-semibold text-gray-900 mb-2">
           Select Time & Date
         </h3>
-        <p className="text-sm text-gray-600">
-          Choose from available time slots with {technicianName}
-        </p>
       </div>
 
       {timeSlots.length === 0 ? (
@@ -129,26 +136,24 @@ export const UserTimeSlotSelection: React.FC<UserTimeSlotSelectionProps> = ({
             No slots available
           </h3>
           <p className="text-gray-600">
-            {technicianName} doesn't have any available slots at the moment.
+            No Available slots for this technician. Please change the
+            Technician.
           </p>
         </div>
       ) : (
         <>
-          {/* Date Selection */}
           <div className="mb-6">
-            <h4 className="text-sm font-medium text-gray-900 mb-3">Select Date</h4>
             <div className="flex space-x-2 overflow-x-auto pb-2">
               {availableDates.map((date) => {
                 const formattedDate = formatDate(date);
                 const isSelected = selectedDate === date;
-                const slotsCount = groupedSlots[date]?.length || 0;
 
                 return (
                   <button
                     key={date}
                     onClick={() => {
                       setSelectedDate(date);
-                      setSelectedTimeSlot(null); // Reset selected slot when changing date
+                      setSelectedTimeSlot(null);
                     }}
                     className={`flex-shrink-0 flex flex-col items-center px-4 py-3 rounded-lg border transition-all min-w-[80px] ${
                       isSelected
@@ -163,32 +168,30 @@ export const UserTimeSlotSelection: React.FC<UserTimeSlotSelectionProps> = ({
                       {formattedDate.dayNumber}
                     </span>
                     <span className="text-xs">{formattedDate.monthName}</span>
-                    <span className="text-xs text-gray-500 mt-1">
-                      {slotsCount} slots
-                    </span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Time Selection */}
           {selectedDate && (
             <div>
               <h4 className="text-sm font-medium text-gray-900 mb-3">
                 Available times for {formatDate(selectedDate).displayDate}
               </h4>
-              
+
               {selectedSlots.length === 0 ? (
                 <div className="text-center py-8">
                   <Clock className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-600">No slots available for this date</p>
+                  <p className="text-gray-600">
+                    No slots available for this date
+                  </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-3 gap-3 max-h-60 overflow-y-auto">
                   {selectedSlots.map((slot) => {
                     const isSelected = selectedTimeSlot?._id === slot._id;
-                    
+
                     return (
                       <button
                         key={slot._id}
@@ -205,27 +208,11 @@ export const UserTimeSlotSelection: React.FC<UserTimeSlotSelectionProps> = ({
                         <div className="font-medium text-sm">
                           {slot.startTime}
                         </div>
-                        <div className="text-xs text-gray-500">
-                          {slot.endTime}
-                        </div>
                       </button>
                     );
                   })}
                 </div>
               )}
-            </div>
-          )}
-
-          {/* Selected Slot Display */}
-          {selectedTimeSlot && (
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center space-x-2 mb-2">
-                <Calendar className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-900">Selected Slot</span>
-              </div>
-              <p className="text-sm text-blue-800">
-                {formatDate(selectedTimeSlot.date).displayDate} at {selectedTimeSlot.startTime} - {selectedTimeSlot.endTime}
-              </p>
             </div>
           )}
         </>

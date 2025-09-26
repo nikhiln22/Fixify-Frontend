@@ -1,7 +1,6 @@
 import axiosInstance from "../config/axios.config";
 import { Itechnician } from "../models/technician";
 import { Iuser } from "../models/user";
-import { GetTimeSlotResponse } from "../types/technicians.types";
 import { UserProfileResponse } from "../types/user.types";
 import { USER_API } from "../constants/apiRoutes";
 
@@ -52,26 +51,6 @@ export const getNearbyTechnicians = async (
   }
 };
 
-export const getTimeSlots = async (
-  technicinaId: string,
-  includePast: boolean
-): Promise<GetTimeSlotResponse> => {
-  try {
-    const response = await axiosInstance.get(
-      `${USER_API}/timeslots/${technicinaId}`,
-      {
-        params: {
-          includePast: includePast,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("error occured while fetching the time slots:", error);
-    throw error;
-  }
-};
-
 export const getAllUsers = async (
   page: number | null,
   search?: string,
@@ -104,10 +83,10 @@ export const getAllUsers = async (
     const response = await axiosInstance.get(url);
     console.log("users response:", response);
     return {
-      data: response.data.data?.users || [],
-      totalPages: response.data.data?.pagination?.pages || 1,
-      currentPage: response.data.data?.pagination?.page || page || 1,
-      total: response.data.data?.pagination?.total || 0,
+      data: response.data.data?.users,
+      totalPages: response.data.data?.pagination?.pages,
+      currentPage: response.data.data?.pagination?.page,
+      total: response.data.data?.pagination?.total,
     };
   } catch (error) {
     console.error("Error fetching the users:", error);

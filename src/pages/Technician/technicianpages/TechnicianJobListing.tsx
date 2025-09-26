@@ -120,7 +120,8 @@ export const TechnicianJobListing: React.FC = () => {
           message: "OTP sent to customer",
           type: "success",
         });
-      } catch (error: any) {
+      } catch (error) {
+        console.log("error occured:", error);
         showToast({
           message: "Failed to generate OTP",
           type: "error",
@@ -161,11 +162,10 @@ export const TechnicianJobListing: React.FC = () => {
 
         handleOtpModalClose();
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error verifying OTP:", error);
       showToast({
-        message:
-          error?.response?.data?.message || "Invalid OTP. Please try again.",
+        message: "Invalid OTP. Please try again.",
         type: "error",
       });
     } finally {
@@ -254,13 +254,13 @@ export const TechnicianJobListing: React.FC = () => {
           type: "error",
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error sending message:", error);
 
       sendMessage(selectedChatBooking._id, messageText, "technician");
 
       showToast({
-        message: error?.response?.data?.message || "Failed to send message",
+        message: "Failed to send message",
         type: "error",
       });
     } finally {

@@ -28,54 +28,50 @@ export const BookingDetailsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (id) {
-      fetchBookingDetails();
-    }
-  }, [id]);
+    if (!id) return;
 
-  const fetchBookingDetails = async () => {
-    try {
-      setLoading(true);
-      const response = await bookingDetails(id!);
-      console.log("response in the userbooking details page:", response);
+    const fetchBookingDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await bookingDetails(id);
+        console.log("response in the userbooking details page:", response);
 
-      if (response.success && response.data) {
-        setBooking(response.data);
+        if (response.success && response.data) {
+          setBooking(response.data);
 
-        if (response.data.bookingStatus === "Completed") {
-          fetchRating();
+          if (response.data.bookingStatus === "Completed") {
+            try {
+              const ratingResponse = await getBookingRating(id);
+              console.log("Rating response:", ratingResponse);
+
+              if (ratingResponse.success) {
+                setRating(ratingResponse.data);
+              }
+            } catch (ratingError) {
+              console.error("Error fetching rating:", ratingError);
+            }
+          }
+        } else {
+          setError(response.message);
+          showToast({
+            message: response.message,
+            type: "error",
+          });
         }
-      } else {
-        setError(response.message);
+      } catch (error) {
+        console.error("Error fetching booking details:", error);
+        setError("Failed to fetch booking details");
         showToast({
-          message: response.message,
+          message: "Failed to fetch booking details",
           type: "error",
         });
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching booking details:", error);
-      setError("Failed to fetch booking details");
-      showToast({
-        message: "Failed to fetch booking details",
-        type: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  const fetchRating = async () => {
-    try {
-      const ratingResponse = await getBookingRating(id!);
-      console.log("Rating response:", ratingResponse);
-
-      if (ratingResponse.success) {
-        setRating(ratingResponse.data);
-      }
-    } catch (error) {
-      console.error("Error fetching rating:", error);
-    }
-  };
+    fetchBookingDetails();
+  }, [id]);
 
   const handleBackClick = () => {
     navigate("/user/bookings");
@@ -130,6 +126,13 @@ export const BookingDetailsPage: React.FC = () => {
         image: booking.technicianId.image || "/default-avatar.png",
       }
     : null;
+
+  const firstTimeSlot =
+    booking.timeSlotId &&
+    Array.isArray(booking.timeSlotId) &&
+    booking.timeSlotId.length > 0
+      ? booking.timeSlotId[0]
+      : booking.timeSlotId;
 
   return (
     <UserLayout>
@@ -192,14 +195,14 @@ export const BookingDetailsPage: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ScheduleInfoCard
                 timeSlot={
-                  booking.timeSlotId &&
-                  booking.timeSlotId.date &&
-                  booking.timeSlotId.startTime &&
-                  booking.timeSlotId.endTime
+                  firstTimeSlot &&
+                  firstTimeSlot.date &&
+                  firstTimeSlot.startTime &&
+                  firstTimeSlot.endTime
                     ? {
-                        date: booking.timeSlotId.date,
-                        startTime: booking.timeSlotId.startTime,
-                        endTime: booking.timeSlotId.endTime,
+                        date: firstTimeSlot.date,
+                        startTime: firstTimeSlot.startTime,
+                        endTime: firstTimeSlot.endTime,
                       }
                     : undefined
                 }

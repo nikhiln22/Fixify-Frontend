@@ -13,7 +13,7 @@ export interface IBooking {
     email: string;
     image: string;
     is_verified: boolean;
-    yearsOfExperience: Number;
+    yearsOfExperience: number;
     Designation: {
       _id: string;
       designation: string;

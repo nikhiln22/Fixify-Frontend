@@ -13,7 +13,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
   onSubmit,
 }) => {
   const navigate = useNavigate();
-  
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -24,6 +24,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
       try {
         await onSubmit(values.email);
       } catch (err) {
+        console.log("error occured:", err);
       } finally {
         setSubmitting(false);
       }
@@ -33,7 +34,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
   return (
     <AuthLayout role={role}>
       <div className="space-y-8">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -42,16 +43,14 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
           <h4 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent capitalize">
             Reset Password
           </h4>
-          <p className="text-lg text-gray-600 font-medium">
-             Enter your email
-          </p>
+          <p className="text-lg text-gray-600 font-medium">Enter your email</p>
         </motion.div>
 
-        <motion.form 
+        <motion.form
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          onSubmit={formik.handleSubmit} 
+          onSubmit={formik.handleSubmit}
           className="space-y-6"
         >
           <motion.div
@@ -91,7 +90,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
             </Button>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.5 }}

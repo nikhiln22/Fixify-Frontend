@@ -59,3 +59,23 @@ export const blockTimeSlot = async (slotId: string) => {
     throw error;
   }
 };
+
+export const getAvailableTimeSlots = async (
+  technicianId: string,
+  includePast: boolean
+): Promise<GetTimeSlotResponse> => {
+  try {
+    const response = await axiosInstance.get(
+      `${TIMESLOTS_API}/available/${technicianId}`,
+      {
+        params: {
+          includePast: includePast,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching available time slots:", error);
+    throw error;
+  }
+};

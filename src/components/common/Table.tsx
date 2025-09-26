@@ -1,4 +1,5 @@
 import { TableProps } from "../../types/component.types";
+
 const Table = <T extends object>({
   data,
   columns,

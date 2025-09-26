@@ -19,6 +19,7 @@ import { CouponListPage } from "../pages/Admin/adminpages/CouponListPage";
 import { SubscriptionPlan } from "../pages/Admin/adminpages/SubscriptionPlan";
 import { SubscriptionHistory } from "../pages/Admin/adminpages/SubscriptionHistory";
 import { TechnicianDetails } from "../pages/Admin/adminpages/TechnicianDetailPage";
+import { PartListPage } from "../pages/Admin/adminpages/PartListPage";
 
 export const AdminRoutes: React.FC = () => {
   const user: string = "Admin";
@@ -42,6 +43,7 @@ export const AdminRoutes: React.FC = () => {
         <Route path="applicants/:applicantId" element={<ApplicantDetails />} />
         <Route path="categories" element={<CategoryListPage />} />
         <Route path="services" element={<ServiceListPage />} />
+        <Route path="parts" element={<PartListPage />} />
         <Route path="bookings" element={<BookingsListPage />} />
         <Route path="bookings/:id" element={<BookingDetailPage />} />
         <Route path="offers" element={<OfferListPage />} />

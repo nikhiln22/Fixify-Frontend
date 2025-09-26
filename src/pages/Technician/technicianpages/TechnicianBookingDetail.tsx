@@ -22,60 +22,60 @@ import { RevenueDetailCard } from "../../../components/admin/RevenueDetailCard";
 
 export const TechnicianBookingDetail: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
-  const [rating, setRating] = useState<IRating | null>(null);
   const navigate = useNavigate();
   const [booking, setBooking] = useState<IBooking | null>(null);
+  const [rating, setRating] = useState<IRating | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (bookingId) {
-      fetchBookingDetails();
-    }
-  }, [bookingId]);
+    if (!bookingId) return;
 
-  const fetchBookingDetails = async () => {
-    try {
-      setLoading(true);
-      const response = await bookingDetails(bookingId!);
+    const fetchBookingDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await bookingDetails(bookingId);
+        console.log(
+          "response in the technician booking details page:",
+          response
+        );
 
-      if (response.success && response.data) {
-        setBooking(response.data);
+        if (response.success && response.data) {
+          setBooking(response.data);
 
-        if (response.data.bookingStatus === "Completed") {
-          fetchRating();
+          if (response.data.bookingStatus === "Completed") {
+            try {
+              const ratingResponse = await getBookingRating(bookingId);
+              console.log("Rating response:", ratingResponse);
+
+              if (ratingResponse.success) {
+                setRating(ratingResponse.data);
+              }
+            } catch (ratingError) {
+              console.error("Error fetching rating:", ratingError);
+            }
+          }
+        } else {
+          setError(response.message);
+          showToast({
+            message: response.message,
+            type: "error",
+          });
         }
-      } else {
-        setError(response.message);
+      } catch (error) {
+        console.error("Error fetching booking details:", error);
+        setError("Failed to fetch booking details");
         showToast({
-          message: response.message,
+          message: "Failed to fetch booking details",
           type: "error",
         });
+      } finally {
+        setLoading(false);
       }
-    } catch (error: any) {
-      console.error("Error fetching booking details:", error);
-      setError("Failed to fetch booking details");
-      showToast({
-        message: "Failed to fetch booking details",
-        type: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  const fetchRating = async () => {
-    try {
-      const ratingResponse = await getBookingRating(bookingId!);
-      console.log("Rating response:", ratingResponse);
-
-      if (ratingResponse.success) {
-        setRating(ratingResponse.data);
-      }
-    } catch (error) {
-      console.error("Error fetching rating:", error);
-    }
-  };
+    fetchBookingDetails();
+  }, [bookingId]);
 
   const handleBackClick = () => {
     navigate("/technician/jobs");
@@ -112,7 +112,7 @@ export const TechnicianBookingDetail: React.FC = () => {
                 {error || "Booking not found"}
               </h1>
               <Button onClick={handleBackClick} variant="primary">
-                Back to Bookings
+                Back to Jobs
               </Button>
             </div>
           </div>
@@ -128,6 +128,13 @@ export const TechnicianBookingDetail: React.FC = () => {
         email: booking.userId.email || "N/A",
       }
     : null;
+
+  const firstTimeSlot =
+    booking.timeSlotId &&
+    Array.isArray(booking.timeSlotId) &&
+    booking.timeSlotId.length > 0
+      ? booking.timeSlotId[0]
+      : booking.timeSlotId;
 
   const showRevenueDetails =
     booking.bookingStatus !== "Cancelled" &&
@@ -167,7 +174,7 @@ export const TechnicianBookingDetail: React.FC = () => {
                 totalAmount={
                   booking.paymentId?.amountPaid || booking.bookingAmount
                 }
-                serviceImage={booking.serviceId.image}
+                serviceImage={booking.serviceId?.image}
               />
 
               <div className="bg-white rounded-lg shadow">
@@ -197,14 +204,14 @@ export const TechnicianBookingDetail: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ScheduleInfoCard
                 timeSlot={
-                  booking.timeSlotId &&
-                  booking.timeSlotId.date &&
-                  booking.timeSlotId.startTime &&
-                  booking.timeSlotId.endTime
+                  firstTimeSlot &&
+                  firstTimeSlot.date &&
+                  firstTimeSlot.startTime &&
+                  firstTimeSlot.endTime
                     ? {
-                        date: booking.timeSlotId.date,
-                        startTime: booking.timeSlotId.startTime,
-                        endTime: booking.timeSlotId.endTime,
+                        date: firstTimeSlot.date,
+                        startTime: firstTimeSlot.startTime,
+                        endTime: firstTimeSlot.endTime,
                       }
                     : undefined
                 }

@@ -26,25 +26,16 @@ export const AddMoneyForm: React.FC<AddMoneyFormProps> = ({
     },
   });
 
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const regex = /^\d*\.?\d*$/;
-    if (regex.test(value) || value === "") {
-      formik.setFieldValue("amount", value);
-    }
-  };
-
   return (
-    <form onSubmit={formik.handleSubmit} className="space-y-6">
+    <form onSubmit={formik.handleSubmit}>
       <div className="mb-6">
         <InputField
-          label="Enter Amount"
+          label="Amount"
           name="amount"
-          type="text"
           value={formik.values.amount}
-          onChange={handleAmountChange}
+          onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          placeholder="100"
+          placeholder="Enter the amount"
           error={
             formik.touched.amount && formik.errors.amount
               ? formik.errors.amount
@@ -52,7 +43,6 @@ export const AddMoneyForm: React.FC<AddMoneyFormProps> = ({
           }
           touched={formik.touched.amount}
           disabled={isLoading || formik.isSubmitting}
-          className="pl-10 text-lg font-medium"
         />
       </div>
 

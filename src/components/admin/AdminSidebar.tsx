@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -12,25 +12,28 @@ import {
   Tag,
   Ticket,
   Crown,
+  Puzzle,
+  LucideIcon,
 } from "lucide-react";
-import { useLocation } from "react-router-dom";
 
-const AdminSidebar: React.FC = () => {
+type SidebarItem = {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+  path: string;
+};
+
+export const AdminSidebar: React.FC = () => {
   const location = useLocation();
 
-  const sidebarItems = [
+  const sidebarItems: SidebarItem[] = [
     {
       id: "dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
       path: "/admin/dashboard",
     },
-    {
-      id: "users",
-      label: "Users",
-      icon: Users,
-      path: "/admin/users",
-    },
+    { id: "users", label: "Users", icon: Users, path: "/admin/users" },
     {
       id: "technicians",
       label: "Technicians",
@@ -61,24 +64,17 @@ const AdminSidebar: React.FC = () => {
       icon: Wrench,
       path: "/admin/services",
     },
+
+    { id: "parts", label: "Parts", icon: Puzzle, path: "/admin/parts" },
+
     {
       id: "bookings",
       label: "Bookings",
       icon: ClipboardList,
       path: "/admin/bookings",
     },
-    {
-      id: "offers",
-      label: "Offers",
-      icon: Tag,
-      path: "/admin/offers",
-    },
-    {
-      id: "coupons",
-      label: "Coupons",
-      icon: Ticket,
-      path: "/admin/coupons",
-    },
+    { id: "offers", label: "Offers", icon: Tag, path: "/admin/offers" },
+    { id: "coupons", label: "Coupons", icon: Ticket, path: "/admin/coupons" },
     {
       id: "subscription Plans",
       label: "Subscription Plans",
@@ -87,19 +83,17 @@ const AdminSidebar: React.FC = () => {
     },
   ];
 
-  const isItemActive = (item: any) => {
-    if (item.id === "bookings") {
+  const isItemActive = (item: SidebarItem) => {
+    if (item.id === "bookings")
       return location.pathname.startsWith("/admin/bookings");
-    }
-    if (item.id === "subscription Plans") {
+    if (item.id === "subscription Plans")
       return location.pathname.startsWith("/admin/subscription");
-    }
-    if (item.id === "applicants") {
+    if (item.id === "applicants")
       return location.pathname.startsWith("/admin/applicants");
-    }
-    if (item.id === "technicians") {
+    if (item.id === "technicians")
       return location.pathname.startsWith("/admin/technicians");
-    }
+    if (item.id === "parts")
+      return location.pathname.startsWith("/admin/parts");
     return location.pathname === item.path;
   };
 
@@ -134,5 +128,3 @@ const AdminSidebar: React.FC = () => {
     </aside>
   );
 };
-
-export default AdminSidebar;
