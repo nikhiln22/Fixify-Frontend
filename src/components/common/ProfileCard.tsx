@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Edit, Save, X, Camera } from "lucide-react";
 import { useFormik } from "formik";
 import Button from "../common/Button";
@@ -26,7 +26,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
     initialValues: {
       name: name || "",
       phone: phone || "",
-      image: image,
+      image: image || undefined,
       Designation: Designation || "",
       yearsOfExperience: yearsOfExperience || 0,
     },
@@ -75,19 +75,39 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
     },
   });
 
+  // Extract formik methods to avoid dependency issues
+  const { setValues, setTouched, setErrors } = formik;
+
+  // Memoize the reset values to prevent unnecessary re-renders
+  const resetValues = useCallback(
+    () => ({
+      name: name || "",
+      phone: phone || "",
+      image: image || undefined,
+      Designation: Designation || "",
+      yearsOfExperience: yearsOfExperience || 0,
+    }),
+    [name, phone, image, Designation, yearsOfExperience]
+  );
+
   useEffect(() => {
     if (!isEditing) {
-      formik.setValues({
-        name: name || "",
-        phone: phone || "",
-        image: image,
-        Designation: Designation || "",
-        yearsOfExperience: yearsOfExperience || 0,
-      });
-      formik.setTouched({});
-      formik.setErrors({});
+      setValues(resetValues());
+      setTouched({});
+      setErrors({});
     }
-  }, [name, phone, image, Designation, yearsOfExperience, isEditing]);
+  }, [
+    name,
+    phone,
+    image,
+    Designation,
+    yearsOfExperience,
+    isEditing,
+    setValues,
+    setTouched,
+    setErrors,
+    resetValues,
+  ]);
 
   const currentPhoto = isEditing
     ? imageRemoved
@@ -101,13 +121,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
 
     console.log("Edit button clicked");
     setIsEditing(true);
-    formik.setValues({
-      name: name || "",
-      phone: phone || "",
-      image: image,
-      Designation: Designation || "",
-      yearsOfExperience: yearsOfExperience || 0,
-    });
+    formik.setValues(resetValues());
     setSelectedFile(null);
     setImageRemoved(false);
     formik.setTouched({});
@@ -120,13 +134,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
 
     console.log("Cancel button clicked");
     setIsEditing(false);
-    formik.setValues({
-      name: name || "",
-      phone: phone || "",
-      image: image,
-      Designation: Designation || "",
-      yearsOfExperience: yearsOfExperience || 0,
-    });
+    formik.setValues(resetValues());
     setSelectedFile(null);
     setImageRemoved(false);
     formik.setTouched({});
@@ -186,6 +194,18 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
     fileInputRef.current?.click();
   };
 
+  // Helper function to check if image should be displayed
+  const shouldDisplayImage = (
+    photo: string | null | undefined
+  ): photo is string => {
+    return !!(
+      photo &&
+      photo !== "undefined" &&
+      photo !== "" &&
+      photo !== "default/image"
+    );
+  };
+
   return (
     <div className="bg-white rounded-3xl shadow-md overflow-hidden w-full">
       <div className="p-8">
@@ -200,10 +220,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
                 }`}
                 onClick={isEditing && isEditable ? triggerFileInput : undefined}
               >
-                {currentPhoto &&
-                currentPhoto !== "undefined" &&
-                currentPhoto !== "" &&
-                currentPhoto !== "default/image" ? (
+                {shouldDisplayImage(currentPhoto) ? (
                   <div className="relative w-full h-full">
                     <img
                       src={currentPhoto}

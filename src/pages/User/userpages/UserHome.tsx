@@ -42,7 +42,6 @@ export const UserHome: React.FC = () => {
         message: "Failed to load offers",
         type: "error",
       });
-    } finally {
     }
   };
 

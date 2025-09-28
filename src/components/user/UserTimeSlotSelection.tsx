@@ -63,14 +63,15 @@ const groupSlotsByDate = (slots: ITimeSlot[]) => {
 
 const convertTo24Hour = (time12h: string) => {
   const [time, modifier] = time12h.split(" ");
-  let [hours, minutes] = time.split(":");
-  if (hours === "12") {
-    hours = "00";
+  const [hours, minutes] = time.split(":");
+  let modifiedHours = hours;
+  if (modifiedHours === "12") {
+    modifiedHours = "00";
   }
   if (modifier === "PM") {
-    hours = (parseInt(hours, 10) + 12).toString();
+    modifiedHours = (parseInt(modifiedHours, 10) + 12).toString();
   }
-  return `${hours.padStart(2, "0")}:${minutes}`;
+  return `${modifiedHours.padStart(2, "0")}:${minutes}`;
 };
 
 export const UserTimeSlotSelection: React.FC<UserTimeSlotSelectionProps> = ({

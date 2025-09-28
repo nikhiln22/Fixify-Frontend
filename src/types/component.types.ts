@@ -81,8 +81,21 @@ export interface AddDesignationFormProps {
   isLoading?: boolean;
 }
 
+export interface QualificationFormData {
+  experience: string;
+  designation: string;
+  about: string;
+  certificates: File[];
+  profilePhoto: File | null;
+  currentLocation: {
+    latitude: number | null;
+    longitude: number | null;
+    address: string;
+  };
+}
+
 export interface QualificationFormProps {
-  onSubmit: (formData: any) => void;
+  onSubmit: (formData: QualificationFormData) => void;
   onCancel: () => void;
   designationOptions: { value: string; label: string }[];
   designationsLoading: boolean;

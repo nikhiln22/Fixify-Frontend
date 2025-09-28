@@ -232,6 +232,10 @@ export const UserBooking: React.FC = () => {
         });
       }
     } catch (error) {
+      console.log(
+        "error occured while fetching the available time slots:",
+        error
+      );
       showToast({
         message: "Failed to fetch available time slots. Please try again.",
         type: "error",

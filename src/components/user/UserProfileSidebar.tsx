@@ -1,11 +1,25 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { User, Settings, Calendar, Wallet, HelpCircle } from "lucide-react";
+import {
+  User,
+  Settings,
+  Calendar,
+  Wallet,
+  HelpCircle,
+  LucideIcon,
+} from "lucide-react";
+
+type SidebarItem = {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+  path: string;
+};
 
 export const UserProfileSidebar: React.FC = () => {
   const location = useLocation();
 
-  const sidebarItems = [
+  const sidebarItems: SidebarItem[] = [
     {
       id: "profile",
       label: "Profile Info",
@@ -38,11 +52,10 @@ export const UserProfileSidebar: React.FC = () => {
     },
   ];
 
-  const isItemActive = (item: any) => {
+  const isItemActive = (item: SidebarItem) => {
     if (item.id === "bookings") {
       return location.pathname.startsWith("/user/bookings");
     }
-
     return location.pathname === item.path;
   };
 

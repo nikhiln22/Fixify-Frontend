@@ -30,6 +30,7 @@ export const getBookingStatusDistribution = async () => {
     const response = await axiosInstance.get(`${ADMIN_API}/bookingsstats`);
     return response.data;
   } catch (error) {
+    console.log("error while fetching the booking distributions:", error);
     throw error;
   }
 };
@@ -40,7 +41,10 @@ export const getRevenueTrends = async (days: number = 30) => {
       `${ADMIN_API}/revenuetrends?days=${days}`
     );
     return response.data;
-  } catch (error) {}
+  } catch (error) {
+    console.log("error occured while fetching the revenue trends:", error);
+    throw error;
+  }
 };
 
 export const getServiceCategoryPerformance = async (
@@ -53,6 +57,7 @@ export const getServiceCategoryPerformance = async (
     );
     return response.data;
   } catch (error) {
+    console.log("error occured while fetching the service category performance:",error);
     throw error;
   }
 };

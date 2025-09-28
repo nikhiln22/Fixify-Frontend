@@ -31,53 +31,50 @@ export const BookingDetailPage: React.FC = () => {
   // const [averageRating, setAverageRating] = useState<number | null>(null);
 
   useEffect(() => {
-    if (id) {
-      fetchBookingDetails();
-    }
-  }, [id]);
+    if (!id) return;
 
-  const fetchBookingDetails = async () => {
-    try {
-      setLoading(true);
-      const response = await bookingDetails(id!);
+    const fetchBookingDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await bookingDetails(id);
+        console.log("response in the userbooking details page:", response);
 
-      if (response.success && response.data) {
-        setBooking(response.data);
+        if (response.success && response.data) {
+          setBooking(response.data);
 
-        if (response?.data?.bookingStatus === "Completed") {
-          fetchRating();
+          if (response.data.bookingStatus === "Completed") {
+            try {
+              const ratingResponse = await getBookingRating(id);
+              console.log("Rating response:", ratingResponse);
+
+              if (ratingResponse.success) {
+                setRating(ratingResponse.data);
+              }
+            } catch (ratingError) {
+              console.error("Error fetching rating:", ratingError);
+            }
+          }
+        } else {
+          setError(response.message);
+          showToast({
+            message: response.message,
+            type: "error",
+          });
         }
-      } else {
-        setError(response.message);
+      } catch (error) {
+        console.error("Error fetching booking details:", error);
+        setError("Failed to fetch booking details");
         showToast({
-          message: response.message,
+          message: "Failed to fetch booking details",
           type: "error",
         });
+      } finally {
+        setLoading(false);
       }
-    } catch (error: any) {
-      console.error("Error fetching booking details:", error);
-      setError("Failed to fetch booking details");
-      showToast({
-        message: "Failed to fetch booking details",
-        type: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  const fetchRating = async () => {
-    try {
-      const ratingResponse = await getBookingRating(id!);
-      console.log("Rating response:", ratingResponse);
-
-      if (ratingResponse.success) {
-        setRating(ratingResponse.data);
-      }
-    } catch (error) {
-      console.error("Error fetching rating:", error);
-    }
-  };
+    fetchBookingDetails();
+  }, [id]);
 
   // useEffect(() => {
   //   const fetchTechnicianAverageRating = async () => {

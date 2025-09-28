@@ -12,15 +12,17 @@ import { IService } from "../../../models/service";
 import { IAddress } from "../../../models/address";
 import { getServiceDetails } from "../../../services/serviceService";
 import technicianBanner from "../../../assets/technician Banner.png";
+import { Itechnician } from "../../../models/technician";
 
 export const UserServiceDetails: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState<IAddress | null>(null);
-  const [selectedTechnician, setSelectedTechnician] = useState<any>(null);
+  const [selectedTechnician, setSelectedTechnician] =
+    useState<Itechnician | null>(null);
   const [serviceData, setServiceData] = useState<IService | null>(null);
-  const [relatedServices, setRelatedServices] = useState<any[]>([]);
+  const [relatedServices, setRelatedServices] = useState<IService[]>([]);
   const [userAddresses, setUserAddresses] = useState<IAddress[]>([]);
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
-  const [technicians, setTechnicians] = useState<any[]>([]);
+  const [technicians, setTechnicians] = useState<Itechnician[]>([]);
   const [isLoadingTechnicians, setIsLoadingTechnicians] = useState(false);
 
   const { serviceId } = useParams<{ serviceId: string }>();
@@ -105,9 +107,6 @@ export const UserServiceDetails: React.FC = () => {
 
   const handleAddressSelect = useCallback(
     (address: IAddress) => {
-      console.log("handleAddressSelect called with:", address);
-      console.log("Current selectedAddress:", selectedAddress);
-
       setSelectedAddress(address);
       setSelectedTechnician(null);
       setTechnicians([]);
@@ -118,7 +117,7 @@ export const UserServiceDetails: React.FC = () => {
   );
 
   const handleTechnicianSelect = useCallback(
-    (technician: any) => {
+    (technician: Itechnician) => {
       setSelectedTechnician(technician);
       console.log("Selected technician:", technician);
 
@@ -133,7 +132,7 @@ export const UserServiceDetails: React.FC = () => {
     [navigate, serviceData, selectedAddress]
   );
 
-  const handleRelatedServiceSelect = useCallback((service: any) => {
+  const handleRelatedServiceSelect = useCallback((service: IService) => {
     console.log("Selected related service:", service);
   }, []);
 
@@ -157,7 +156,7 @@ export const UserServiceDetails: React.FC = () => {
           <div className="space-y-6">
             <TechnicianList
               onTechnicianSelect={handleTechnicianSelect}
-              selectedTechnicianId={selectedTechnician?.id}
+              selectedTechnicianId={selectedTechnician?._id}
               serviceId={serviceId}
               selectedAddress={selectedAddress}
               technicians={technicians}

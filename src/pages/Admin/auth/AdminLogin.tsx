@@ -49,13 +49,18 @@ export const AdminLogin: React.FC = () => {
           type: "error",
         });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      const errorMessage =
+        error?.response?.data?.message || "Something went wrong!";
+
       showToast({
-        message: err?.response?.data?.message || "Login failed.",
+        message: errorMessage,
         type: "error",
       });
     }
   };
+
   return (
     <div>
       <Login role="ADMIN" onsubmit={handleLoginSubmit} />

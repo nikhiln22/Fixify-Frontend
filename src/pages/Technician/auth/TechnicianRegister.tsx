@@ -37,12 +37,16 @@ export const TechnicianRegister: React.FC = () => {
 
         navigate(`/technician/otp`, { state: stateData });
       }
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      const errorMessage =
+        error?.response?.data?.message || "Something went wrong!";
+
       showToast({
-        message: error?.response?.data?.message || "Registration failed",
+        message: errorMessage,
         type: "error",
       });
-      throw error;
+      throw new Error(errorMessage);
     }
   };
 

@@ -5,22 +5,25 @@ import InputField from "../common/InputField";
 import SelectField from "../common/SelectField";
 import { ISubscriptionPlan } from "../../models/subscriptionPlan";
 import { subscriptionPlanSchema } from "../../utils/validations/formvalidationSchema";
+import { SubscriptionPlanFormDto } from "../../types/subscription.types";
 
 interface AddSubscriptionPlanProps {
   onCancel: () => void;
-  onSubmit: (data: ISubscriptionPlan) => Promise<void>;
+  onSubmit: (data: SubscriptionPlanFormDto) => Promise<void>;
   isLoading?: boolean;
   initialValues?: Partial<ISubscriptionPlan>;
   isEditing?: boolean;
 }
 
-const getErrorMessage = (error: any): string | undefined => {
+const getErrorMessage = (
+  error: string | string[] | undefined
+): string | undefined => {
   if (typeof error === "string") return error;
   if (Array.isArray(error)) return error[0];
   return undefined;
 };
 
-const getTouchedValue = (touched: any): boolean | undefined => {
+const getTouchedValue = (touched: boolean | undefined): boolean | undefined => {
   if (typeof touched === "boolean") return touched;
   return !!touched;
 };
@@ -70,12 +73,12 @@ export const AddSubscriptionPlan: React.FC<AddSubscriptionPlanProps> = ({
     validationSchema: subscriptionPlanSchema,
     onSubmit: async (values) => {
       try {
-        const subscriptionPlanData: Partial<ISubscriptionPlan> = {
+        const subscriptionPlanData: SubscriptionPlanFormDto = {
           planName: values.planName,
           price: Number(values.price),
           commissionRate: Number(values.commissionRate),
           WalletCreditDelay: Number(values.WalletCreditDelay),
-          profileBoost: values.profileBoost === "true",
+          profileBoost: values.profileBoost,
           durationInMonths: Number(values.durationInMonths),
           description: values.description,
         };
@@ -84,7 +87,7 @@ export const AddSubscriptionPlan: React.FC<AddSubscriptionPlanProps> = ({
           subscriptionPlanData._id = initialValues._id;
         }
 
-        await onSubmit?.(subscriptionPlanData as ISubscriptionPlan);
+        await onSubmit?.(subscriptionPlanData as SubscriptionPlanFormDto);
       } catch (error) {
         console.error("Error submitting subscription plan form:", error);
       }

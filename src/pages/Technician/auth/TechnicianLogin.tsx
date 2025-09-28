@@ -42,11 +42,16 @@ export const TechnicianLogin: React.FC = () => {
           type: "error",
         });
       }
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      const errorMessage =
+        error?.response?.data?.message || "Something went wrong!";
+
       showToast({
-        message: err?.response?.data?.message,
+        message: errorMessage,
         type: "error",
       });
+      throw new Error(errorMessage);
     }
   };
 

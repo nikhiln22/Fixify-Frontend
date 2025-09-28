@@ -1,26 +1,30 @@
 import React from "react";
-import { Home, ArrowLeft, Settings, Wrench, User } from "lucide-react";
+import {
+  Home,
+  ArrowLeft,
+  Settings,
+  Wrench,
+  User,
+  LucideIcon,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-// Define types for better TypeScript support
-type UserRole = "admin" | "technician" | "user";
+import { Role } from "../../types/auth.types";
 
 interface PageNotFoundProps {
-  userRole?: UserRole;
+  userRole?: Role;
   userName?: string;
 }
 
 export const PageNotFound: React.FC<PageNotFoundProps> = ({
-  userRole = "user",
+  userRole = "USER",
   userName = "User",
 }) => {
   const navigate = useNavigate();
 
-  // Define role-specific configurations with proper typing
   const roleConfig: Record<
-    UserRole,
+    Role,
     {
-      icon: React.ComponentType<any>;
+      icon: LucideIcon;
       color: string;
       bgColor: string;
       buttonColor: string;
@@ -28,7 +32,7 @@ export const PageNotFound: React.FC<PageNotFoundProps> = ({
       suggestions: string[];
     }
   > = {
-    admin: {
+    ADMIN: {
       icon: Settings,
       color: "from-purple-600 to-blue-600",
       bgColor: "bg-purple-50",
@@ -41,7 +45,7 @@ export const PageNotFound: React.FC<PageNotFoundProps> = ({
         "Monitor technician performance",
       ],
     },
-    technician: {
+    TECHNICIAN: {
       icon: Wrench,
       color: "from-orange-600 to-red-600",
       bgColor: "bg-orange-50",
@@ -54,7 +58,7 @@ export const PageNotFound: React.FC<PageNotFoundProps> = ({
         "Check service history",
       ],
     },
-    user: {
+    USER: {
       icon: User,
       color: "from-green-600 to-teal-600",
       bgColor: "bg-green-50",
@@ -69,7 +73,7 @@ export const PageNotFound: React.FC<PageNotFoundProps> = ({
     },
   };
 
-  const config = roleConfig[userRole] || roleConfig.user;
+  const config = roleConfig[userRole] || roleConfig.USER;
   const IconComponent = config.icon;
 
   const handleGoHome = () => {
@@ -85,7 +89,6 @@ export const PageNotFound: React.FC<PageNotFoundProps> = ({
       className={`min-h-screen ${config.bgColor} flex items-center justify-center px-4`}
     >
       <div className="max-w-2xl w-full text-center">
-        {/* Header Section */}
         <div className="mb-8">
           <div
             className={`inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r ${config.color} mb-6`}
@@ -105,7 +108,6 @@ export const PageNotFound: React.FC<PageNotFoundProps> = ({
           </p>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
           <button
             onClick={handleGoHome}
@@ -124,7 +126,6 @@ export const PageNotFound: React.FC<PageNotFoundProps> = ({
           </button>
         </div>
 
-        {/* Role-specific Suggestions */}
         <div className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
             What would you like to do instead?
@@ -141,7 +142,6 @@ export const PageNotFound: React.FC<PageNotFoundProps> = ({
           </ul>
         </div>
 
-        {/* Footer */}
         <div className="mt-12 text-center">
           <p className="text-gray-500 text-sm">
             Need help? Contact our support team at{" "}

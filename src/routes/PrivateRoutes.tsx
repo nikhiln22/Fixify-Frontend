@@ -9,38 +9,38 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ role }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    checkAuth();
-  }, []);
+    const checkAuth = async () => {
+      const token = cookie.get("access_token");
+      console.log("token in the private route:", token);
 
-  const checkAuth = async () => {
-    const token = cookie.get("access_token");
-    console.log("token in the private route:", token);
-
-    if (token && isRoleMatch(token, role)) {
-      setIsAuthenticated(true);
-      setIsChecking(false);
-      return;
-    }
-
-    console.log(`No access token found for ${role}, trying to refresh...`);
-
-    try {
-      const newAccessToken = await authService.newRefreshToken();
-
-      if (newAccessToken && isRoleMatch(newAccessToken, role)) {
-        console.log(`New access token generated for ${role}!`);
+      if (token && isRoleMatch(token, role)) {
         setIsAuthenticated(true);
-      } else {
-        console.log(`Refresh failed for ${role}`);
+        setIsChecking(false);
+        return;
+      }
+
+      console.log(`No access token found for ${role}, trying to refresh...`);
+
+      try {
+        const newAccessToken = await authService.newRefreshToken();
+
+        if (newAccessToken && isRoleMatch(newAccessToken, role)) {
+          console.log(`New access token generated for ${role}!`);
+          setIsAuthenticated(true);
+        } else {
+          console.log(`Refresh failed for ${role}`);
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.log(`Refresh error for ${role}:`, error);
         setIsAuthenticated(false);
       }
-    } catch (error) {
-      console.log(`Refresh error for ${role}:`, error);
-      setIsAuthenticated(false);
-    }
 
-    setIsChecking(false);
-  };
+      setIsChecking(false);
+    };
+
+    checkAuth();
+  }, [role]);
 
   const isRoleMatch = (token: string, role: string) => {
     const payload = JSON.parse(atob(token.split(".")[1]));

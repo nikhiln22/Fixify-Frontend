@@ -164,7 +164,10 @@ export const TechnicianAvailability: React.FC = () => {
 
       if (response.success) {
         if (response.data && Array.isArray(response.data)) {
-          setTimeSlots((prevSlots) => [...prevSlots, ...response.data]);
+          setTimeSlots((prevSlots) => [
+            ...prevSlots,
+            ...(response.data as ITimeSlot[]),
+          ]);
         } else {
           await fetchTimeSlots();
         }
