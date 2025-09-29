@@ -119,11 +119,8 @@ export const BookingDetailsPage: React.FC = () => {
 
   const technicianData = booking.technicianId
     ? {
-        _id: booking.technicianId._id || "",
-        username: booking.technicianId.username || "N/A",
+        ...booking.technicianId,
         averageRating: 0,
-        yearsOfExperience: Number(booking.technicianId.yearsOfExperience) || 0,
-        image: booking.technicianId.image || "/default-avatar.png",
       }
     : null;
 

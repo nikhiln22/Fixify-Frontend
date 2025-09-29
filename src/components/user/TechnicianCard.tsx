@@ -5,7 +5,7 @@ import Button from "../common/Button";
 import { Itechnician } from "../../models/technician";
 
 interface TechnicianCardProps {
-  technician: Itechnician & { averageRating: number };
+  technician: Itechnician & { averageRating?: number }; // Make it optional
   onSelect?: () => void;
   showBookButton?: boolean;
   isSelected?: boolean;
@@ -15,8 +15,9 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
   technician,
   onSelect,
   showBookButton = true,
+  isSelected,
 }) => {
-  const { username, averageRating, yearsOfExperience } = technician;
+  const { username, averageRating = 0, yearsOfExperience, image } = technician; // Default to 0
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -53,14 +54,16 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
   };
 
   return (
-    <div className="p-6 hover:bg-gray-50 transition-colors">
+    <div
+      className={`p-6 hover:bg-gray-50 transition-colors ${
+        isSelected ? "bg-blue-50 border-l-4 border-blue-500" : ""
+      }`}
+    >
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div className="flex items-start space-x-4 flex-1">
           <div className="relative flex-shrink-0">
             <img
-              src={
-                technician.image ? buildCloudinaryUrl(technician.image) : "N/A"
-              }
+              src={image ? buildCloudinaryUrl(image) : "/default-avatar.png"}
               alt={username}
               className="w-16 h-16 rounded-full object-cover"
               onError={(e) => {
@@ -74,6 +77,11 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
               <h3 className="text-lg font-semibold text-gray-900 truncate">
                 {username}
               </h3>
+              {isSelected && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  Selected
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-2 mb-2">

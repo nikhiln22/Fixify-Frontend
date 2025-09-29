@@ -7,9 +7,9 @@ interface TechnicianListProps {
   serviceId?: string;
   selectedAddress: IAddress | null;
   onTechnicianSelect: (
-    technician: Itechnician & { averageRating: number }
+    technician: Itechnician & { averageRating?: number }
   ) => void;
-  technicians: (Itechnician & { averageRating: number })[];
+  technicians: (Itechnician & { averageRating?: number })[];
   selectedTechnicianId?: string | number;
   isLoading?: boolean;
 }
