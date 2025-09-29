@@ -47,7 +47,7 @@ export const TechnicianRoutes: React.FC = () => {
 
       <Route
         path="*"
-        element={<PageNotFound userName={user} userRole="technician" />}
+        element={<PageNotFound userName={user} userRole="TECHNICIAN" />}
       />
     </Routes>
   );

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import UserLayout from "../../../layouts/UserLayout";
 import Banner from "../../../components/common/Banner";
 import ServiceHeader from "../../../components/user/ServiceHeader";
-import TechnicianList from "../../../components/user/TechncianList";
+import TechnicianList from "../../../components/user/TechnicianList";
 import AddressSelector from "../../../components/user/AddressSelector";
 import RelatedServices from "../../../components/user/RelatedServices";
 import { getNearbyTechnicians } from "../../../services/userServices";
@@ -22,7 +22,10 @@ export const UserServiceDetails: React.FC = () => {
   const [relatedServices, setRelatedServices] = useState<IService[]>([]);
   const [userAddresses, setUserAddresses] = useState<IAddress[]>([]);
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
-  const [technicians, setTechnicians] = useState<Itechnician[]>([]);
+  const [technicians, setTechnicians] = useState<
+    (Itechnician & { averageRating: number })[]
+  >([]);
+
   const [isLoadingTechnicians, setIsLoadingTechnicians] = useState(false);
 
   const { serviceId } = useParams<{ serviceId: string }>();
@@ -61,9 +64,6 @@ export const UserServiceDetails: React.FC = () => {
 
   const fetchTechnicians = useCallback(
     async (address: IAddress) => {
-      console.log("fetchTechnicians called with address:", address);
-      console.log("serviceData:", serviceData);
-
       if (!address) {
         console.log("No address provided, returning early");
         return;
@@ -92,9 +92,11 @@ export const UserServiceDetails: React.FC = () => {
 
         console.log("techniciansList received:", techniciansList);
 
-        setTechnicians(techniciansList);
+        const techniciansWithRating = techniciansList.map(
+          (tech) => tech as Itechnician & { averageRating: number }
+        );
 
-        console.log("Technicians state updated");
+        setTechnicians(techniciansWithRating);
       } catch (error) {
         console.error("Error fetching technicians:", error);
         setTechnicians([]);

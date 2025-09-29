@@ -6,7 +6,7 @@ import { showToast } from "../../../utils/toast";
 import UserLayout from "../../../layouts/UserLayout";
 import Banner from "../../../components/common/Banner";
 import { AddressCard } from "../../../components/user/AddressCard";
-import TechnicianCard from "../../../components/user/TechncianCard";
+import TechnicianCard from "../../../components/user/TechnicianCard";
 import { UserTimeSlotSelection } from "../../../components/user/UserTimeSlotSelection";
 import { BookingSummary } from "../../../components/user/BookingSummary";
 import {

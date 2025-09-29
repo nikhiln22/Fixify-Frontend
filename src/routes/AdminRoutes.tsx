@@ -54,7 +54,7 @@ export const AdminRoutes: React.FC = () => {
 
       <Route
         path="*"
-        element={<PageNotFound userName={user} userRole="admin" />}
+        element={<PageNotFound userName={user} userRole="ADMIN" />}
       />
     </Routes>
   );

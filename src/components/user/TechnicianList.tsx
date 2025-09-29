@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import TechnicianCard from "./TechncianCard";
+import TechnicianCard from "./TechnicianCard";
 import { Itechnician } from "../../models/technician";
 import { IAddress } from "../../models/address";
 

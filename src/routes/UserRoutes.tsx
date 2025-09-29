@@ -52,7 +52,7 @@ export const UserRoutes: React.FC = () => {
 
       <Route
         path="*"
-        element={<PageNotFound userName={user?.username} userRole="user" />}
+        element={<PageNotFound userName={user?.username} userRole="USER" />}
       />
     </Routes>
   );

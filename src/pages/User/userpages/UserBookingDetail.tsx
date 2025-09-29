@@ -12,7 +12,7 @@ import { IBooking } from "../../../models/booking";
 import { BookingHeader } from "../../../components/common/BookingHeader";
 import { BookingStatusCard } from "../../../components/common/BookingStatusCard";
 import { ServiceDetailsCard } from "../../../components/common/ServiceDetailsCard";
-import TechnicianCard from "../../../components/user/TechncianCard";
+import TechnicianCard from "../../../components/user/TechnicianCard";
 import { AddressCard } from "../../../components/user/AddressCard";
 import { ScheduleInfoCard } from "../../../components/common/ScheduledInfoCard";
 import { CancellationCard } from "../../../components/common/CancellationCard";
