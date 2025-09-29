@@ -36,11 +36,13 @@ export const getApplicantsColumns = (
     label: "Application Date",
     render: (item) => (
       <div className="text-center">
-        {new Date(item.createdAt).toLocaleDateString("en-US", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        })}
+        {item.createdAt
+          ? new Date(item.createdAt).toLocaleDateString("en-US", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })
+          : "N/A"}
       </div>
     ),
   },
