@@ -51,9 +51,12 @@ export const UserLogin: React.FC = () => {
           type: "error",
         });
       }
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      const errorMessage =
+        error?.response?.data?.message || "Something went wrong!";
       showToast({
-        message: err?.response?.data?.message || "Login failed.",
+        message: errorMessage,
         type: "error",
       });
     }

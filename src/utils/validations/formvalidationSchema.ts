@@ -71,7 +71,7 @@ export const addServiceSchema = Yup.object().shape({
     .min(2, "Service name must be at least 2 characters")
     .max(50, "Service name must not exceed 50 characters")
     .matches(
-      /^[a-zA-Z0-9\s\-&\/\\]+$/,
+      /^[a-zA-Z0-9\s\-&/\\]+$/,
       "Service name can only contain letters, numbers, spaces, hyphens, ampersands (&), and slashes"
     ),
 
@@ -395,4 +395,14 @@ export const subscriptionPlanSchema = Yup.object({
   description: Yup.string()
     .max(500, "Description cannot exceed 500 characters")
     .trim(),
+});
+
+export const addPartSchema = Yup.object().shape({
+  name: Yup.string().required("Part name is required"),
+  price: Yup.string().required("Price is required"),
+  description: Yup.string().required("Description is required"),
+  services: Yup.array()
+    .of(Yup.string())
+    .min(1, "At least one service must be selected")
+    .required("Services are required"),
 });

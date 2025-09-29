@@ -7,6 +7,7 @@ import { ICoupon } from "../models/coupon";
 import { OfferData } from "./user.types";
 import { CouponData } from "./user.types";
 import { IOffer } from "../models/offer";
+import { IService } from "../models/service";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -80,8 +81,21 @@ export interface AddDesignationFormProps {
   isLoading?: boolean;
 }
 
+export interface QualificationFormData {
+  experience: string;
+  designation: string;
+  about: string;
+  certificates: File[];
+  profilePhoto: File | null;
+  currentLocation: {
+    latitude: number | null;
+    longitude: number | null;
+    address: string;
+  };
+}
+
 export interface QualificationFormProps {
-  onSubmit: (formData: any) => void;
+  onSubmit: (formData: QualificationFormData) => void;
   onCancel: () => void;
   designationOptions: { value: string; label: string }[];
   designationsLoading: boolean;
@@ -249,13 +263,7 @@ export interface PaymentMethodSelectorProps {
 }
 
 export interface BookingSummaryProps {
-  service: {
-    image?: string;
-    name?: string;
-    designation?: string;
-    description?: string;
-    price?: string | number;
-  };
+  service: IService;
   offerData?: OfferData | null;
   isLoadingOffer?: boolean;
   isLoadingCoupons?: boolean;
@@ -330,6 +338,22 @@ export interface CouponModalProps {
     currentCoupon?: CouponData | null
   ) => void;
   appliedCoupon: CouponData | null;
+}
+
+export interface AddPartProps {
+  onCancel: () => void;
+  onSubmit?: (data: AddPartFormData) => Promise<void>;
+  isLoading?: boolean;
+  initialValues?: AddPartFormData;
+  isEditing?: boolean;
+  serviceOptions?: Array<{ value: string; label: string }>;
+}
+
+export interface AddPartFormData {
+  name: string;
+  description: string;
+  price: string;
+  services: string[];
 }
 
 export interface PrivateRouteProps {

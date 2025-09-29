@@ -1,9 +1,9 @@
 import React from "react";
 import { HelpCircle, Info, Copyright } from "lucide-react";
 
-const AdminFooter: React.FC = () => {
+export const AdminFooter: React.FC = () => {
   const currentYear = new Date().getFullYear();
-  const appVersion = "v1.2.0"; 
+  const appVersion = "v1.2.0";
 
   return (
     <footer className="bg-white border-t border-gray-200 py-4 px-6 text-sm text-gray-600">
@@ -46,5 +46,3 @@ const AdminFooter: React.FC = () => {
     </footer>
   );
 };
-
-export default AdminFooter;

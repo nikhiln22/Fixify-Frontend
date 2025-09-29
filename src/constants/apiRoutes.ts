@@ -15,3 +15,4 @@ export const TIMESLOTS_API = "/api/timeslots";
 export const OFFERS_API = "/api/offers";
 export const COUPONS_API = "/api/coupons";
 export const SUBSCRIPTION_PLANS_API = "/api/subscription-plans";
+export const PARTS_API = "/api/parts";

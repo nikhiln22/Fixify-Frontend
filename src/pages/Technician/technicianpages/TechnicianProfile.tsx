@@ -37,56 +37,50 @@ export const TechnicianProfile: React.FC = () => {
   );
 
   useEffect(() => {
+    const fetchTechnicianProfile = async () => {
+      try {
+        const response = await getTechnicianProfile();
+        if (response) {
+          setTechnicianData(response);
+          fetchTechnicianAddress();
+        }
+      } catch (err) {
+        console.error("Error fetching technician profile:", err);
+        showToast({
+          message: "Failed to load technician profile",
+          type: "error",
+        });
+      }
+    };
+
+    const fetchTechnicianReviews = async () => {
+      try {
+        setReviewsLoading(true);
+        setReviewsError(null);
+
+        const response = await getReviews();
+
+        if (response.data.reviews) {
+          setReviews(response.data.reviews || []);
+          setAverageRating(response.data.averageRating);
+          setTotalReviews(response.data.totalReviews);
+        } else {
+          setReviewsError(response.data.message || "Failed to load reviews");
+        }
+      } catch (err) {
+        console.error("Error fetching reviews:", err);
+        const error = err as { response?: { data?: { message?: string } } };
+        const errorMessage =
+          error?.response?.data?.message || "Something went wrong!";
+        setReviewsError(errorMessage);
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+
     fetchTechnicianProfile();
     fetchTechnicianReviews();
   }, []);
-
-  const fetchTechnicianReviews = async () => {
-    try {
-      setReviewsLoading(true);
-      setReviewsError(null);
-
-      const response = await getReviews();
-      console.log("response for reviews:", response);
-
-      if (response.data.reviews) {
-        setReviews(response.data.reviews || []);
-        setAverageRating(response.data.averageRating);
-        setTotalReviews(response.data.totalReviews);
-      } else {
-        setReviewsError(response.data.message || "Failed to load reviews");
-      }
-    } catch (err: any) {
-      console.error("Error fetching reviews:", err);
-      setReviewsError(
-        err?.response?.data?.message || err?.message || "Error fetching reviews"
-      );
-    } finally {
-      setReviewsLoading(false);
-    }
-  };
-
-  const fetchTechnicianProfile = async () => {
-    try {
-      const response = await getTechnicianProfile();
-      console.log(
-        "technician profile response in the technician profile page:",
-        response
-      );
-
-      if (response) {
-        setTechnicianData(response);
-        // Fetch address for the current technician
-        fetchTechnicianAddress();
-      }
-    } catch (err) {
-      console.error("Error fetching technician profile:", err);
-      showToast({
-        message: "Failed to load technician profile",
-        type: "error",
-      });
-    }
-  };
 
   const fetchTechnicianAddress = async () => {
     try {

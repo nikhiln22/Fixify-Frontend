@@ -18,18 +18,18 @@ export const ScheduleInfoCard: React.FC<ScheduleInfoCardProps> = ({
   const formatDate = (dateString: string) => {
     try {
       let date: Date;
-      
+
       if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
-        const [day, month, year] = dateString.split('-');
+        const [day, month, year] = dateString.split("-");
         date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
       } else {
         date = new Date(dateString);
       }
-      
+
       if (isNaN(date.getTime())) {
         return "Invalid Date";
       }
-      
+
       return date.toLocaleDateString("en-US", {
         weekday: "long",
         year: "numeric",
@@ -37,32 +37,34 @@ export const ScheduleInfoCard: React.FC<ScheduleInfoCardProps> = ({
         day: "numeric",
       });
     } catch (error) {
-      return "Error formatting date";
+      console.log("an error occured:", error);
+      throw new Error("Error formatting date");
     }
   };
 
   const formatTime = (timeString: string) => {
     try {
       if (!timeString) return "No time specified";
-      
+
       if (/^\d{1,2}:\d{2}$/.test(timeString)) {
         return timeString;
       }
-      
-      if (timeString.includes('T') || timeString.includes(' ')) {
+
+      if (timeString.includes("T") || timeString.includes(" ")) {
         const date = new Date(timeString);
         if (!isNaN(date.getTime())) {
           return date.toLocaleTimeString("en-US", {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
           });
         }
       }
-      
+
       return timeString;
     } catch (error) {
-      return "Error formatting time";
+      console.log("error occured:", error);
+      throw new Error("Error formatting time");
     }
   };
 
@@ -83,13 +85,10 @@ export const ScheduleInfoCard: React.FC<ScheduleInfoCardProps> = ({
 
         <div>
           <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-            Time Slot
+            Service Time
           </h3>
           <p className="text-lg text-gray-900 mt-1">
-            {timeSlot 
-              ? `${formatTime(timeSlot.startTime)} - ${formatTime(timeSlot.endTime)}`
-              : "N/A"
-            }
+            {timeSlot ? formatTime(timeSlot.startTime) : "N/A"}
           </p>
         </div>
       </div>

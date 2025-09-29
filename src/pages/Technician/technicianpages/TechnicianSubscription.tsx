@@ -106,7 +106,7 @@ export const TechnicianSubscription: React.FC = () => {
               type: "error",
             });
           }
-        } catch (error: any) {
+        } catch (error) {
           console.error("Error verifying purchase:", error);
           showToast({
             message: "Failed to verify purchase",
@@ -134,7 +134,7 @@ export const TechnicianSubscription: React.FC = () => {
             setSubscriptionData(response.data.currentSubscription);
             setUpcomingSubscription(response.data.upcomingSubscription || null);
           }
-        } catch (error: any) {
+        } catch (error) {
           console.error("Error fetching subscription data:", error);
         }
       };
@@ -158,7 +158,7 @@ export const TechnicianSubscription: React.FC = () => {
       setHistoryData(response.data);
       setTotalPages(response.totalPages);
       setCurrentPage(response.currentPage);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error fetching subscription history:", error);
     } finally {
       setHistoryLoading(false);
@@ -176,7 +176,8 @@ export const TechnicianSubscription: React.FC = () => {
       } else {
         setPlansError("Failed to fetch plans");
       }
-    } catch (error: any) {
+    } catch (error) {
+      console.log("error occured while fetching the plans:", error);
       setPlansError("Failed to fetch plans");
     } finally {
       setPlansLoading(false);
@@ -200,11 +201,11 @@ export const TechnicianSubscription: React.FC = () => {
       } else {
         setPlansError("Failed to initiate payment. Please try again.");
       }
-    } catch (error: any) {
-      console.error("Error creating checkout session:", error);
-      setPlansError(
-        error.response?.data?.message || "Payment initialization failed"
-      );
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      const errorMessage =
+        error?.response?.data?.message || "Something went wrong!";
+      setPlansError(errorMessage);
     } finally {
       setPlansLoading(false);
     }

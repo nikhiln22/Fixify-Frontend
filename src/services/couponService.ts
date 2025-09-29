@@ -104,7 +104,7 @@ export const getEligibleCoupons = async (serviceId: string) => {
 
 export const applyCoupon = async (serviceId: string, couponId: string) => {
   try {
-    const response = await axiosInstance.post(`${COUPONS_API}/apply`, {
+    const response = await axiosInstance.patch(`${COUPONS_API}/apply`, {
       serviceId,
       couponId,
     });

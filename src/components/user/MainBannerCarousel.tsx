@@ -8,6 +8,30 @@ interface MainBannerCarouselProps {
   error?: string | null;
 }
 
+interface HeroSlide {
+  id: string;
+  type: "hero";
+  title: string;
+  subtitle: string;
+  description: string;
+  buttonText: string;
+  backgroundColor: string;
+}
+
+interface OfferSlide {
+  id: string;
+  type: "offer";
+  title: string;
+  subtitle: string;
+  description: string;
+  offerCode: string;
+  backgroundColor: string;
+  offer_type: "global" | "service_category" | "first_time_user";
+  min_booking_amount?: number;
+}
+
+type SlideData = HeroSlide | OfferSlide;
+
 export const MainBannerCarousel: React.FC<MainBannerCarouselProps> = ({
   offers = [],
   loading = false,
@@ -15,10 +39,10 @@ export const MainBannerCarousel: React.FC<MainBannerCarouselProps> = ({
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const slides = [
+  const slides: SlideData[] = [
     {
       id: "hero",
-      type: "hero" as const,
+      type: "hero",
       title: "Welcome to Fixify",
       subtitle: "Your trusted home service partner",
       description:
@@ -27,20 +51,22 @@ export const MainBannerCarousel: React.FC<MainBannerCarouselProps> = ({
       backgroundColor: "linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%)",
     },
 
-    ...offers.map((offer, index) => ({
-      id: offer._id || `offer-${index}`,
-      type: "offer" as const,
-      title:
-        offer.discount_type === "percentage"
-          ? `${offer.discount_value}% OFF`
-          : `₹${offer.discount_value} OFF`,
-      subtitle: offer.title,
-      description: offer.description,
-      offerCode: `SAVE${offer.discount_value}`,
-      backgroundColor: "#ffffff",
-      offer_type: offer.offer_type,
-      min_booking_amount: offer.min_booking_amount,
-    })),
+    ...offers.map(
+      (offer, index): OfferSlide => ({
+        id: offer._id || `offer-${index}`,
+        type: "offer",
+        title:
+          offer.discount_type === "percentage"
+            ? `${offer.discount_value}% OFF`
+            : `₹${offer.discount_value} OFF`,
+        subtitle: offer.title,
+        description: offer.description,
+        offerCode: `SAVE${offer.discount_value}`,
+        backgroundColor: "#ffffff",
+        offer_type: offer.offer_type,
+        min_booking_amount: offer.min_booking_amount,
+      })
+    ),
   ];
 
   useEffect(() => {
@@ -136,7 +162,7 @@ export const MainBannerCarousel: React.FC<MainBannerCarouselProps> = ({
           background:
             currentSlideData.type === "hero"
               ? currentSlideData.backgroundColor
-              : `linear-gradient(135deg, ${getBrandColor((currentSlideData as any).offer_type)}15 0%, ${getBrandColor((currentSlideData as any).offer_type)}25 100%)`,
+              : `linear-gradient(135deg, ${getBrandColor(currentSlideData.offer_type)}15 0%, ${getBrandColor(currentSlideData.offer_type)}25 100%)`,
         }}
       >
         <div className="absolute inset-0 overflow-hidden">
@@ -172,7 +198,7 @@ export const MainBannerCarousel: React.FC<MainBannerCarouselProps> = ({
                 <div
                   className="absolute inset-0 blur-lg opacity-30"
                   style={{
-                    color: getBrandColor((currentSlideData as any).offer_type),
+                    color: getBrandColor(currentSlideData.offer_type),
                   }}
                 >
                   <div className="text-6xl md:text-8xl font-black">
@@ -182,7 +208,7 @@ export const MainBannerCarousel: React.FC<MainBannerCarouselProps> = ({
                 <div
                   className="relative text-6xl md:text-8xl font-black mb-2 drop-shadow-xl"
                   style={{
-                    color: getBrandColor((currentSlideData as any).offer_type),
+                    color: getBrandColor(currentSlideData.offer_type),
                   }}
                 >
                   {currentSlideData.title}
@@ -198,10 +224,9 @@ export const MainBannerCarousel: React.FC<MainBannerCarouselProps> = ({
               </p>
 
               <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-sm">
-                {(currentSlideData as any).min_booking_amount && (
+                {currentSlideData.min_booking_amount && (
                   <span className="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-gray-200">
-                    Min. booking: ₹
-                    {(currentSlideData as any).min_booking_amount}
+                    Min. booking: ₹{currentSlideData.min_booking_amount}
                   </span>
                 )}
               </div>

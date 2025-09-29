@@ -13,9 +13,6 @@ export interface Itechnician {
   About?: string;
   image?: string;
   certificates?: string[];
-  address?: string;
-  longitude?: number;
-  latitude?: number;
   createdAt: Date;
   updatedAt: Date;
 }

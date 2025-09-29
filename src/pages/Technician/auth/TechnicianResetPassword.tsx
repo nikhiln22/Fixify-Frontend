@@ -21,11 +21,16 @@ export const TechnicianResetPassword: React.FC = () => {
         type: "success",
       });
       navigate("/technician/login");
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      const errorMessage =
+        error?.response?.data?.message || "Something went wrong!";
+
       showToast({
-        message: error?.response?.data?.message || "Failed to reset password.",
+        message: errorMessage,
         type: "error",
       });
+      throw new Error(errorMessage);
     }
   };
 

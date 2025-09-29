@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Card from "../common/Card";
 import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
+import { IService } from "../../models/service";
 
 interface RelatedServicesProps {
-  relatedServices?: any[];
-  onServiceSelect?: (service: any) => void;
+  relatedServices?: IService[];
+  onServiceSelect?: (service: IService) => void;
 }
 
 const RelatedServices: React.FC<RelatedServicesProps> = ({
@@ -29,7 +30,7 @@ const RelatedServices: React.FC<RelatedServicesProps> = ({
     );
   };
 
-  const handleServiceClick = (service: any) => {
+  const handleServiceClick = (service: IService) => {
     if (onServiceSelect) {
       onServiceSelect(service);
     }

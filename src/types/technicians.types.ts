@@ -7,12 +7,7 @@ export interface SubmitTechnicianQualificationResponse {
   status: number;
   technician: Pick<
     Itechnician,
-    | "yearsOfExperience"
-    | "Designation"
-    | "About"
-    | "image"
-    | "certificates"
-    | "address"
+    "yearsOfExperience" | "Designation" | "About" | "image" | "certificates"
   >;
 }
 
@@ -34,7 +29,7 @@ export interface ITimeSlotData {
 export interface CreateTimeSlotsResponse {
   success: boolean;
   message: string;
-  data?: any;
+  data?: ITimeSlot[];
 }
 
 export interface GetTimeSlotResponse {

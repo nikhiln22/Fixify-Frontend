@@ -25,6 +25,13 @@ interface ServiceRevenueChartProps {
   totalRevenue: number;
 }
 
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    payload: ServiceRevenueData;
+  }>;
+}
+
 const SERVICE_COLORS = [
   "#3B82F6",
   "#10B981",
@@ -51,7 +58,7 @@ export const ServiceRevenueChart: React.FC<ServiceRevenueChartProps> = ({
     }).format(value);
   };
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (

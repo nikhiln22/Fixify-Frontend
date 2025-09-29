@@ -35,6 +35,14 @@ interface EarningsSummary {
   period: string;
 }
 
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    payload: EarningsData;
+  }>;
+  label?: string;
+}
+
 type Period = "daily" | "weekly" | "monthly" | "yearly";
 type ChartType = "line" | "bar";
 
@@ -82,7 +90,6 @@ export const TechnicianEarningsChart: React.FC<
     },
   ];
 
-  // Chart type options
   const chartTypeOptions: {
     value: ChartType;
     label: string;
@@ -100,7 +107,6 @@ export const TechnicianEarningsChart: React.FC<
     },
   ];
 
-  // Format currency
   const formatCurrency = (value: number): string => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
@@ -110,8 +116,11 @@ export const TechnicianEarningsChart: React.FC<
     }).format(value);
   };
 
-  // Custom tooltip for the chart
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip: React.FC<CustomTooltipProps> = ({
+    active,
+    payload,
+    label,
+  }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -138,7 +147,6 @@ export const TechnicianEarningsChart: React.FC<
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
-      {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
         <div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">
@@ -147,9 +155,7 @@ export const TechnicianEarningsChart: React.FC<
           <p className="text-gray-600">Track your earnings over time</p>
         </div>
 
-        {/* Controls */}
         <div className="flex flex-col sm:flex-row gap-4 mt-4 lg:mt-0">
-          {/* Period Selection */}
           <div className="flex bg-gray-100 rounded-lg p-1">
             {periodOptions.map((option) => (
               <button
@@ -167,7 +173,6 @@ export const TechnicianEarningsChart: React.FC<
             ))}
           </div>
 
-          {/* Chart Type Selection */}
           <div className="flex bg-gray-100 rounded-lg p-1">
             {chartTypeOptions.map((option) => (
               <button
@@ -187,7 +192,6 @@ export const TechnicianEarningsChart: React.FC<
         </div>
       </div>
 
-      {/* Summary Stats */}
       {summary && !loading && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-green-50 p-4 rounded-lg border border-green-200">
@@ -235,7 +239,6 @@ export const TechnicianEarningsChart: React.FC<
         </div>
       )}
 
-      {/* Chart Area */}
       <div className="h-80">
         {loading && (
           <div className="flex items-center justify-center h-full">

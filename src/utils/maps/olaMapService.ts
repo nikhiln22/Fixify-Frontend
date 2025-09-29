@@ -3,10 +3,10 @@ import {
   MapLocation,
   MapConfig,
   MapInstance,
-  // ReverseGeocodeResult,
   MapCallbacks,
 } from "../../types/map.types";
 import { MAP_CONFIG, MAP_ERRORS } from "../../config/mapConfig";
+import { envConfig } from "../../config/env.config";
 
 const mapInstances = new Map<string, MapInstance>();
 
@@ -14,12 +14,13 @@ let isGettingLocation = false;
 
 export const reverseGeocode = async (
   lat: number,
-  lng: number,
+  lng: number
 ): Promise<string> => {
   try {
-    const apiKey = import.meta.env.VITE_OLA_MAPS_API_KEY;
+    const { apiKey, reverseGeocodeUrl } = envConfig.olaMaps;
+
     const response = await fetch(
-      `https://api.olamaps.io/places/v1/reverse-geocode?latlng=${lat},${lng}&api_key=${apiKey}`,
+      `${reverseGeocodeUrl}?latlng=${lat},${lng}&api_key=${apiKey}`
     );
 
     if (!response.ok) {
@@ -64,14 +65,14 @@ export const getCurrentLocation = async (): Promise<MapLocation> => {
             enableHighAccuracy: false,
             timeout: 15000,
             maximumAge: 300000,
-          },
+          }
         );
-      },
+      }
     );
 
     const address = await reverseGeocode(
       position.coords.latitude,
-      position.coords.longitude,
+      position.coords.longitude
     );
 
     return {
@@ -102,7 +103,7 @@ export const initializeMap = (
   container: HTMLElement,
   location: MapLocation,
   callbacks?: MapCallbacks,
-  config?: Partial<MapConfig>,
+  config?: Partial<MapConfig>
 ): MapInstance => {
   if (!container) {
     throw new Error("Container element is required");
@@ -113,7 +114,7 @@ export const initializeMap = (
   }
 
   try {
-    const apiKey = import.meta.env.VITE_OLA_MAPS_API_KEY;
+    const apiKey = envConfig.olaMaps.apiKey;
 
     const olaMaps = new OlaMaps({
       apiKey: apiKey || "",

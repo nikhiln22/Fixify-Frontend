@@ -20,12 +20,16 @@ export const TechnicianForgotPassword: React.FC = () => {
       });
 
       return response;
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      const errorMessage =
+        error?.response?.data?.message || "Something went wrong!";
+
       showToast({
-        message: err?.response?.data?.message || "Failed to send OTP.",
+        message: errorMessage,
         type: "error",
       });
-      throw err;
+      throw new Error(errorMessage);
     }
   };
 

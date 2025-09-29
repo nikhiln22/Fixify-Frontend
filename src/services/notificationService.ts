@@ -17,6 +17,6 @@ export const markNotificationRead = async (notificationId: string) => {
     );
     return response.data;
   } catch (error) {
-    console.log("error occured while marking the notification as read");
+    console.log("error occured while marking the notification as read:", error);
   }
 };

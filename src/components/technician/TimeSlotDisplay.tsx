@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Clock, CheckCircle, XCircle, Lock, Unlock } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Lock,
+  Unlock,
+} from "lucide-react";
 import { ITimeSlot } from "../../models/timeslot";
 import { TimeSlotDisplayProps } from "../../types/component.types";
 
@@ -54,22 +61,22 @@ const groupSlotsByDate = (slots: ITimeSlot[]) => {
 
 const convertTo24Hour = (time12h: string) => {
   const [time, modifier] = time12h.split(" ");
-  let [hours, minutes] = time.split(":");
-  if (hours === "12") {
-    hours = "00";
+  const [hours, minutes] = time.split(":");
+  let modifiedHours = hours;
+  if (modifiedHours === "12") {
+    modifiedHours = "00";
   }
   if (modifier === "PM") {
-    hours = (parseInt(hours, 10) + 12).toString();
+    modifiedHours = (parseInt(modifiedHours, 10) + 12).toString();
   }
-  return `${hours.padStart(2, "0")}:${minutes}`;
+  return `${modifiedHours.padStart(2, "0")}:${minutes}`;
 };
 
-export const TimeSlotDisplay: React.FC<TimeSlotDisplayProps & {
-  onBlockSlot: (slotId: string, currentStatus: boolean) => void;
-}> = ({
-  timeSlots,
-  onBlockSlot,
-}) => {
+export const TimeSlotDisplay: React.FC<
+  TimeSlotDisplayProps & {
+    onBlockSlot: (slotId: string, currentStatus: boolean) => void;
+  }
+> = ({ timeSlots, onBlockSlot }) => {
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [groupedSlots, setGroupedSlots] = useState<{
     [key: string]: ITimeSlot[];
@@ -92,7 +99,9 @@ export const TimeSlotDisplay: React.FC<TimeSlotDisplayProps & {
 
   const totalSlots = selectedSlots.length;
   const bookedSlots = selectedSlots.filter((slot) => slot.isBooked).length;
-  const blockedSlots = selectedSlots.filter((slot) => !slot.isAvailable && !slot.isBooked).length;
+  const blockedSlots = selectedSlots.filter(
+    (slot) => !slot.isAvailable && !slot.isBooked
+  ).length;
   const availableSlots = totalSlots - bookedSlots - blockedSlots;
 
   return (
@@ -202,8 +211,8 @@ export const TimeSlotDisplay: React.FC<TimeSlotDisplayProps & {
                       isBooked
                         ? "border-red-200 bg-red-50 text-red-400"
                         : isBlocked
-                        ? "border-orange-200 bg-orange-50 text-orange-400"
-                        : "border-gray-300 bg-gray-50 text-gray-700 hover:border-gray-400 hover:bg-gray-100"
+                          ? "border-orange-200 bg-orange-50 text-orange-400"
+                          : "border-gray-300 bg-gray-50 text-gray-700 hover:border-gray-400 hover:bg-gray-100"
                     }`}
                   >
                     <div className="flex items-center justify-center space-x-2 mb-1">
@@ -215,9 +224,7 @@ export const TimeSlotDisplay: React.FC<TimeSlotDisplayProps & {
                         <CheckCircle className="w-4 h-4" />
                       )}
                     </div>
-                    <div className="font-medium text-sm">
-                      {slot.startTime} - {slot.endTime}
-                    </div>
+                    <div className="font-medium text-sm">{slot.startTime}</div>
 
                     {isBooked && (
                       <div className="absolute inset-0 flex items-center justify-center rounded-lg">
@@ -237,7 +244,9 @@ export const TimeSlotDisplay: React.FC<TimeSlotDisplayProps & {
 
                     {!isBooked && (
                       <button
-                        onClick={() => onBlockSlot(slot._id, slot.isAvailable ?? true)}
+                        onClick={() =>
+                          onBlockSlot(slot._id, slot.isAvailable ?? true)
+                        }
                         className={`absolute top-1 right-1 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${
                           isBlocked
                             ? "bg-green-100 hover:bg-green-200 text-green-600"
@@ -264,8 +273,8 @@ export const TimeSlotDisplay: React.FC<TimeSlotDisplayProps & {
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg">
           <p className="text-sm text-gray-600">
             <strong>Note:</strong> Gray slots are available for booking. Red
-            slots are already booked by customers. Orange slots are blocked by you.
-            Hover over slots to block/unblock them.
+            slots are already booked by customers. Orange slots are blocked by
+            you. Hover over slots to block/unblock them.
           </p>
         </div>
       )}

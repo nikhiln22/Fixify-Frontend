@@ -21,21 +21,27 @@ interface ServiceCategoryChartProps {
   loading: boolean;
 }
 
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  label?: string;
+}
+
 export const ServiceCategoryChart: React.FC<ServiceCategoryChartProps> = ({
   data,
   loading,
 }) => {
   const COLORS = [
-    "#3b82f6", // blue
-    "#10b981", // green
-    "#f59e0b", // yellow
-    "#ef4444", // red
-    "#8b5cf6", // purple
-    "#06b6d4", // cyan
-    "#f97316", // orange
-    "#84cc16", // lime
-    "#ec4899", // pink
-    "#6b7280", // gray
+    "#3b82f6",
+    "#10b981",
+    "#f59e0b",
+    "#ef4444",
+    "#8b5cf6",
+    "#06b6d4",
+    "#f97316",
+    "#84cc16",
+    "#ec4899",
+    "#6b7280",
   ];
 
   if (loading) {
@@ -62,10 +68,8 @@ export const ServiceCategoryChart: React.FC<ServiceCategoryChartProps> = ({
     );
   }
 
-  // Debug log
   console.log("ServiceCategoryChart data:", data);
 
-  // Add colors to data and ensure proper structure
   const chartData = data.map((item, index) => ({
     categoryName: item.categoryName || "Unknown Category",
     bookingCount: item.bookingCount || 0,
@@ -75,8 +79,11 @@ export const ServiceCategoryChart: React.FC<ServiceCategoryChartProps> = ({
 
   console.log("Chart data processed:", chartData);
 
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip: React.FC<CustomTooltipProps> = ({
+    active,
+    payload,
+    label,
+  }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-3 border border-gray-200 rounded shadow-lg">
@@ -125,7 +132,6 @@ export const ServiceCategoryChart: React.FC<ServiceCategoryChartProps> = ({
         </BarChart>
       </ResponsiveContainer>
 
-      {/* Top 3 Categories Summary */}
       <div className="mt-4 pt-4 border-t border-gray-200">
         <h4 className="text-sm font-medium text-gray-700 mb-2">
           Top Performing Categories:

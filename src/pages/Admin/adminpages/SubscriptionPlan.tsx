@@ -18,6 +18,7 @@ import {
 import { ISubscriptionPlan } from "../../../models/subscriptionPlan";
 import { getSubscriptionPlanColumns } from "../../../constants/tablecolumns/SubscriptionPlanColumns";
 import { Link } from "react-router-dom";
+import { SubscriptionPlanFormDto } from "../../../types/subscription.types";
 
 export const SubscriptionPlan: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -95,13 +96,15 @@ export const SubscriptionPlan: React.FC = () => {
     setSelectedSubscriptionPlan(null);
   };
 
-  const handleSubmitSubscriptionPlan = async (subscriptionPlanData: any) => {
+  const handleSubmitSubscriptionPlan = async (
+    subscriptionPlanData: SubscriptionPlanFormDto
+  ) => {
     setIsLoading(true);
     try {
       if (selectedSubscriptionPlan) {
         const response = await updateSubscriptionPlan(
           selectedSubscriptionPlan._id,
-          subscriptionPlanData,
+          subscriptionPlanData
         );
         if (response && subscriptionPlans) {
           setSubscriptionPlans(
@@ -115,9 +118,7 @@ export const SubscriptionPlan: React.FC = () => {
           });
         }
       } else {
-        const response = await addSubscriptionPlan(
-          subscriptionPlanData,
-        );
+        const response = await addSubscriptionPlan(subscriptionPlanData);
         if (response && subscriptionPlans) {
           const firstPageItems = [
             response.data,
@@ -153,9 +154,7 @@ export const SubscriptionPlan: React.FC = () => {
 
   const handleStatusToggle = async (subscriptionPlanId: string) => {
     try {
-      const result = await toggleSubscriptionPlanStatus(
-        subscriptionPlanId,
-      );
+      const result = await toggleSubscriptionPlanStatus(subscriptionPlanId);
       console.log("result from toggling the subscription plan status:", result);
       if (result) {
         console.log("New status:", result.data.status);

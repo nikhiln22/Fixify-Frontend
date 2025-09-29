@@ -2,15 +2,10 @@ import React from "react";
 import { Star, Briefcase } from "lucide-react";
 import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
 import Button from "../common/Button";
+import { Itechnician } from "../../models/technician";
 
 interface TechnicianCardProps {
-  technician: {
-    _id: string;
-    username: string;
-    averageRating: number;
-    yearsOfExperience: number;
-    image: string;
-  };
+  technician: Itechnician & { averageRating: number };
   onSelect?: () => void;
   showBookButton?: boolean;
   isSelected?: boolean;
@@ -21,7 +16,7 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
   onSelect,
   showBookButton = true,
 }) => {
-  const { username, averageRating, yearsOfExperience, image } = technician;
+  const { username, averageRating, yearsOfExperience } = technician;
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -53,8 +48,8 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
     return stars;
   };
 
-  const formatExperience = (exp: number) => {
-    return `${exp}`;
+  const formatExperience = (exp: number | undefined) => {
+    return `${exp ?? 0}`;
   };
 
   return (
@@ -63,7 +58,9 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
         <div className="flex items-start space-x-4 flex-1">
           <div className="relative flex-shrink-0">
             <img
-              src={buildCloudinaryUrl(image)}
+              src={
+                technician.image ? buildCloudinaryUrl(technician.image) : "N/A"
+              }
               alt={username}
               className="w-16 h-16 rounded-full object-cover"
               onError={(e) => {

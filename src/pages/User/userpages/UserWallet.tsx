@@ -105,7 +105,7 @@ export const UserWallet: React.FC = () => {
           setIsVerifying(false);
         });
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, setTransactions]);
 
   const handleAddMoney = async (amount: number) => {
     try {

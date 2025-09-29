@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import UserLayout from "../../../layouts/UserLayout";
 import Banner from "../../../components/common/Banner";
 import ServiceHeader from "../../../components/user/ServiceHeader";
-import TechnicianList from "../../../components/user/TechncianList";
+import TechnicianList from "../../../components/user/TechnicianList";
 import AddressSelector from "../../../components/user/AddressSelector";
 import RelatedServices from "../../../components/user/RelatedServices";
 import { getNearbyTechnicians } from "../../../services/userServices";
@@ -12,15 +12,20 @@ import { IService } from "../../../models/service";
 import { IAddress } from "../../../models/address";
 import { getServiceDetails } from "../../../services/serviceService";
 import technicianBanner from "../../../assets/technician Banner.png";
+import { Itechnician } from "../../../models/technician";
 
 export const UserServiceDetails: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState<IAddress | null>(null);
-  const [selectedTechnician, setSelectedTechnician] = useState<any>(null);
+  const [selectedTechnician, setSelectedTechnician] =
+    useState<Itechnician | null>(null);
   const [serviceData, setServiceData] = useState<IService | null>(null);
-  const [relatedServices, setRelatedServices] = useState<any[]>([]);
+  const [relatedServices, setRelatedServices] = useState<IService[]>([]);
   const [userAddresses, setUserAddresses] = useState<IAddress[]>([]);
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
-  const [technicians, setTechnicians] = useState<any[]>([]);
+  const [technicians, setTechnicians] = useState<
+    (Itechnician & { averageRating: number })[]
+  >([]);
+
   const [isLoadingTechnicians, setIsLoadingTechnicians] = useState(false);
 
   const { serviceId } = useParams<{ serviceId: string }>();
@@ -59,9 +64,6 @@ export const UserServiceDetails: React.FC = () => {
 
   const fetchTechnicians = useCallback(
     async (address: IAddress) => {
-      console.log("fetchTechnicians called with address:", address);
-      console.log("serviceData:", serviceData);
-
       if (!address) {
         console.log("No address provided, returning early");
         return;
@@ -82,7 +84,7 @@ export const UserServiceDetails: React.FC = () => {
         console.log("Starting to fetch technicians...");
 
         const techniciansList = await getNearbyTechnicians(
-          serviceData.designation._id,
+          serviceData.designation as unknown as string,
           address.latitude,
           address.longitude,
           10
@@ -90,9 +92,11 @@ export const UserServiceDetails: React.FC = () => {
 
         console.log("techniciansList received:", techniciansList);
 
-        setTechnicians(techniciansList);
+        const techniciansWithRating = techniciansList.map(
+          (tech) => tech as Itechnician & { averageRating: number }
+        );
 
-        console.log("Technicians state updated");
+        setTechnicians(techniciansWithRating);
       } catch (error) {
         console.error("Error fetching technicians:", error);
         setTechnicians([]);
@@ -105,9 +109,6 @@ export const UserServiceDetails: React.FC = () => {
 
   const handleAddressSelect = useCallback(
     (address: IAddress) => {
-      console.log("handleAddressSelect called with:", address);
-      console.log("Current selectedAddress:", selectedAddress);
-
       setSelectedAddress(address);
       setSelectedTechnician(null);
       setTechnicians([]);
@@ -118,7 +119,7 @@ export const UserServiceDetails: React.FC = () => {
   );
 
   const handleTechnicianSelect = useCallback(
-    (technician: any) => {
+    (technician: Itechnician) => {
       setSelectedTechnician(technician);
       console.log("Selected technician:", technician);
 
@@ -133,7 +134,7 @@ export const UserServiceDetails: React.FC = () => {
     [navigate, serviceData, selectedAddress]
   );
 
-  const handleRelatedServiceSelect = useCallback((service: any) => {
+  const handleRelatedServiceSelect = useCallback((service: IService) => {
     console.log("Selected related service:", service);
   }, []);
 
@@ -157,7 +158,7 @@ export const UserServiceDetails: React.FC = () => {
           <div className="space-y-6">
             <TechnicianList
               onTechnicianSelect={handleTechnicianSelect}
-              selectedTechnicianId={selectedTechnician?.id}
+              selectedTechnicianId={selectedTechnician?._id}
               serviceId={serviceId}
               selectedAddress={selectedAddress}
               technicians={technicians}

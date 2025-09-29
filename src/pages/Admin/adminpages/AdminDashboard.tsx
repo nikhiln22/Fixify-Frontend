@@ -118,7 +118,7 @@ export const AdminDashboard: React.FC = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [timePeriod]);
 
   return (
     <AdminLayout>
@@ -146,11 +146,7 @@ export const AdminDashboard: React.FC = () => {
         />
       </div>
 
-      {/* Future sections */}
-      <div className="space-y-6">
-        {/* Recent activity section can be added here */}
-        {/* Management sections can be added here */}
-      </div>
+      <div className="space-y-6"></div>
     </AdminLayout>
   );
 };

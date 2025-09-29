@@ -36,21 +36,35 @@ export const getBookingsColumns = (
     baseColumns.push({
       key: "timeSlotId",
       label: "Service Date",
-      render: (item) => (
-        <div className="text-center font-medium">{item.timeSlotId.date}</div>
-      ),
+      render: (item) => {
+        const firstTimeSlot =
+          Array.isArray(item.timeSlotId) && item.timeSlotId.length > 0
+            ? item.timeSlotId[0]
+            : null;
+
+        return (
+          <div className="text-center font-medium">
+            {firstTimeSlot?.date || "N/A"}
+          </div>
+        );
+      },
     });
 
     baseColumns.push({
       key: "timeSlotId",
       label: "Service Time",
-      render: (item) => (
-        <div className="text-center font-medium">
-          {item.timeSlotId?.startTime && item.timeSlotId?.endTime
-            ? `${item.timeSlotId.startTime} - ${item.timeSlotId.endTime}`
-            : "N/A"}
-        </div>
-      ),
+      render: (item) => {
+        const firstTimeSlot =
+          Array.isArray(item.timeSlotId) && item.timeSlotId.length > 0
+            ? item.timeSlotId[0]
+            : null;
+
+        return (
+          <div className="text-center font-medium">
+            {firstTimeSlot?.startTime || "N/A"}
+          </div>
+        );
+      },
     });
   } else {
     baseColumns.push({
@@ -75,7 +89,7 @@ export const getBookingsColumns = (
       <div className="text-center font-medium">
         ₹
         {role === "technician"
-          ? item.paymentId.technicianShare
+          ? item.paymentId?.technicianShare || 0
           : item.bookingAmount}
       </div>
     ),
@@ -134,30 +148,64 @@ export const getBookingsColumns = (
   baseColumns.push({
     key: "action",
     label: "Actions",
-    render: (item) => (
-      <div className="flex justify-center gap-2">
-        <button
-          onClick={() => handleViewDetails(item._id)}
-          className="px-5 py-2.5 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm"
-        >
-          View
-        </button>
+    render: (item) => {
+      const firstTimeSlot =
+        Array.isArray(item.timeSlotId) && item.timeSlotId.length > 0
+          ? item.timeSlotId[0]
+          : null;
 
-        {item.bookingStatus === "Booked" && role !== "admin" && (
+      return (
+        <div className="flex justify-center gap-2">
           <button
-            onClick={() => handleChatWithTechnician?.(item._id)}
-            className="px-5 py-2.5 rounded bg-green-500 text-white hover:bg-green-600 transition-colors text-xs"
+            onClick={() => handleViewDetails(item._id)}
+            className="px-5 py-2.5 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm"
           >
-            Chat
+            View
           </button>
-        )}
 
-        {(role === "user" || role === "technician") &&
-          handleCancelBooking &&
-          item.bookingStatus === "Booked" &&
-          (() => {
-            if (role === "technician") {
-              const [day, month, year] = item.timeSlotId.date.split("-");
+          {item.bookingStatus === "Booked" && role !== "admin" && (
+            <button
+              onClick={() => handleChatWithTechnician?.(item._id)}
+              className="px-5 py-2.5 rounded bg-green-500 text-white hover:bg-green-600 transition-colors text-xs"
+            >
+              Chat
+            </button>
+          )}
+
+          {(role === "user" || role === "technician") &&
+            handleCancelBooking &&
+            item.bookingStatus === "Booked" &&
+            (() => {
+              if (role === "technician" && firstTimeSlot?.date) {
+                const [day, month, year] = firstTimeSlot.date.split("-");
+                const serviceDate = new Date(
+                  parseInt(year),
+                  parseInt(month) - 1,
+                  parseInt(day)
+                );
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                serviceDate.setHours(0, 0, 0, 0);
+
+                return serviceDate > today;
+              }
+
+              return role === "user";
+            })() && (
+              <button
+                onClick={() => handleCancelBooking(item._id)}
+                className="px-5 py-2.5 rounded bg-red-500 text-white hover:bg-red-600 transition-colors text-xs"
+              >
+                Cancel
+              </button>
+            )}
+
+          {role === "technician" &&
+            handleCompleteBooking &&
+            item.bookingStatus === "Booked" &&
+            firstTimeSlot?.date &&
+            (() => {
+              const [day, month, year] = firstTimeSlot.date.split("-");
               const serviceDate = new Date(
                 parseInt(year),
                 parseInt(month) - 1,
@@ -165,66 +213,40 @@ export const getBookingsColumns = (
               );
               const today = new Date();
               today.setHours(0, 0, 0, 0);
-              serviceDate.setHours(0, 0, 0, 0);
+              return serviceDate <= today;
+            })() && (
+              <button
+                onClick={() => handleCompleteBooking(item._id)}
+                className="px-5 py-2.5 rounded bg-purple-500 text-white hover:bg-purple-600 transition-colors text-xs"
+              >
+                Complete
+              </button>
+            )}
 
-              return serviceDate > today;
-            }
+          {role === "user" &&
+            handleRateService &&
+            item.bookingStatus === "Completed" &&
+            !item.isRated &&
+            (() => {
+              const completedDate = new Date(item.updatedAt);
+              const today = new Date();
+              const daysDifference = Math.floor(
+                (today.getTime() - completedDate.getTime()) /
+                  (1000 * 60 * 60 * 24)
+              );
 
-            return true;
-          })() && (
-            <button
-              onClick={() => handleCancelBooking(item._id)}
-              className="px-5 py-2.5 rounded bg-red-500 text-white hover:bg-red-600 transition-colors text-xs"
-            >
-              Cancel
-            </button>
-          )}
-
-        {role === "technician" &&
-          handleCompleteBooking &&
-          item.bookingStatus === "Booked" &&
-          (() => {
-            const [day, month, year] = item.timeSlotId.date.split("-");
-            const serviceDate = new Date(
-              parseInt(year),
-              parseInt(month) - 1,
-              parseInt(day)
-            );
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            return serviceDate <= today;
-          })() && (
-            <button
-              onClick={() => handleCompleteBooking(item._id)}
-              className="px-5 py-2.5 rounded bg-purple-500 text-white hover:bg-purple-600 transition-colors text-xs"
-            >
-              Complete
-            </button>
-          )}
-
-        {role === "user" &&
-          handleRateService &&
-          item.bookingStatus === "Completed" &&
-          !item.isRated &&
-          (() => {
-            const completedDate = new Date(item.updatedAt);
-            const today = new Date();
-            const daysDifference = Math.floor(
-              (today.getTime() - completedDate.getTime()) /
-                (1000 * 60 * 60 * 24)
-            );
-
-            return daysDifference <= 3;
-          })() && (
-            <button
-              onClick={() => handleRateService(item._id)}
-              className="px-5 py-2.5 rounded bg-orange-500 text-white hover:bg-orange-600 transition-colors text-xs"
-            >
-              Rate
-            </button>
-          )}
-      </div>
-    ),
+              return daysDifference <= 3;
+            })() && (
+              <button
+                onClick={() => handleRateService(item._id)}
+                className="px-5 py-2.5 rounded bg-orange-500 text-white hover:bg-orange-600 transition-colors text-xs"
+              >
+                Rate
+              </button>
+            )}
+        </div>
+      );
+    },
   });
 
   return baseColumns;

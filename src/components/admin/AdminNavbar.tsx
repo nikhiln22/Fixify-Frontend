@@ -15,7 +15,7 @@ import {
 } from "../../utils/socket/socket";
 import { useAppSelector } from "../../hooks/useRedux";
 
-const AdminNavbar: React.FC = () => {
+export const AdminNavbar: React.FC = () => {
   const adminData = useAppSelector((state) => state.admin.adminData);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
@@ -141,5 +141,3 @@ const AdminNavbar: React.FC = () => {
     </>
   );
 };
-
-export default AdminNavbar;

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TechnicianLayout from "../../../layouts/TechnicianLayout";
 import { TechnicianProfileSidebar } from "../../../components/technician/TechnicianProfileSidebar";
-import { RecurringDaysSelector } from "../../../components/technician/RecurringDaysSelector";
 import { TimeSlotDisplay } from "../../../components/technician/TimeSlotDisplay";
 import MultiDatePicker from "../../../components/technician/MultiDatePicker";
 import TimeSelection from "../../../components/technician/TimeSelection";
@@ -23,8 +22,6 @@ interface DateTimeSlot {
 }
 
 export const TechnicianAvailability: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("recurring");
-  const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [showTimeSlotForm, setShowTimeSlotForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [timeSlots, setTimeSlots] = useState<ITimeSlot[]>([]);
@@ -167,7 +164,10 @@ export const TechnicianAvailability: React.FC = () => {
 
       if (response.success) {
         if (response.data && Array.isArray(response.data)) {
-          setTimeSlots((prevSlots) => [...prevSlots, ...response.data]);
+          setTimeSlots((prevSlots) => [
+            ...prevSlots,
+            ...(response.data as ITimeSlot[]),
+          ]);
         } else {
           await fetchTimeSlots();
         }
@@ -219,40 +219,11 @@ export const TechnicianAvailability: React.FC = () => {
             </div>
 
             <div className="space-y-6">
-              <div className="border-b border-gray-200">
-                <nav className="-mb-px flex space-x-8">
-                  <button
-                    onClick={() => setActiveTab("recurring")}
-                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                      activeTab === "recurring"
-                        ? "border-black text-black"
-                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    }`}
-                  >
-                    Recurring Schedule
-                  </button>
-                  <button
-                    onClick={() => setActiveTab("specific")}
-                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                      activeTab === "specific"
-                        ? "border-black text-black"
-                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    }`}
-                  >
-                    Specific Dates
-                  </button>
-                </nav>
-              </div>
-
-              {activeTab === "recurring" ? (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    Recurring Schedule
-                  </h3>
-                  <RecurringDaysSelector
-                    selectedDays={selectedDays}
-                    onDaysChange={setSelectedDays}
-                    showError={false}
+              {showTimeSlotForm ? (
+                <div className="space-y-6">
+                  <MultiDatePicker
+                    onDatesChange={handleDatesChange}
+                    maxDates={7}
                   />
 
                   <TimeSelection
@@ -260,102 +231,80 @@ export const TechnicianAvailability: React.FC = () => {
                     onTimeChange={handleTimeChange}
                     isLoading={isLoading}
                   />
-                  <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                    <p className="text-blue-800">
-                      Days selection, time settings, and recurring slots
-                    </p>
-                  </div>
+
+                  {selectedDates.length > 0 && (
+                    <div className="flex justify-end space-x-4">
+                      <button
+                        onClick={handleCancel}
+                        className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleSubmit}
+                        disabled={!canSubmit || isLoading}
+                        className="px-6 py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {isLoading ? "Creating..." : "Create Time Slots"}
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {showTimeSlotForm ? (
-                    <div className="space-y-6">
-                      <MultiDatePicker
-                        onDatesChange={handleDatesChange}
-                        maxDates={7}
-                      />
+                  {timeSlots.length > 0 ? (
+                    <>
+                      <div className="flex justify-between items-center">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                          Your Schedule
+                        </h2>
+                        <button
+                          onClick={() => setShowTimeSlotForm(true)}
+                          className="inline-flex items-center px-4 py-2 bg-black text-white font-medium rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add More Slots
+                        </button>
+                      </div>
 
-                      <TimeSelection
-                        selectedDates={selectedDates}
-                        onTimeChange={handleTimeChange}
-                        isLoading={isLoading}
+                      <TimeSlotDisplay
+                        timeSlots={timeSlots}
+                        onBlockSlot={handleBlockSlot}
                       />
-
-                      {selectedDates.length > 0 && (
-                        <div className="flex justify-end space-x-4">
-                          <button
-                            onClick={handleCancel}
-                            className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={handleSubmit}
-                            disabled={!canSubmit || isLoading}
-                            className="px-6 py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                          >
-                            {isLoading ? "Creating..." : "Create Time Slots"}
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                    </>
                   ) : (
-                    <div className="space-y-6">
-                      {timeSlots.length > 0 ? (
-                        <>
-                          <div className="flex justify-between items-center">
-                            <h2 className="text-xl font-semibold text-gray-900">
-                              Your Schedule
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                      <div className="text-center py-12">
+                        <div className="mb-6">
+                          <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                        </div>
+                        {isLoadingSlots ? (
+                          <div>
+                            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                              Loading your schedule...
                             </h2>
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+                          </div>
+                        ) : (
+                          <>
+                            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                              Manage Your Availability
+                            </h2>
+                            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                              Create and manage your available time slots for
+                              bookings. Set your working hours and preferred
+                              slot durations.
+                            </p>
                             <button
                               onClick={() => setShowTimeSlotForm(true)}
-                              className="inline-flex items-center px-4 py-2 bg-black text-white font-medium rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                              className="inline-flex items-center px-6 py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
                             >
-                              <Plus className="w-4 h-4 mr-2" />
-                              Add More Slots
+                              <Plus className="w-5 h-5 mr-2" />
+                              Generate Time Slots
                             </button>
-                          </div>
-
-                          <TimeSlotDisplay
-                            timeSlots={timeSlots}
-                            onBlockSlot={handleBlockSlot}
-                          />
-                        </>
-                      ) : (
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                          <div className="text-center py-12">
-                            <div className="mb-6">
-                              <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                            </div>
-                            {isLoadingSlots ? (
-                              <div>
-                                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                                  Loading your schedule...
-                                </h2>
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                              </div>
-                            ) : (
-                              <>
-                                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                                  Manage Your Availability
-                                </h2>
-                                <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                                  Create and manage your available time slots
-                                  for bookings. Set your working hours and
-                                  preferred slot durations.
-                                </p>
-                                <button
-                                  onClick={() => setShowTimeSlotForm(true)}
-                                  className="inline-flex items-center px-6 py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
-                                >
-                                  <Plus className="w-5 h-5 mr-2" />
-                                  Generate Time Slots
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )}
+                          </>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

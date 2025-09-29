@@ -17,6 +17,7 @@ import { getTechnicianProfile } from "../../../services/technicianServices";
 import { getAllDesignations } from "../../../services/designationService";
 import { useDispatch } from "react-redux";
 import { updateTechnicianData } from "../../../redux/slices/technicianslice";
+import { QualificationFormData } from "../../../types/component.types";
 
 interface TechnicianDashboardStatsData {
   totalEarnings: number;
@@ -261,7 +262,6 @@ export const TechnicianPortal: React.FC = () => {
             response.Designation ||
             response.About ||
             response.image ||
-            response.address ||
             (response.certificates && response.certificates.length > 0)
           );
 
@@ -287,13 +287,13 @@ export const TechnicianPortal: React.FC = () => {
     };
 
     fetchTechnicianProfile();
-  }, []);
+  }, [selectedPeriod]);
 
   const handleStartVerification = () => {
     setShowQualificationForm(true);
   };
 
-  const handleFormSubmit = async (formData: any) => {
+  const handleFormSubmit = async (formData: QualificationFormData) => {
     console.log("Form submitted with data:", formData);
     try {
       const data = new FormData();
@@ -327,7 +327,6 @@ export const TechnicianPortal: React.FC = () => {
         const technicianData = {
           yearsOfExperience: response.technician.yearsOfExperience,
           Designation: response.technician.Designation,
-          address: response.technician.address,
           About: response.technician.About,
           image: response.technician.image,
           certificates: response.technician.certificates,

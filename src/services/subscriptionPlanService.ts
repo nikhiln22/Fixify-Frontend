@@ -2,16 +2,11 @@ import axiosInstance from "../config/axios.config";
 import { SUBSCRIPTION_PLANS_API } from "../constants/apiRoutes";
 import { ISubscriptionPlan } from "../models/subscriptionPlan";
 import { ISubscriptionPlanHistory } from "../models/subscriptionPlanHistory";
+import { SubscriptionPlanFormDto } from "../types/subscription.types";
 
-export const addSubscriptionPlan = async (subscriptionPlanData: {
-  planName: string;
-  monthlyPrice: number;
-  commissionRate: number;
-  WalletCreditDelay: number;
-  profileBoost: string;
-  durationInMonths: number;
-  description: string;
-}) => {
+export const addSubscriptionPlan = async (
+  subscriptionPlanData: SubscriptionPlanFormDto
+) => {
   const response = await axiosInstance.post(
     `${SUBSCRIPTION_PLANS_API}`,
     subscriptionPlanData
@@ -106,11 +101,7 @@ export const toggleSubscriptionPlanStatus = async (
 
 export const updateSubscriptionPlan = async (
   subscriptionPlanId: string,
-  subscriptionPlanData: {
-    planName: string;
-    price: number;
-    commissionRate: number;
-  }
+  subscriptionPlanData: SubscriptionPlanFormDto
 ) => {
   try {
     const response = await axiosInstance.put(

@@ -14,13 +14,17 @@ export const AddCoupon: React.FC<AddCouponProps> = ({
   initialValues,
   isEditing = false,
 }) => {
-  const getErrorMessage = (error: any): string | undefined => {
+  const getErrorMessage = (
+    error: string | string[] | undefined
+  ): string | undefined => {
     if (typeof error === "string") return error;
     if (Array.isArray(error)) return error[0];
     return undefined;
   };
 
-  const getTouchedValue = (touched: any): boolean | undefined => {
+  const getTouchedValue = (
+    touched: boolean | undefined
+  ): boolean | undefined => {
     if (typeof touched === "boolean") return touched;
     return !!touched;
   };

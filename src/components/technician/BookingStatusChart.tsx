@@ -30,6 +30,13 @@ interface BookingStatusChartProps {
   totalBookings?: number;
 }
 
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    payload: BookingStatusData;
+  }>;
+}
+
 const STATUS_COLORS: Record<string, string> = {
   Completed: "#10B981",
   Booked: "#3B82F6",
@@ -57,8 +64,7 @@ export const BookingStatusChart: React.FC<BookingStatusChartProps> = ({
     }
   };
 
-  // Custom tooltip for booking status
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -94,7 +100,6 @@ export const BookingStatusChart: React.FC<BookingStatusChartProps> = ({
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
-      {/* Header */}
       <div className="mb-6">
         <h3 className="text-xl font-bold text-gray-900 mb-2">
           Booking Status Distribution
@@ -183,7 +188,6 @@ export const BookingStatusChart: React.FC<BookingStatusChartProps> = ({
         )}
       </div>
 
-      {/* Stats Summary */}
       {!loading && !error && data.length > 0 && (
         <div className="mt-4 pt-4 border-t border-gray-200">
           <div className="grid grid-cols-3 gap-4 text-sm">

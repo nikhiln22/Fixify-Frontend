@@ -175,13 +175,16 @@ export const UserBookingsList: React.FC = () => {
           type: "error",
         });
       }
-    } catch (error: any) {
-      console.error("Error sending message:", error);
+    } catch (err) {
+      console.error("Error sending message:", err);
+      const error = err as { response?: { data?: { message?: string } } };
+      const errorMessage =
+        error?.response?.data?.message || "Something went wrong!";
 
       sendMessage(selectedChatBooking._id, messageText, "user");
 
       showToast({
-        message: error?.response?.data?.message || "Failed to send message",
+        message: errorMessage,
         type: "error",
       });
     } finally {
@@ -241,14 +244,15 @@ export const UserBookingsList: React.FC = () => {
           type: "error",
         });
       }
-    } catch (error: any) {
-      console.error("Error submitting rating:", error);
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      const errorMessage =
+        error?.response?.data?.message || "Something went wrong!";
       showToast({
-        message:
-          error?.response?.data?.message ||
-          "Failed to submit rating. Please try again.",
+        message: errorMessage,
         type: "error",
       });
+      throw new Error(errorMessage);
     } finally {
       setIsSubmittingRating(false);
     }
