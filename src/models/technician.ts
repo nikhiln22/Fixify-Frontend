@@ -13,6 +13,6 @@ export interface Itechnician {
   About?: string;
   image?: string;
   certificates?: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
