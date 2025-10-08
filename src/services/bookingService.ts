@@ -31,6 +31,18 @@ export const verifyPaymentSession = async (sessionId: string) => {
   }
 };
 
+export const startService = async (bookingId: string) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/${BOOKINGS_API}/${bookingId}/start`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occured while starting the service:", error);
+    throw error;
+  }
+};
+
 export const createBookingRating = async (
   bookingId: string,
   rating: number,

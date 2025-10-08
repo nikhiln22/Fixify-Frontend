@@ -31,7 +31,6 @@ export const UserNavbar: React.FC = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // Debounced search effect
   useEffect(() => {
     if (!searchTerm.trim()) return;
 

@@ -5,6 +5,8 @@ import adminReducer from "../redux/slices/adminSlice";
 import storage from "redux-persist/lib/storage";
 import { persistStore, persistReducer } from "redux-persist";
 import couponReducer from "../redux/slices/couponSlice";
+import bookingReducer from "../redux/slices/bookingSlice";
+import offerReducer from "../redux/slices/offerSlice";
 
 const persistConfig = {
   key: "root",
@@ -16,6 +18,8 @@ const rootReducer = combineReducers({
   user: userReducer,
   admin: adminReducer,
   coupon: couponReducer,
+  booking: bookingReducer,
+  offer: offerReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

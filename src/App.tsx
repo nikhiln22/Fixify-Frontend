@@ -33,19 +33,14 @@ function App() {
           />
 
           <Routes>
-            {/* Landing page */}
             <Route path="/" element={<LandingPage />} />
 
-            {/* User routes */}
             <Route path="/user/*" element={<UserRoutes />} />
 
-            {/* Technician routes */}
             <Route path="/technician/*" element={<TechnicianRoutes />} />
 
-            {/* Admin routes */}
             <Route path="/admin/*" element={<AdminRoutes />} />
 
-            {/* Catch all unmatched routes */}
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </BrowserRouter>
