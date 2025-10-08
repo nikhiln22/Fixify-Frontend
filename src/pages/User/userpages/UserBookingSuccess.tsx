@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import UserLayout from "../../../layouts/UserLayout";
 import Button from "../../../components/common/Button";
 import Banner from "../../../components/common/Banner";
@@ -8,10 +9,14 @@ import { showToast } from "../../../utils/toast";
 import dayjs from "dayjs";
 import { IBooking } from "../../../models/booking";
 import technicianBanner from "../../../assets/technician Banner.png";
+import { clearBookingData } from "../../../redux/slices/bookingSlice";
+import { clearCouponData } from "../../../redux/slices/couponSlice";
+import { clearOfferData } from "../../../redux/slices/offerSlice";
 
 export const UserBookingSuccess: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
 
   const data = location.state?.booking || null;
   console.log("data:", data);
@@ -22,6 +27,12 @@ export const UserBookingSuccess: React.FC = () => {
   const [booking, setBooking] = useState<IBooking | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const hasVerified = useRef(false);
+
+  useEffect(() => {
+    dispatch(clearBookingData());
+    dispatch(clearCouponData());
+    dispatch(clearOfferData());
+  }, [dispatch]);
 
   useEffect(() => {
     const verify = async () => {
@@ -114,12 +125,6 @@ export const UserBookingSuccess: React.FC = () => {
           </p>
 
           <div className="text-left mb-6 space-y-2">
-            {/* <div className="flex justify-between">
-              <span className="text-gray-500">Total Amount</span>
-              <span className="text-gray-900 font-medium">
-                ₹{booking.bookingAmount}
-              </span>
-            </div> */}
             <div className="flex justify-between">
               <span className="text-gray-500">Date</span>
               <span className="text-gray-900 font-medium">

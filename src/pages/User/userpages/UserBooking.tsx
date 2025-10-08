@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "../../../hooks/useRedux";
 import { showToast } from "../../../utils/toast";
@@ -34,31 +34,43 @@ import {
   clearCouponData,
 } from "../../../redux/slices/couponSlice";
 import technicianBanner from "../../../assets/technician Banner.png";
+import { setBookingData } from "../../../redux/slices/bookingSlice";
+import { setOfferData } from "../../../redux/slices/offerSlice"; // ✅ added import
+import { CheckCircle } from "lucide-react";
 
 export const UserBooking: React.FC = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const { service, address, technician, selectedSlot } = useAppSelector(
+    (state) => state.booking
+  );
   const { appliedCoupon } = useAppSelector((state) => state.coupon);
+
+  const { currentOffer } = useAppSelector((state) => state.offer);
 
   const [timeSlots, setTimeSlots] = useState<ITimeSlot[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isConfirmingBooking, setIsConfirmingBooking] = useState(false);
-  const [selectedSlot, setSelectedSlot] = useState<ITimeSlot | null>(null);
   const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<PaymentMethod | null>(null);
 
-  const [offerData, setOfferData] = useState<OfferData | null>(null);
   const [isLoadingOffer, setIsLoadingOffer] = useState(true);
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
 
   const [eligibleCoupons, setEligibleCoupons] = useState<CouponData[]>([]);
   const [isLoadingCoupons, setIsLoadingCoupons] = useState(false);
 
-  const state = location.state;
-  const { service, address, technician } = state;
+  useEffect(() => {
+    if (!service || !address || !technician) {
+      showToast({
+        message: "Please select a service and technician first",
+        type: "warning",
+      });
+      navigate("/user/services");
+    }
+  }, [service, address, technician, navigate]);
 
   console.log("technician data in the user booking:", technician);
 
@@ -66,21 +78,25 @@ export const UserBooking: React.FC = () => {
     if (
       appliedCoupon &&
       appliedCoupon.serviceId &&
+      service &&
       appliedCoupon.serviceId !== service._id
     ) {
       dispatch(clearCouponData());
     }
-  }, [service._id, appliedCoupon, dispatch]);
+  }, [service, appliedCoupon, dispatch]);
 
   useEffect(() => {
     const checkOffers = async () => {
       if (service) {
-        if (service.serviceType === "fixed") {
+        if (service.serviceType === "fixed" && service.price) {
+          if (currentOffer?.offerId) {
+            console.log("Offer already applied, skipping fetch");
+            setIsLoadingOffer(false);
+            return;
+          }
+
           try {
             setIsLoadingOffer(true);
-            console.log(
-              `Checking offers for service ${service.name} with serviceID ${service._id} and price ${service.price}`
-            );
 
             const offerResponse = await applyBestOffer(
               service._id,
@@ -89,7 +105,7 @@ export const UserBooking: React.FC = () => {
             console.log("Offer response in UserBooking:", offerResponse);
 
             if (offerResponse?.success && offerResponse.data) {
-              setOfferData({
+              const newOffer: OfferData = {
                 offerId: offerResponse.data.offerId,
                 offerApplied: offerResponse.data.offerApplied,
                 offerName: offerResponse.data.offerName,
@@ -100,7 +116,8 @@ export const UserBooking: React.FC = () => {
                 discountType: offerResponse.data.discountType,
                 offerType: offerResponse.data.offerType,
                 minBookingAmount: offerResponse.data.minBookingAmount,
-              });
+              };
+              dispatch(setOfferData(newOffer));
             }
           } catch (error) {
             console.log("Error occurred while fetching offers:", error);
@@ -117,22 +134,13 @@ export const UserBooking: React.FC = () => {
     };
 
     checkOffers();
-  }, [service]);
+  }, [service, currentOffer, dispatch]);
 
   const handleFetchCoupons = async () => {
     console.log("Fetching eligible coupons...");
 
     if (!service?._id) {
       console.log("No service ID found");
-      return;
-    }
-
-    if (service.serviceType === "HOURLY") {
-      showToast({
-        message:
-          "Coupons and offers will be applied after service completion for hourly services",
-        type: "info",
-      });
       return;
     }
 
@@ -168,6 +176,8 @@ export const UserBooking: React.FC = () => {
     newCoupon: CouponData,
     currentCoupon: CouponData | null = null
   ) => {
+    if (!service) return;
+
     try {
       console.log("Applying coupon:", newCoupon);
       console.log("Current coupon:", currentCoupon);
@@ -218,9 +228,16 @@ export const UserBooking: React.FC = () => {
   };
 
   const fetchTimeSlots = async () => {
+    if (!technician) return;
+
     try {
       setIsLoadingSlots(true);
       const response = await getAvailableTimeSlots(technician._id, false);
+
+      console.log(
+        "reseponse forthe avilable time slots in the user booking page:",
+        response.data
+      );
 
       if (response.success) {
         setTimeSlots(response.data || []);
@@ -245,8 +262,9 @@ export const UserBooking: React.FC = () => {
     }
   };
 
-  const handleSlotSelect = (slot: ITimeSlot) => {
-    setSelectedSlot(slot);
+  const handleSlotSelect = (slot: ITimeSlot | null) => {
+    dispatch(setBookingData({ selectedSlot: slot }));
+    showToast({ message: "Slot selected. Proceed to book now!", type: "info" });
   };
 
   const handleCloseSlotModal = () => {
@@ -258,6 +276,14 @@ export const UserBooking: React.FC = () => {
   };
 
   const handleConfirmBooking = async () => {
+    if (!service || !address || !technician) {
+      showToast({
+        message: "Missing booking information",
+        type: "error",
+      });
+      return;
+    }
+
     if (!selectedSlot) {
       showToast({
         message: "Please select a time slot first",
@@ -277,10 +303,10 @@ export const UserBooking: React.FC = () => {
     try {
       setIsConfirmingBooking(true);
 
-      let finalBookingAmount = service.price;
+      let finalBookingAmount: number = service.price || 0;
 
-      if (offerData?.offerApplied && offerData.finalAmount) {
-        finalBookingAmount = offerData.finalAmount;
+      if (currentOffer?.offerApplied && currentOffer.finalAmount) {
+        finalBookingAmount = currentOffer.finalAmount;
       }
 
       if (appliedCoupon?.discountAmount) {
@@ -295,9 +321,13 @@ export const UserBooking: React.FC = () => {
         paymentMethod: selectedPaymentMethod,
         originalAmount: service.price,
         bookingAmount: finalBookingAmount,
-        offerId: offerData?.offerId || "",
+        offerId: currentOffer?.offerId || "",
         couponId: appliedCoupon?.couponId || "",
       };
+
+      if (service.serviceType === "hourly") {
+        bookingData.bookingAmount = 300;
+      }
 
       console.log("Sending booking data to backend:", bookingData);
 
@@ -340,6 +370,10 @@ export const UserBooking: React.FC = () => {
 
   const isBookingReady = selectedSlot && selectedPaymentMethod;
 
+  if (!service || !address || !technician) {
+    return null;
+  }
+
   return (
     <UserLayout>
       <Banner backgroundImage={technicianBanner} height="400px" />
@@ -371,17 +405,8 @@ export const UserBooking: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center space-x-2 mb-2">
-                        <svg
-                          className="w-5 h-5 text-green-600"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
+                        <CheckCircle className="w-5 h-5 text-green-600" />
+
                         <h3 className="text-lg font-medium text-green-900">
                           Time Slot Selected
                         </h3>
@@ -405,7 +430,7 @@ export const UserBooking: React.FC = () => {
                     Select Time Slot
                   </h3>
                   <p className="text-sm text-gray-600 mb-6">
-                    Choose from available time slots from {technician.name}
+                    Choose from available time slots from {technician.username}
                   </p>
                   <Button
                     onClick={fetchTimeSlots}
@@ -430,7 +455,7 @@ export const UserBooking: React.FC = () => {
           <div className="lg:col-span-1">
             <BookingSummary
               service={service}
-              offerData={offerData}
+              offerData={currentOffer}
               isLoadingOffer={isLoadingOffer}
               appliedCoupon={appliedCoupon}
               onConfirmBooking={handleConfirmBooking}

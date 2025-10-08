@@ -7,7 +7,8 @@ export const getBookingsColumns = (
   handleCompleteBooking?: (id: string) => void,
   handleCancelBooking?: (id: string) => void,
   handleChatWithTechnician?: (id: string) => void,
-  handleRateService?: (id: string) => void
+  handleRateService?: (id: string) => void,
+  handleStartService?: (id: string) => void // ✅ added
 ): Column<IBooking>[] => {
   const baseColumns: Column<IBooking>[] = [
     {
@@ -110,7 +111,9 @@ export const getBookingsColumns = (
                   ? "bg-red-100 text-red-800"
                   : item.bookingStatus === "Booked"
                     ? "bg-blue-100 text-blue-800"
-                    : "bg-gray-100 text-gray-800"
+                    : item.bookingStatus === "In Progress"
+                      ? "bg-orange-100 text-orange-800"
+                      : "bg-gray-100 text-gray-800"
           }`}
         >
           {item.bookingStatus}
@@ -197,6 +200,29 @@ export const getBookingsColumns = (
                 className="px-5 py-2.5 rounded bg-red-500 text-white hover:bg-red-600 transition-colors text-xs"
               >
                 Cancel
+              </button>
+            )}
+
+          {role === "technician" &&
+            handleStartService &&
+            item.bookingStatus === "Booked" &&
+            firstTimeSlot?.date &&
+            (() => {
+              const [day, month, year] = firstTimeSlot.date.split("-");
+              const serviceDate = new Date(
+                parseInt(year),
+                parseInt(month) - 1,
+                parseInt(day)
+              );
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              return serviceDate.getTime() === today.getTime();
+            })() && (
+              <button
+                onClick={() => handleStartService(item._id)}
+                className="px-5 py-2.5 rounded bg-yellow-500 text-white hover:bg-yellow-600 transition-colors text-xs"
+              >
+                Start Service
               </button>
             )}
 

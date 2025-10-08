@@ -13,8 +13,11 @@ import { IAddress } from "../../../models/address";
 import { getServiceDetails } from "../../../services/serviceService";
 import technicianBanner from "../../../assets/technician Banner.png";
 import { Itechnician } from "../../../models/technician";
+import { useDispatch } from "react-redux";
+import { setBookingData } from "../../../redux/slices/bookingSlice";
 
 export const UserServiceDetails: React.FC = () => {
+  const dispatch = useDispatch();
   const [selectedAddress, setSelectedAddress] = useState<IAddress | null>(null);
   const [selectedTechnician, setSelectedTechnician] =
     useState<Itechnician | null>(null);
@@ -112,10 +115,19 @@ export const UserServiceDetails: React.FC = () => {
       setSelectedAddress(address);
       setSelectedTechnician(null);
       setTechnicians([]);
+      dispatch(
+        setBookingData({
+          service: serviceData,
+          address: address,
+          technician: null,
+          selectedSlot: null,
+        })
+      );
+
       console.log("About to call fetchTechnicians with address:", address);
       fetchTechnicians(address);
     },
-    [fetchTechnicians]
+    [dispatch, serviceData, fetchTechnicians]
   );
 
   const handleTechnicianSelect = useCallback(
@@ -123,15 +135,18 @@ export const UserServiceDetails: React.FC = () => {
       setSelectedTechnician(technician);
       console.log("Selected technician:", technician);
 
-      navigate("/user/booking", {
-        state: {
+      dispatch(
+        setBookingData({
           service: serviceData,
           address: selectedAddress,
           technician: technician,
-        },
-      });
+          selectedSlot: null,
+        })
+      );
+
+      navigate("/user/booking");
     },
-    [navigate, serviceData, selectedAddress]
+    [dispatch, navigate, serviceData, selectedAddress]
   );
 
   const handleRelatedServiceSelect = useCallback((service: IService) => {

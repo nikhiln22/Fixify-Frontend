@@ -2,7 +2,6 @@ export const USER_API = "/api/user";
 export const ADMIN_API = "/api/admin";
 export const TECHNICIAN_API = "/api/technician";
 export const APPLICANTS_API = "/api/applicants";
-export const AUTH_API = "/api/auth";
 export const ADDRESSES_API = "/api/addresses";
 export const WALLET_API = "/api/wallet";
 export const NOTIFICATIONS_API = "/api/notifications";

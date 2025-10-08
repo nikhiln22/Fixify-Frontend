@@ -41,10 +41,15 @@ export interface IBooking {
     endTime: string;
   };
   bookingAmount: number;
-  bookingStatus: "Pending" | "Booked" | "Cancelled" | "Completed";
+  bookingStatus:
+    | "Pending"
+    | "Booked"
+    | "In Progress"
+    | "Cancelled"
+    | "Completed";
   paymentId: {
     _id: string;
-    paymentStatus: "Paid" | "Refunded";
+    paymentStatus: "Partial Paid" | "Paid" | "Refunded";
     paymentMethod?: "Online" | "Wallet";
     originalAmount?: number;
     amountPaid?: number;

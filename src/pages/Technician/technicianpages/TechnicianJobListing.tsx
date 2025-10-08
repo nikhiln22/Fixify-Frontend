@@ -11,6 +11,7 @@ import { IBooking } from "../../../models/booking";
 import {
   cancelBooking,
   generateCompletionOtp,
+  startService,
   verifyCompletionOtp,
 } from "../../../services/bookingService";
 import { showToast } from "../../../utils/toast";
@@ -105,6 +106,38 @@ export const TechnicianJobListing: React.FC = () => {
     console.log("Filter changed to:", e.target.value);
     setFilterStatus(e.target.value);
     setCurrentPage(1);
+  };
+
+  const handleStartService = async (bookingId: string) => {
+    try {
+      const response = await startService(bookingId);
+
+      if (response.success) {
+        setBookings(
+          bookings.map((booking) =>
+            booking._id === bookingId
+              ? { ...booking, bookingStatus: response.data.bookingStatus }
+              : booking
+          )
+        );
+
+        showToast({
+          message: "Service started successfully!",
+          type: "success",
+        });
+      } else {
+        showToast({
+          message: response.message || "Failed to start the service",
+          type: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error starting service:", error);
+      showToast({
+        message: "Failed to start the service. Please try again.",
+        type: "error",
+      });
+    }
   };
 
   const handleCompleteBooking = async (bookingId: string) => {
@@ -387,7 +420,8 @@ export const TechnicianJobListing: React.FC = () => {
     handleCompleteBooking,
     handleCancelBooking,
     handleChatWithUser,
-    undefined
+    undefined,
+    handleStartService
   );
 
   if (error) {

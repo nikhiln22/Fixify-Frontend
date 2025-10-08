@@ -7,13 +7,15 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
+  CircleDashed,
+  Loader,
 } from "lucide-react";
 
 interface BookingStatusCardProps {
   bookingDate: string | Date;
   paymentMethod?: "Online" | "Wallet";
-  status: "Pending" | "Booked" | "Cancelled" | "Completed";
-  paymentStatus?: "Paid" | "Refunded";
+  status: "Pending" | "Booked" | "In Progress" | "Cancelled" | "Completed";
+  paymentStatus?: "Partial Paid" | "Paid" | "Refunded";
   bookingId?: string;
   userType?: "user" | "technician" | "admin";
 }
@@ -49,13 +51,15 @@ export const BookingStatusCard: React.FC<BookingStatusCardProps> = ({
   };
 
   const getBookingStatusIcon = (
-    status: "Pending" | "Booked" | "Cancelled" | "Completed"
+    status: "Pending" | "Booked" | "In Progress" | "Cancelled" | "Completed"
   ) => {
     switch (status) {
       case "Pending":
         return <Clock className="w-5 h-5 text-yellow-500" />;
       case "Booked":
         return <CheckCircle className="w-5 h-5 text-blue-500" />;
+      case "In Progress":
+        return <Loader className="w-5 h-5 text-indigo-500 animate-spin" />;
       case "Completed":
         return <CheckCircle className="w-5 h-5 text-green-500" />;
       case "Cancelled":
@@ -66,11 +70,15 @@ export const BookingStatusCard: React.FC<BookingStatusCardProps> = ({
   };
 
   const getBookingStatusBadge = (
-    status: "Pending" | "Booked" | "Cancelled" | "Completed"
+    status: "Pending" | "Booked" | "In Progress" | "Cancelled" | "Completed"
   ) => {
     const statusConfig = {
       Pending: { color: "bg-yellow-100 text-yellow-800", label: "Pending" },
       Booked: { color: "bg-blue-100 text-blue-800", label: "Booked" },
+      "In Progress": {
+        color: "bg-indigo-100 text-indigo-800",
+        label: "In Progress",
+      },
       Completed: { color: "bg-green-100 text-green-800", label: "Completed" },
       Cancelled: { color: "bg-red-100 text-red-800", label: "Cancelled" },
     };
@@ -86,8 +94,12 @@ export const BookingStatusCard: React.FC<BookingStatusCardProps> = ({
     );
   };
 
-  const getPaymentStatusIcon = (paymentStatus?: "Paid" | "Refunded") => {
+  const getPaymentStatusIcon = (
+    paymentStatus?: "Partial Paid" | "Paid" | "Refunded"
+  ) => {
     switch (paymentStatus) {
+      case "Partial Paid":
+        return <CircleDashed className="w-5 h-5 text-yellow-500" />;
       case "Paid":
         return <CheckCircle className="w-5 h-5 text-green-500" />;
       case "Refunded":
@@ -98,10 +110,14 @@ export const BookingStatusCard: React.FC<BookingStatusCardProps> = ({
   };
 
   const getPaymentStatusBadge = (
-    paymentStatus: "Paid" | "Pending" | "Failed" | "Refunded"
+    paymentStatus: "Paid" | "Pending" | "Failed" | "Refunded" | "Partial Paid"
   ) => {
     const statusConfig = {
       Paid: { color: "bg-green-100 text-green-800", label: "Paid" },
+      "Partial Paid": {
+        color: "bg-yellow-100 text-yellow-800",
+        label: "Partial Paid",
+      },
       Pending: { color: "bg-yellow-100 text-yellow-800", label: "Pending" },
       Failed: { color: "bg-red-100 text-red-800", label: "Failed" },
       Refunded: { color: "bg-purple-100 text-purple-800", label: "Refunded" },
