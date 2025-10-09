@@ -14,7 +14,13 @@ import {
 interface BookingStatusCardProps {
   bookingDate: string | Date;
   paymentMethod?: "Online" | "Wallet";
-  status: "Pending" | "Booked" | "In Progress" | "Cancelled" | "Completed";
+  status:
+    | "Pending"
+    | "Booked"
+    | "In Progress"
+    | "Payment Pending"
+    | "Cancelled"
+    | "Completed";
   paymentStatus?: "Partial Paid" | "Paid" | "Refunded";
   bookingId?: string;
   userType?: "user" | "technician" | "admin";
@@ -51,7 +57,13 @@ export const BookingStatusCard: React.FC<BookingStatusCardProps> = ({
   };
 
   const getBookingStatusIcon = (
-    status: "Pending" | "Booked" | "In Progress" | "Cancelled" | "Completed"
+    status:
+      | "Pending"
+      | "Booked"
+      | "In Progress"
+      | "Payment Pending"
+      | "Cancelled"
+      | "Completed"
   ) => {
     switch (status) {
       case "Pending":
@@ -59,6 +71,8 @@ export const BookingStatusCard: React.FC<BookingStatusCardProps> = ({
       case "Booked":
         return <CheckCircle className="w-5 h-5 text-blue-500" />;
       case "In Progress":
+        return <Loader className="w-5 h-5 text-indigo-500 animate-spin" />;
+      case "Payment Pending":
         return <Loader className="w-5 h-5 text-indigo-500 animate-spin" />;
       case "Completed":
         return <CheckCircle className="w-5 h-5 text-green-500" />;
@@ -70,7 +84,13 @@ export const BookingStatusCard: React.FC<BookingStatusCardProps> = ({
   };
 
   const getBookingStatusBadge = (
-    status: "Pending" | "Booked" | "In Progress" | "Cancelled" | "Completed"
+    status:
+      | "Pending"
+      | "Booked"
+      | "In Progress"
+      | "Payment Pending"
+      | "Cancelled"
+      | "Completed"
   ) => {
     const statusConfig = {
       Pending: { color: "bg-yellow-100 text-yellow-800", label: "Pending" },
@@ -78,6 +98,10 @@ export const BookingStatusCard: React.FC<BookingStatusCardProps> = ({
       "In Progress": {
         color: "bg-indigo-100 text-indigo-800",
         label: "In Progress",
+      },
+      "Payment Pending": {
+        color: "bg-purple-100 text-purple-800",
+        label: "Payment Pending",
       },
       Completed: { color: "bg-green-100 text-green-800", label: "Completed" },
       Cancelled: { color: "bg-red-100 text-red-800", label: "Cancelled" },
