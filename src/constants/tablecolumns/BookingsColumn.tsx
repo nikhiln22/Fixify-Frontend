@@ -8,7 +8,8 @@ export const getBookingsColumns = (
   handleCancelBooking?: (id: string) => void,
   handleChatWithTechnician?: (id: string) => void,
   handleRateService?: (id: string) => void,
-  handleStartService?: (id: string) => void // ✅ added
+  handleStartService?: (id: string) => void,
+  handlePayNow?: (id: string) => void
 ): Column<IBooking>[] => {
   const baseColumns: Column<IBooking>[] = [
     {
@@ -34,39 +35,38 @@ export const getBookingsColumns = (
   ];
 
   if (role === "technician") {
-    baseColumns.push({
-      key: "timeSlotId",
-      label: "Service Date",
-      render: (item) => {
-        const firstTimeSlot =
-          Array.isArray(item.timeSlotId) && item.timeSlotId.length > 0
-            ? item.timeSlotId[0]
-            : null;
-
-        return (
-          <div className="text-center font-medium">
-            {firstTimeSlot?.date || "N/A"}
-          </div>
-        );
+    baseColumns.push(
+      {
+        key: "timeSlotId",
+        label: "Service Date",
+        render: (item) => {
+          const firstTimeSlot =
+            Array.isArray(item.timeSlotId) && item.timeSlotId.length > 0
+              ? item.timeSlotId[0]
+              : null;
+          return (
+            <div className="text-center font-medium">
+              {firstTimeSlot?.date || "N/A"}
+            </div>
+          );
+        },
       },
-    });
-
-    baseColumns.push({
-      key: "timeSlotId",
-      label: "Service Time",
-      render: (item) => {
-        const firstTimeSlot =
-          Array.isArray(item.timeSlotId) && item.timeSlotId.length > 0
-            ? item.timeSlotId[0]
-            : null;
-
-        return (
-          <div className="text-center font-medium">
-            {firstTimeSlot?.startTime || "N/A"}
-          </div>
-        );
-      },
-    });
+      {
+        key: "timeSlotId",
+        label: "Service Time",
+        render: (item) => {
+          const firstTimeSlot =
+            Array.isArray(item.timeSlotId) && item.timeSlotId.length > 0
+              ? item.timeSlotId[0]
+              : null;
+          return (
+            <div className="text-center font-medium">
+              {firstTimeSlot?.startTime || "N/A"}
+            </div>
+          );
+        },
+      }
+    );
   } else {
     baseColumns.push({
       key: "createdAt",
@@ -113,7 +113,9 @@ export const getBookingsColumns = (
                     ? "bg-blue-100 text-blue-800"
                     : item.bookingStatus === "In Progress"
                       ? "bg-orange-100 text-orange-800"
-                      : "bg-gray-100 text-gray-800"
+                      : item.bookingStatus === "Payment Pending"
+                        ? "bg-purple-100 text-purple-800"
+                        : "bg-gray-100 text-gray-800"
           }`}
         >
           {item.bookingStatus}
@@ -128,16 +130,17 @@ export const getBookingsColumns = (
       label: "Payment Status",
       render: (item) => {
         const paymentStatus = item.paymentId?.paymentStatus || "Pending";
-
         return (
           <div className="flex justify-center">
             <span
               className={`px-2 py-1 rounded-full text-sm font-medium ${
                 paymentStatus === "Paid"
                   ? "bg-green-100 text-green-800"
-                  : paymentStatus === "Refunded"
-                    ? "bg-blue-100 text-blue-800"
-                    : "bg-yellow-100 text-yellow-800"
+                  : paymentStatus === "Partial Paid"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : paymentStatus === "Refunded"
+                      ? "bg-blue-100 text-blue-800"
+                      : "bg-yellow-100 text-yellow-800"
               }`}
             >
               {paymentStatus}
@@ -158,7 +161,7 @@ export const getBookingsColumns = (
           : null;
 
       return (
-        <div className="flex justify-center gap-2">
+        <div className="flex justify-center gap-2 flex-wrap">
           <button
             onClick={() => handleViewDetails(item._id)}
             className="px-5 py-2.5 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm"
@@ -166,14 +169,27 @@ export const getBookingsColumns = (
             View
           </button>
 
-          {item.bookingStatus === "Booked" && role !== "admin" && (
-            <button
-              onClick={() => handleChatWithTechnician?.(item._id)}
-              className="px-5 py-2.5 rounded bg-green-500 text-white hover:bg-green-600 transition-colors text-xs"
-            >
-              Chat
-            </button>
-          )}
+          {role === "user" &&
+            handlePayNow &&
+            item.bookingStatus === "Payment Pending" && (
+              <button
+                onClick={() => handlePayNow(item._id)}
+                className="px-5 py-2.5 rounded bg-yellow-500 text-white hover:bg-yellow-600 transition-colors text-sm font-semibold animate-pulse"
+              >
+                Pay Now
+              </button>
+            )}
+
+          {item.bookingStatus === "Booked" &&
+            role !== "admin" &&
+            handleChatWithTechnician && (
+              <button
+                onClick={() => handleChatWithTechnician(item._id)}
+                className="px-5 py-2.5 rounded bg-green-500 text-white hover:bg-green-600 transition-colors text-xs"
+              >
+                Chat
+              </button>
+            )}
 
           {(role === "user" || role === "technician") &&
             handleCancelBooking &&
@@ -189,10 +205,8 @@ export const getBookingsColumns = (
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 serviceDate.setHours(0, 0, 0, 0);
-
                 return serviceDate > today;
               }
-
               return role === "user";
             })() && (
               <button
@@ -228,19 +242,8 @@ export const getBookingsColumns = (
 
           {role === "technician" &&
             handleCompleteBooking &&
-            item.bookingStatus === "Booked" &&
-            firstTimeSlot?.date &&
-            (() => {
-              const [day, month, year] = firstTimeSlot.date.split("-");
-              const serviceDate = new Date(
-                parseInt(year),
-                parseInt(month) - 1,
-                parseInt(day)
-              );
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-              return serviceDate <= today;
-            })() && (
+            item.bookingStatus === "In Progress" &&
+            firstTimeSlot?.date && (
               <button
                 onClick={() => handleCompleteBooking(item._id)}
                 className="px-5 py-2.5 rounded bg-purple-500 text-white hover:bg-purple-600 transition-colors text-xs"
@@ -260,7 +263,6 @@ export const getBookingsColumns = (
                 (today.getTime() - completedDate.getTime()) /
                   (1000 * 60 * 60 * 24)
               );
-
               return daysDifference <= 3;
             })() && (
               <button

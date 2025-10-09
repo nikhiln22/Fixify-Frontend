@@ -17,6 +17,6 @@ export interface IService {
   estimatedTime?: number;
   hourlyRate?: number;
   maxHours?: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }

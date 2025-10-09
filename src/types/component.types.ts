@@ -279,6 +279,11 @@ export interface BookingSummaryProps {
   isLoading?: boolean;
   disabled?: boolean;
   selectedPaymentMethod?: PaymentMethod | null;
+  isFinalPayment?: boolean;
+  advancePaid?: number;
+  subtotal?: number;
+  billedHours?: number;
+  hourlyRate?: number;
 }
 
 export interface WalletBalanceProps {
