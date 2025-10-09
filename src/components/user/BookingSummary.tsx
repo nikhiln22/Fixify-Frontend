@@ -15,19 +15,60 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
   isLoading = false,
   disabled = false,
   isLoadingCoupons,
+  isFinalPayment = false,
+  advancePaid = 0,
+  subtotal = 0,
+  billedHours = 0,
+  hourlyRate = 0,
 }) => {
-  const serviceCharge =
-    service.serviceType === "fixed"
+  const isHourlyService = service.serviceType === "hourly";
+
+  const getServiceCharge = (): number => {
+    if (isFinalPayment && isHourlyService) {
+      return subtotal;
+    }
+    return service.serviceType === "fixed"
       ? service.price || 0
       : service.hourlyRate || 0;
+  };
+
+  const serviceCharge = getServiceCharge();
 
   const offerDiscount = offerData?.discountAmount || 0;
   const couponDiscount = appliedCoupon?.discountAmount || 0;
   const totalDiscountAmount = offerDiscount + couponDiscount;
-  const totalAmount = serviceCharge - totalDiscountAmount;
+
+  const calculateFinalAmount = (): number => {
+    let amount = serviceCharge;
+
+    if (isFinalPayment && isHourlyService && advancePaid > 0) {
+      amount = amount - advancePaid;
+    }
+
+    if (offerData?.offerApplied && offerData.finalAmount !== undefined) {
+      amount = offerData.finalAmount;
+
+      if (isFinalPayment && isHourlyService && advancePaid > 0) {
+        amount = amount - advancePaid;
+      }
+    } else if (offerDiscount > 0) {
+      amount = amount - offerDiscount;
+    }
+
+    if (couponDiscount > 0) {
+      amount = amount - couponDiscount;
+    }
+
+    return Math.max(0, amount);
+  };
+
+  const finalAmount = calculateFinalAmount();
+
   const hasDiscount = offerData?.offerApplied || appliedCoupon;
 
-  const isHourlyService = service.serviceType === "hourly";
+  const shouldShowDiscounts =
+    (isHourlyService && isFinalPayment) ||
+    (!isHourlyService && !isFinalPayment);
 
   const getOfferDisplayMessage = () => {
     if (!offerData) return "";
@@ -47,18 +88,28 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
   };
 
   const getAdvanceAmount = (): number => {
+    if (isFinalPayment) {
+      return finalAmount;
+    }
+
     if (service.serviceType === "fixed") {
-      return totalAmount;
+      return finalAmount;
     } else if (service.serviceType === "hourly") {
       return 300;
     }
     return 0;
   };
 
+  const getButtonText = (): string => {
+    if (isLoading) return "Processing...";
+    if (isFinalPayment) return "Complete Payment";
+    return "Confirm Booking";
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 sticky top-4">
       <h2 className="text-xl font-semibold text-gray-900 mb-6">
-        Booking Summary
+        {isFinalPayment ? "Payment Summary" : "Booking Summary"}
       </h2>
 
       <div className="space-y-4 mb-6">
@@ -83,7 +134,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
 
       <hr className="my-4" />
 
-      {isHourlyService && (
+      {isHourlyService && !isFinalPayment && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
           <div className="flex items-start gap-2">
             <Info className="w-4 h-4 text-blue-600 mt-0.5" />
@@ -100,7 +151,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
         </div>
       )}
 
-      {!isHourlyService && appliedCoupon && (
+      {shouldShowDiscounts && appliedCoupon && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -125,7 +176,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
         </div>
       )}
 
-      {!isHourlyService && offerData?.offerApplied && (
+      {shouldShowDiscounts && offerData?.offerApplied && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
           <div className="flex items-center gap-2">
             <span className="text-sm text-green-700 font-medium">
@@ -138,7 +189,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
         </div>
       )}
 
-      {!isHourlyService && (
+      {shouldShowDiscounts && (
         <div
           onClick={onFetchCoupons}
           className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 cursor-pointer hover:bg-blue-100 transition-colors"
@@ -151,7 +202,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
                   ? "Loading..."
                   : appliedCoupon
                     ? "Change Coupon"
-                    : "view all coupons"}
+                    : "Apply Coupon"}
               </span>
             </div>
             <ChevronRight className="w-4 h-4 text-blue-600" />
@@ -160,30 +211,52 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
       )}
 
       <div className="space-y-3 mb-6">
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Service Charge:</span>
-          <span className="font-medium">
-            {isHourlyService ? `₹${serviceCharge}/hr` : `₹${serviceCharge}`}
-          </span>
-        </div>
-
-        {isHourlyService && (
+        {isFinalPayment && isHourlyService ? (
+          <>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Hourly Rate:</span>
+              <span className="font-medium">₹{hourlyRate}/hr</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Billed Hours:</span>
+              <span className="font-medium">× {billedHours}</span>
+            </div>
+            <div className="flex justify-between text-sm font-medium">
+              <span className="text-gray-900">Subtotal:</span>
+              <span className="text-gray-900">₹{subtotal}</span>
+            </div>
+            <hr className="my-2" />
+          </>
+        ) : (
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Advance Payment:</span>
-            <span className="font-medium">₹{getAdvanceAmount()}</span>
-          </div>
-        )}
-
-        {!isHourlyService && offerData?.offerApplied && (
-          <div className="flex justify-between text-sm">
-            <span className="text-green-600">Offer Discount:</span>
-            <span className="font-medium text-green-600">
-              -₹{offerDiscount}
+            <span className="text-gray-600">Service Charge:</span>
+            <span className="font-medium">
+              {isHourlyService && !isFinalPayment
+                ? `₹${serviceCharge}/hr`
+                : `₹${serviceCharge}`}
             </span>
           </div>
         )}
 
-        {!isHourlyService && appliedCoupon && (
+        {isFinalPayment && advancePaid > 0 && (
+          <div className="flex justify-between text-sm">
+            <span className="text-green-600">Advance Paid:</span>
+            <span className="font-medium text-green-600">-₹{advancePaid}</span>
+          </div>
+        )}
+
+        {shouldShowDiscounts &&
+          offerData?.offerApplied &&
+          offerDiscount > 0 && (
+            <div className="flex justify-between text-sm">
+              <span className="text-green-600">Offer Discount:</span>
+              <span className="font-medium text-green-600">
+                -₹{offerDiscount}
+              </span>
+            </div>
+          )}
+
+        {shouldShowDiscounts && appliedCoupon && couponDiscount > 0 && (
           <div className="flex justify-between text-sm">
             <span className="text-green-600">Coupon Discount:</span>
             <span className="font-medium text-green-600">
@@ -192,10 +265,12 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
           </div>
         )}
 
-        {!isHourlyService && hasDiscount && (
+        {shouldShowDiscounts && hasDiscount && (
           <div className="flex justify-between text-sm font-medium">
             <span className="text-green-600">Total Savings:</span>
-            <span className="text-green-600">-₹{totalDiscountAmount}</span>
+            <span className="text-green-600">
+              -₹{isFinalPayment ? totalDiscountAmount : totalDiscountAmount}
+            </span>
           </div>
         )}
 
@@ -203,12 +278,16 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
 
         <div className="flex justify-between text-lg font-semibold">
           <span>
-            {isHourlyService ? "Amount to Pay Now:" : "Total Amount:"}
+            {isFinalPayment
+              ? "Amount to Pay:"
+              : isHourlyService
+                ? "Amount to Pay Now:"
+                : "Total Amount:"}
           </span>
           <span className="text-black">₹{getAdvanceAmount()}</span>
         </div>
 
-        {isHourlyService && (
+        {isHourlyService && !isFinalPayment && (
           <div className="text-xs text-gray-500 mt-2">
             Remaining amount will be calculated based on actual hours worked and
             charged after service completion
@@ -224,7 +303,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
           isLoading={isLoading}
           disabled={disabled || isLoading || isLoadingOffer}
         >
-          {isLoading ? "Processing..." : "Confirm Booking"}
+          {getButtonText()}
         </Button>
       </div>
     </div>

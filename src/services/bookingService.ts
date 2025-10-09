@@ -2,6 +2,10 @@ import axiosInstance from "../config/axios.config";
 import { BOOKINGS_API } from "../constants/apiRoutes";
 import { IBooking } from "../models/booking";
 import {
+  StartServicePayload,
+  VerifyOtpPayload,
+} from "../types/technicians.types";
+import {
   BookingDetailsResponse,
   BookServiceResponse,
   CreateBookingRequest,
@@ -31,14 +35,24 @@ export const verifyPaymentSession = async (sessionId: string) => {
   }
 };
 
-export const startService = async (bookingId: string) => {
+export const startService = async (
+  bookingId: string,
+  serviceStartTime?: Date
+) => {
   try {
+    const payload: StartServicePayload = {};
+
+    if (serviceStartTime) {
+      payload.serviceStartTime = serviceStartTime.toISOString();
+    }
+
     const response = await axiosInstance.patch(
-      `/${BOOKINGS_API}/${bookingId}/start`
+      `${BOOKINGS_API}/${bookingId}/start`,
+      payload
     );
     return response.data;
   } catch (error) {
-    console.log("error occured while starting the service:", error);
+    console.error("Error starting service:", error);
     throw error;
   }
 };
@@ -166,15 +180,43 @@ export const generateCompletionOtp = async (bookingId: string) => {
   }
 };
 
-export const verifyCompletionOtp = async (bookingId: string, otp: string) => {
+export const verifyCompletionOtp = async (
+  bookingId: string,
+  otp: string,
+  serviceEndTime?: Date
+) => {
   try {
+    const payload: VerifyOtpPayload = { otp };
+
+    if (serviceEndTime) {
+      payload.serviceEndTime = serviceEndTime.toISOString();
+    }
     const response = await axiosInstance.post(
       `${BOOKINGS_API}/${bookingId}/verify-completion-otp`,
-      { otp }
+      { payload }
     );
     return response.data;
   } catch (error) {
     console.log("error occured while veryfying the completion otp:", error);
+    throw error;
+  }
+};
+
+export const completeFinalPayment = async (paymentData: {
+  bookingId: string;
+  paymentMethod: string;
+  finalAmount: number;
+  offerId: string;
+  couponId: string;
+}) => {
+  try {
+    const response = await axiosInstance.post(
+      `${BOOKINGS_API}/${paymentData.bookingId}/complete-payment`,
+      paymentData
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occured while making the payment:", error);
     throw error;
   }
 };

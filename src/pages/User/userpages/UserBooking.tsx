@@ -465,6 +465,7 @@ export const UserBooking: React.FC = () => {
               disabled={!isBookingReady}
               selectedPaymentMethod={selectedPaymentMethod}
               isLoadingCoupons={isLoadingCoupons}
+              isFinalPayment={false}
             />
           </div>
         </div>

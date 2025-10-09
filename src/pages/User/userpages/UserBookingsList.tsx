@@ -67,6 +67,10 @@ export const UserBookingsList: React.FC = () => {
     navigate(`/user/bookings/${bookingId}`);
   };
 
+  const handlePayNow = (bookingId: string) => {
+    navigate(`/user/bookings/${bookingId}/finalpayment`);
+  };
+
   useEffect(() => {
     connectSocket();
 
@@ -384,7 +388,8 @@ export const UserBookingsList: React.FC = () => {
     undefined,
     handleCancelBooking,
     handleChatWithTechnician,
-    handleRateService
+    handleRateService,
+    handlePayNow
   );
 
   return (

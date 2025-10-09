@@ -19,6 +19,8 @@ import { UserBookingSuccess } from "../pages/User/userpages/UserBookingSuccess";
 import { UserBookingsList } from "../pages/User/userpages/UserBookingsList";
 import { BookingDetailsPage } from "../pages/User/userpages/UserBookingDetail";
 import { UserWallet } from "../pages/User/userpages/UserWallet";
+import { UserFinalPayment } from "../pages/User/userpages/UserFinalPayment";
+import { UserFinalPaymentSuccess } from "../pages/User/userpages/UserFinalPaymentSuccess";
 
 export const UserRoutes: React.FC = () => {
   const user = useAppSelector((state) => state.user.userData);
@@ -47,6 +49,16 @@ export const UserRoutes: React.FC = () => {
         <Route path="bookingsuccess" element={<UserBookingSuccess />} />
         <Route path="bookings" element={<UserBookingsList />} />
         <Route path="bookings/:id" element={<BookingDetailsPage />} />
+
+        <Route
+          path="bookings/:bookingId/finalpayment"
+          element={<UserFinalPayment />}
+        />
+        <Route
+          path="finalpayment/success"
+          element={<UserFinalPaymentSuccess />}
+        />
+
         <Route path="wallet" element={<UserWallet />} />
       </Route>
 

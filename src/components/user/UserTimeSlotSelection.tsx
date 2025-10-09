@@ -141,13 +141,13 @@ export const UserTimeSlotSelection: React.FC<UserTimeSlotSelectionProps> = ({
                     }}
                     className={`flex-shrink-0 flex flex-col items-center justify-center px-5 py-4 rounded-xl border-2 min-w-[90px] transition-all duration-200 ${
                       isSelected
-                        ? "border-blue-600 bg-blue-600 text-white shadow-lg shadow-blue-200 scale-105"
-                        : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-md text-gray-700"
+                        ? "border-indigo-900 bg-indigo-900 text-white shadow-lg shadow-indigo-200 scale-105"
+                        : "border-gray-200 bg-white hover:border-indigo-300 hover:shadow-md text-gray-700"
                     }`}
                   >
                     <span
                       className={`text-xs font-medium mb-1 ${
-                        isSelected ? "text-blue-100" : "text-gray-500"
+                        isSelected ? "text-indigo-100" : "text-gray-500"
                       }`}
                     >
                       {weekday}
@@ -155,7 +155,7 @@ export const UserTimeSlotSelection: React.FC<UserTimeSlotSelectionProps> = ({
                     <span className="text-2xl font-bold">{day}</span>
                     <span
                       className={`text-xs font-medium mt-1 ${
-                        isSelected ? "text-blue-100" : "text-gray-500"
+                        isSelected ? "text-indigo-100" : "text-gray-500"
                       }`}
                     >
                       {month}
@@ -182,12 +182,12 @@ export const UserTimeSlotSelection: React.FC<UserTimeSlotSelectionProps> = ({
                     onClick={() => handleSlotSelect(slot)}
                     className={`relative px-4 py-4 rounded-lg border-2 transition-all duration-200 text-center group ${
                       isSelected
-                        ? "border-blue-600 bg-blue-50 text-blue-700 shadow-md"
-                        : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm text-gray-700"
+                        ? "border-indigo-900 bg-indigo-50 text-indigo-900 shadow-md"
+                        : "border-gray-200 bg-white hover:border-indigo-300 hover:shadow-sm text-gray-700"
                     }`}
                   >
                     {isSelected && (
-                      <div className="absolute -top-2 -right-2 bg-blue-600 rounded-full p-1">
+                      <div className="absolute -top-2 -right-2 bg-indigo-900 rounded-full p-1">
                         <CheckCircle className="w-4 h-4 text-white" />
                       </div>
                     )}

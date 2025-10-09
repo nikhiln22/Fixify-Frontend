@@ -38,3 +38,12 @@ export interface GetTimeSlotResponse {
   status: number;
   data?: ITimeSlot[];
 }
+
+export interface StartServicePayload {
+  serviceStartTime?: string;
+}
+
+export interface VerifyOtpPayload {
+  otp: string;
+  serviceEndTime?: string;
+}

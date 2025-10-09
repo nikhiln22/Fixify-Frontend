@@ -23,9 +23,22 @@ export interface IBooking {
     _id: string;
     name: string;
     description: string;
+    serviceType: "fixed" | "hourly";
     price: number;
     bookingAmount: number;
+    hourlyRate: number;
     image: string;
+    category: {
+      _id: string;
+      name: string;
+    };
+    designation: {
+      _id: string;
+      designation: string;
+    };
+    status: string;
+    estimatedTime?: number;
+    maxHours?: number;
   };
   addressId: {
     _id: string;
@@ -40,11 +53,15 @@ export interface IBooking {
     startTime: string;
     endTime: string;
   };
+  serviceStartTime: Date;
+  serviceEndTime: Date;
+  actualDuration: Date;
   bookingAmount: number;
   bookingStatus:
     | "Pending"
     | "Booked"
     | "In Progress"
+    | "Payment Pending"
     | "Cancelled"
     | "Completed";
   paymentId: {
@@ -61,6 +78,7 @@ export interface IBooking {
     refundDate?: Date;
     refundAmount?: number;
     creditReleaseDate?: Date;
+    advanceAmount?: number;
   };
   cancellationDate?: Date;
   cancellationReason?: string;

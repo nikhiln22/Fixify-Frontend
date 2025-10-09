@@ -110,13 +110,28 @@ export const TechnicianJobListing: React.FC = () => {
 
   const handleStartService = async (bookingId: string) => {
     try {
-      const response = await startService(bookingId);
+      const booking = bookings.find((b) => b._id === bookingId);
+
+      const isHourlyService =
+        booking &&
+        typeof booking.serviceId === "object" &&
+        booking.serviceId.serviceType === "hourly";
+
+      const serviceStartTime = isHourlyService ? new Date() : undefined;
+
+      const response = await startService(bookingId, serviceStartTime);
 
       if (response.success) {
         setBookings(
           bookings.map((booking) =>
             booking._id === bookingId
-              ? { ...booking, bookingStatus: response.data.bookingStatus }
+              ? {
+                  ...booking,
+                  bookingStatus: response.data.bookingStatus,
+                  ...(isHourlyService && {
+                    serviceStartTime: response.data.serviceStartTime,
+                  }),
+                }
               : booking
           )
         );
@@ -163,6 +178,7 @@ export const TechnicianJobListing: React.FC = () => {
     }
   };
 
+  // ✅ Check if hourly service before sending end time
   const handleVerifyOtp = async () => {
     if (!selectedCompletionBooking || otp.length !== 4) {
       showToast({
@@ -174,22 +190,38 @@ export const TechnicianJobListing: React.FC = () => {
 
     setIsVerifyingOtp(true);
     try {
+      const isHourlyService =
+        typeof selectedCompletionBooking.serviceId === "object" &&
+        selectedCompletionBooking.serviceId.serviceType === "hourly";
+
+      const serviceEndTime = isHourlyService ? new Date() : undefined;
+
       const response = await verifyCompletionOtp(
         selectedCompletionBooking._id,
-        otp
+        otp,
+        serviceEndTime
       );
 
       if (response.success) {
         setBookings(
           bookings.map((booking) =>
             booking._id === selectedCompletionBooking._id
-              ? { ...booking, bookingStatus: "Completed" }
+              ? {
+                  ...booking,
+                  bookingStatus: response.data.bookingStatus,
+                  ...(isHourlyService && {
+                    serviceEndTime: response.data.serviceEndTime,
+                    actualDuration: response.data.actualDuration,
+                  }),
+                }
               : booking
           )
         );
 
         showToast({
-          message: "Job completed successfully!",
+          message: isHourlyService
+            ? "Service completed! Waiting for customer payment..."
+            : "Job completed successfully!",
           type: "success",
         });
 
