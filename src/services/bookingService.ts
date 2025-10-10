@@ -1,6 +1,7 @@
 import axiosInstance from "../config/axios.config";
 import { BOOKINGS_API } from "../constants/apiRoutes";
 import { IBooking } from "../models/booking";
+import { AddPartsPayload } from "../types/booking.types";
 import {
   StartServicePayload,
   VerifyOtpPayload,
@@ -53,6 +54,68 @@ export const startService = async (
     return response.data;
   } catch (error) {
     console.error("Error starting service:", error);
+    throw error;
+  }
+};
+
+export const addReplacementParts = async (
+  bookingId: string,
+  parts: Array<{ partId: string; quantity: number }>,
+  totalPartsAmount: number
+) => {
+  try {
+    const payload: AddPartsPayload = {
+      parts,
+      totalPartsAmount,
+    };
+    const response = await axiosInstance.post(
+      `${BOOKINGS_API}/${bookingId}/add-parts`,
+      payload
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error adding replacement parts:", error);
+    throw error;
+  }
+};
+
+export const getReplacementPartsApproval = async (bookingId: string) => {
+  try {
+    const response = await axiosInstance.get(
+      `${BOOKINGS_API}/${bookingId}/replacement-parts`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error while getting the replacement parts approval:", error);
+    throw error;
+  }
+};
+
+export const approveReplacementParts = async (
+  bookingId: string,
+  approved: boolean,
+  rejectionReason?: string
+) => {
+  try {
+    const payload: {
+      approved: boolean;
+      rejectionReason?: string;
+    } = {
+      approved,
+    };
+
+    if (rejectionReason) {
+      payload.rejectionReason = rejectionReason;
+    }
+
+    const response = await axiosInstance.patch(
+      `${BOOKINGS_API}/${bookingId}/parts-approval`,
+      payload
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error approving/rejecting replacement parts:", error);
     throw error;
   }
 };
@@ -193,7 +256,7 @@ export const verifyCompletionOtp = async (
     }
     const response = await axiosInstance.post(
       `${BOOKINGS_API}/${bookingId}/verify-completion-otp`,
-      { payload }
+      payload
     );
     return response.data;
   } catch (error) {

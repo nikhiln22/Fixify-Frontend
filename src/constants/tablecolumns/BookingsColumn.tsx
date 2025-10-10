@@ -9,7 +9,9 @@ export const getBookingsColumns = (
   handleChatWithTechnician?: (id: string) => void,
   handleRateService?: (id: string) => void,
   handleStartService?: (id: string) => void,
-  handlePayNow?: (id: string) => void
+  handlePayNow?: (id: string) => void,
+  handleReviewParts?: (id: string) => void,
+  handleAddParts?: (id: string) => void
 ): Column<IBooking>[] => {
   const baseColumns: Column<IBooking>[] = [
     {
@@ -37,7 +39,7 @@ export const getBookingsColumns = (
   if (role === "technician") {
     baseColumns.push(
       {
-        key: "timeSlotId",
+        key: "serviceDate",
         label: "Service Date",
         render: (item) => {
           const firstTimeSlot =
@@ -52,7 +54,7 @@ export const getBookingsColumns = (
         },
       },
       {
-        key: "timeSlotId",
+        key: "serviceTime",
         label: "Service Time",
         render: (item) => {
           const firstTimeSlot =
@@ -162,6 +164,7 @@ export const getBookingsColumns = (
 
       return (
         <div className="flex justify-center gap-2 flex-wrap">
+          {/* View Button - Always visible */}
           <button
             onClick={() => handleViewDetails(item._id)}
             className="px-5 py-2.5 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm"
@@ -169,9 +172,43 @@ export const getBookingsColumns = (
             View
           </button>
 
+          {/* ✅ Review Parts Button - User only, when parts need approval */}
+          {role === "user" &&
+            handleReviewParts &&
+            item.bookingStatus === "In Progress" &&
+            item.hasReplacementParts &&
+            item.replacementPartsApproved === null && (
+              <button
+                onClick={() => handleReviewParts(item._id)}
+                className="px-5 py-2.5 rounded bg-purple-500 text-white hover:bg-purple-600 transition-colors text-sm font-semibold animate-pulse"
+              >
+                Review Parts
+              </button>
+            )}
+
+          {/* User - Parts Status Display */}
+          {role === "user" &&
+            item.bookingStatus === "In Progress" &&
+            item.hasReplacementParts && (
+              <div className="px-3 py-2 rounded text-xs font-medium">
+                {item.replacementPartsApproved === true && (
+                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
+                    ✓ Parts Approved
+                  </span>
+                )}
+                {item.replacementPartsApproved === false && (
+                  <span className="bg-red-100 text-red-800 px-2 py-1 rounded">
+                    ✗ Parts Rejected
+                  </span>
+                )}
+              </div>
+            )}
+
           {role === "user" &&
             handlePayNow &&
-            item.bookingStatus === "Payment Pending" && (
+            (item.bookingStatus === "Payment Pending" ||
+              (item.bookingStatus === "Completed" &&
+                item.paymentId?.paymentStatus === "Partial Paid")) && (
               <button
                 onClick={() => handlePayNow(item._id)}
                 className="px-5 py-2.5 rounded bg-yellow-500 text-white hover:bg-yellow-600 transition-colors text-sm font-semibold animate-pulse"
@@ -180,6 +217,7 @@ export const getBookingsColumns = (
               </button>
             )}
 
+          {/* ✅ Chat Button - Only when Booked (Hidden when In Progress) */}
           {item.bookingStatus === "Booked" &&
             role !== "admin" &&
             handleChatWithTechnician && (
@@ -191,6 +229,41 @@ export const getBookingsColumns = (
               </button>
             )}
 
+          {role === "technician" &&
+            handleAddParts &&
+            item.bookingStatus === "In Progress" &&
+            !item.hasReplacementParts && (
+              <button
+                onClick={() => handleAddParts(item._id)}
+                className="px-5 py-2.5 rounded bg-teal-500 text-white hover:bg-teal-600 transition-colors text-xs"
+              >
+                Add Parts
+              </button>
+            )}
+
+          {role === "technician" &&
+            item.bookingStatus === "In Progress" &&
+            item.hasReplacementParts && (
+              <div className="px-3 py-2 rounded text-xs font-medium">
+                {item.replacementPartsApproved === null && (
+                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                    ⏳ Parts Pending
+                  </span>
+                )}
+                {item.replacementPartsApproved === true && (
+                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
+                    ✓ Parts Approved
+                  </span>
+                )}
+                {item.replacementPartsApproved === false && (
+                  <span className="bg-red-100 text-red-800 px-2 py-1 rounded">
+                    ✗ Parts Rejected
+                  </span>
+                )}
+              </div>
+            )}
+
+          {/* Cancel Button */}
           {(role === "user" || role === "technician") &&
             handleCancelBooking &&
             item.bookingStatus === "Booked" &&
@@ -217,6 +290,7 @@ export const getBookingsColumns = (
               </button>
             )}
 
+          {/* Start Service Button - Technician */}
           {role === "technician" &&
             handleStartService &&
             item.bookingStatus === "Booked" &&
@@ -240,6 +314,7 @@ export const getBookingsColumns = (
               </button>
             )}
 
+          {/* Complete Button - Technician */}
           {role === "technician" &&
             handleCompleteBooking &&
             item.bookingStatus === "In Progress" &&
@@ -252,10 +327,12 @@ export const getBookingsColumns = (
               </button>
             )}
 
+          {/* Rate Button - User */}
           {role === "user" &&
             handleRateService &&
             item.bookingStatus === "Completed" &&
             !item.isRated &&
+            item.paymentId?.paymentStatus === "Paid" &&
             (() => {
               const completedDate = new Date(item.updatedAt);
               const today = new Date();

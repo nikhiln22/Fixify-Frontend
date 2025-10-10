@@ -22,7 +22,14 @@ import {
 } from "../../../services/couponService";
 import { CouponData, OfferData } from "../../../types/user.types";
 import technicianBanner from "../../../assets/technician Banner.png";
-import { Clock, Calendar, User, Wrench, CheckCircle } from "lucide-react";
+import {
+  Clock,
+  Calendar,
+  User,
+  Wrench,
+  CheckCircle,
+  Package,
+} from "lucide-react";
 
 export const UserFinalPayment: React.FC = () => {
   const navigate = useNavigate();
@@ -36,6 +43,8 @@ export const UserFinalPayment: React.FC = () => {
   const [billedHours, setBilledHours] = useState(0);
   const [subtotal, setSubtotal] = useState(0);
   const [advancePaid, setAdvancePaid] = useState(300);
+  const [partsAmount, setPartsAmount] = useState(0);
+  const [isHourlyService, setIsHourlyService] = useState(false); // ✅ Track if hourly service
 
   const [currentOffer, setCurrentOffer] = useState<OfferData | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<CouponData | null>(null);
@@ -54,7 +63,8 @@ export const UserFinalPayment: React.FC = () => {
   const calculatePaymentBreakdown = useCallback(() => {
     if (!booking) return;
 
-    if (booking.serviceStartTime && booking.serviceEndTime) {
+    // ✅ Only calculate hourly charges if it's an hourly service
+    if (isHourlyService && booking.serviceStartTime && booking.serviceEndTime) {
       const startTime = new Date(booking.serviceStartTime).getTime();
       const endTime = new Date(booking.serviceEndTime).getTime();
       const durationInMs = endTime - startTime;
@@ -67,11 +77,28 @@ export const UserFinalPayment: React.FC = () => {
 
       const total = billed * hourlyRate;
       setSubtotal(total);
+    } else {
+      // ✅ For fixed services, no service charges (already paid)
+      setSubtotal(0);
+      setBilledHours(0);
+      setActualDuration(0);
     }
-  }, [booking, hourlyRate]);
+
+    // ✅ Set parts amount if parts were approved
+    if (
+      booking.hasReplacementParts &&
+      booking.replacementPartsApproved === true
+    ) {
+      setPartsAmount(booking.totalPartsAmount || 0);
+    } else {
+      setPartsAmount(0);
+    }
+  }, [booking, hourlyRate, isHourlyService]);
 
   const applyBestOfferForFinalPayment = useCallback(async () => {
-    if (!booking || !booking.serviceId || subtotal <= 0) return;
+    // ✅ Only apply offers for hourly services with service charges
+    if (!booking || !booking.serviceId || !isHourlyService || subtotal <= 0)
+      return;
 
     try {
       setIsLoadingOffer(true);
@@ -81,6 +108,7 @@ export const UserFinalPayment: React.FC = () => {
           ? booking.serviceId
           : booking.serviceId._id;
 
+      // ✅ Apply offer ONLY to service subtotal, NOT parts
       const offerResponse = await applyBestOffer(serviceId, subtotal);
       console.log("Offer response for final payment:", offerResponse);
 
@@ -105,7 +133,7 @@ export const UserFinalPayment: React.FC = () => {
     } finally {
       setIsLoadingOffer(false);
     }
-  }, [booking, subtotal]);
+  }, [booking, subtotal, isHourlyService]);
 
   const fetchBookingDetails = useCallback(async () => {
     if (!bookingId) return;
@@ -128,36 +156,37 @@ export const UserFinalPayment: React.FC = () => {
           return;
         }
 
-        if (
-          typeof bookingData.serviceId === "object" &&
-          bookingData.serviceId.serviceType !== "hourly"
-        ) {
-          showToast({
-            message: "This is not an hourly service booking",
-            type: "warning",
-          });
-          navigate("/user/bookings");
-          return;
-        }
-
         setBooking(bookingData);
 
-        if (bookingData.serviceStartTime) {
-          setServiceStartTime(new Date(bookingData.serviceStartTime));
-        }
-        if (bookingData.serviceEndTime) {
-          setServiceEndTime(new Date(bookingData.serviceEndTime));
-        }
-
-        if (
+        // ✅ Check if hourly service
+        const isHourly =
           typeof bookingData.serviceId === "object" &&
-          bookingData.serviceId.hourlyRate
-        ) {
-          setHourlyRate(bookingData.serviceId.hourlyRate);
-        }
+          bookingData.serviceId.serviceType === "hourly";
 
-        if (typeof bookingData.paymentId === "object") {
-          setAdvancePaid(bookingData.paymentId.advanceAmount || 300);
+        setIsHourlyService(isHourly);
+
+        if (isHourly) {
+          // For hourly services
+          if (bookingData.serviceStartTime) {
+            setServiceStartTime(new Date(bookingData.serviceStartTime));
+          }
+          if (bookingData.serviceEndTime) {
+            setServiceEndTime(new Date(bookingData.serviceEndTime));
+          }
+
+          if (
+            typeof bookingData.serviceId === "object" &&
+            bookingData.serviceId.hourlyRate
+          ) {
+            setHourlyRate(bookingData.serviceId.hourlyRate);
+          }
+
+          if (typeof bookingData.paymentId === "object") {
+            setAdvancePaid(bookingData.paymentId.advanceAmount || 300);
+          }
+        } else {
+          // ✅ For fixed services - payment is ONLY for parts
+          setAdvancePaid(bookingData.bookingAmount || 0); // Full service already paid
         }
       } else {
         showToast({
@@ -183,18 +212,33 @@ export const UserFinalPayment: React.FC = () => {
   }, [fetchBookingDetails]);
 
   useEffect(() => {
-    if (booking && booking.serviceStartTime && booking.serviceEndTime) {
+    if (booking) {
       calculatePaymentBreakdown();
     }
   }, [booking, calculatePaymentBreakdown]);
 
   useEffect(() => {
-    if (subtotal > 0 && booking?.serviceId) {
+    // ✅ Only apply offers for hourly services
+    if (isHourlyService && subtotal > 0 && booking?.serviceId) {
       applyBestOfferForFinalPayment();
     }
-  }, [subtotal, booking?.serviceId, applyBestOfferForFinalPayment]);
+  }, [
+    subtotal,
+    booking?.serviceId,
+    isHourlyService,
+    applyBestOfferForFinalPayment,
+  ]);
 
   const handleFetchCoupons = async () => {
+    // ✅ Only allow coupons for hourly services
+    if (!isHourlyService) {
+      showToast({
+        message: "Coupons are not applicable for parts-only payments",
+        type: "info",
+      });
+      return;
+    }
+
     if (!booking?.serviceId) {
       console.log("No service ID found");
       return;
@@ -238,7 +282,7 @@ export const UserFinalPayment: React.FC = () => {
     newCoupon: CouponData,
     currentCoupon: CouponData | null = null
   ) => {
-    if (!booking?.serviceId) return;
+    if (!booking?.serviceId || !isHourlyService) return;
 
     try {
       console.log("Applying coupon:", newCoupon);
@@ -297,16 +341,25 @@ export const UserFinalPayment: React.FC = () => {
   };
 
   const calculateFinalAmount = () => {
-    let finalAmount = subtotal;
+    let finalAmount = 0;
 
-    finalAmount = finalAmount - advancePaid;
+    if (isHourlyService) {
+      // ✅ For hourly services: service charges + parts - advance - discounts
+      finalAmount = subtotal + partsAmount;
+      finalAmount = finalAmount - advancePaid;
 
-    if (currentOffer?.offerApplied && currentOffer.discountAmount) {
-      finalAmount = finalAmount - currentOffer.discountAmount;
-    }
+      // Apply offer discount (only on service charges)
+      if (currentOffer?.offerApplied && currentOffer.discountAmount) {
+        finalAmount = finalAmount - currentOffer.discountAmount;
+      }
 
-    if (appliedCoupon?.discountAmount) {
-      finalAmount = finalAmount - appliedCoupon.discountAmount;
+      // Apply coupon discount (only on service charges)
+      if (appliedCoupon?.discountAmount) {
+        finalAmount = finalAmount - appliedCoupon.discountAmount;
+      }
+    } else {
+      // ✅ For fixed services: ONLY parts amount (no discounts, service already paid)
+      finalAmount = partsAmount;
     }
 
     return Math.max(0, finalAmount);
@@ -456,7 +509,9 @@ export const UserFinalPayment: React.FC = () => {
             Complete Final Payment
           </h1>
           <p className="text-gray-600">
-            Review service duration and complete your payment
+            {isHourlyService
+              ? "Review service duration and complete your payment"
+              : "Complete payment for replacement parts"}
           </p>
         </div>
 
@@ -513,80 +568,152 @@ export const UserFinalPayment: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-blue-900 mb-4 flex items-center">
-                <Clock className="w-5 h-5 mr-2" />
-                Service Duration
-              </h3>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="bg-white rounded-lg p-4">
-                  <p className="text-sm text-blue-600 mb-1">Start Time</p>
-                  <p className="text-lg font-semibold text-blue-900">
-                    {formatTime(serviceStartTime)}
-                  </p>
+            {/* ✅ Only show duration for hourly services */}
+            {isHourlyService && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                <h3 className="text-lg font-semibold text-blue-900 mb-4 flex items-center">
+                  <Clock className="w-5 h-5 mr-2" />
+                  Service Duration
+                </h3>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="bg-white rounded-lg p-4">
+                    <p className="text-sm text-blue-600 mb-1">Start Time</p>
+                    <p className="text-lg font-semibold text-blue-900">
+                      {formatTime(serviceStartTime)}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-lg p-4">
+                    <p className="text-sm text-blue-600 mb-1">End Time</p>
+                    <p className="text-lg font-semibold text-blue-900">
+                      {formatTime(serviceEndTime)}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-lg p-4">
+                    <p className="text-sm text-blue-600 mb-1">
+                      Actual Duration
+                    </p>
+                    <p className="text-lg font-semibold text-blue-900">
+                      {formatDuration(actualDuration)}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-lg p-4">
+                    <p className="text-sm text-blue-600 mb-1">Billed Hours</p>
+                    <p className="text-lg font-semibold text-blue-900">
+                      {billedHours} hour{billedHours !== 1 ? "s" : ""}
+                    </p>
+                  </div>
                 </div>
-                <div className="bg-white rounded-lg p-4">
-                  <p className="text-sm text-blue-600 mb-1">End Time</p>
-                  <p className="text-lg font-semibold text-blue-900">
-                    {formatTime(serviceEndTime)}
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg p-4">
-                  <p className="text-sm text-blue-600 mb-1">Actual Duration</p>
-                  <p className="text-lg font-semibold text-blue-900">
-                    {formatDuration(actualDuration)}
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg p-4">
-                  <p className="text-sm text-blue-600 mb-1">Billed Hours</p>
-                  <p className="text-lg font-semibold text-blue-900">
-                    {billedHours} hour{billedHours !== 1 ? "s" : ""}
-                  </p>
+                <div className="text-sm text-blue-800 bg-blue-100 p-3 rounded-lg">
+                  ℹ️ Minimum 1 hour billing applies. Actual duration is rounded
+                  up to the nearest hour.
                 </div>
               </div>
-              <div className="text-sm text-blue-800 bg-blue-100 p-3 rounded-lg">
-                ℹ️ Minimum 1 hour billing applies. Actual duration is rounded up
-                to the nearest hour.
+            )}
+
+            {/* ✅ Replacement Parts Section */}
+            {partsAmount > 0 && (
+              <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
+                <h3 className="text-lg font-semibold text-purple-900 mb-4 flex items-center">
+                  <Package className="w-5 h-5 mr-2" />
+                  Replacement Parts
+                </h3>
+                <div className="bg-white rounded-lg p-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-sm text-purple-600 mb-1">
+                        Parts Approved
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {isHourlyService
+                          ? "Additional parts used during service"
+                          : "Parts used for this service"}
+                      </p>
+                    </div>
+                    <p className="text-lg font-semibold text-purple-900">
+                      ₹{partsAmount.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-sm text-purple-800 bg-purple-100 p-3 rounded-lg mt-4">
+                  ✓ You have approved these replacement parts
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="bg-white border border-gray-200 rounded-xl p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Payment Breakdown
               </h3>
               <div className="space-y-3">
-                <div className="flex justify-between text-sm pb-3 border-b">
-                  <span className="text-gray-600">Hourly Rate</span>
-                  <span className="font-medium">₹{hourlyRate}/hour</span>
-                </div>
-                <div className="flex justify-between text-sm pb-3 border-b">
-                  <span className="text-gray-600">Billed Hours</span>
-                  <span className="font-medium">× {billedHours}</span>
-                </div>
-                <div className="flex justify-between font-semibold pb-3 border-b">
-                  <span>Subtotal</span>
-                  <span>₹{subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm text-green-600 pb-3 border-b">
-                  <span>Advance Already Paid</span>
-                  <span>- ₹{advancePaid.toFixed(2)}</span>
-                </div>
-                {currentOffer?.offerApplied && (
-                  <div className="flex justify-between text-sm text-green-600 pb-3 border-b">
-                    <span className="flex items-center">
-                      <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                      {currentOffer.offerName}
+                {/* ✅ Only show service charges for hourly services */}
+                {isHourlyService && (
+                  <>
+                    <div className="flex justify-between text-sm pb-3 border-b">
+                      <span className="text-gray-600">Hourly Rate</span>
+                      <span className="font-medium">₹{hourlyRate}/hour</span>
+                    </div>
+                    <div className="flex justify-between text-sm pb-3 border-b">
+                      <span className="text-gray-600">Billed Hours</span>
+                      <span className="font-medium">× {billedHours}</span>
+                    </div>
+                    <div className="flex justify-between font-semibold pb-3 border-b">
+                      <span>Service Subtotal</span>
+                      <span>₹{subtotal.toFixed(2)}</span>
+                    </div>
+                  </>
+                )}
+
+                {/* ✅ Parts line item */}
+                {partsAmount > 0 && (
+                  <div className="flex justify-between text-sm pb-3 border-b">
+                    <span className="text-gray-600">Replacement Parts</span>
+                    <span className="font-medium">
+                      ₹{partsAmount.toFixed(2)}
                     </span>
-                    <span>- ₹{currentOffer.discountAmount?.toFixed(2)}</span>
                   </div>
                 )}
-                {appliedCoupon && (
-                  <div className="flex justify-between text-sm text-green-600 pb-3 border-b">
-                    <span className="flex items-center">
-                      <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                      {appliedCoupon.code}
-                    </span>
-                    <span>- ₹{appliedCoupon.discountAmount?.toFixed(2)}</span>
+
+                {/* ✅ Total before deductions (only for hourly) */}
+                {isHourlyService && (
+                  <>
+                    <div className="flex justify-between font-semibold text-lg pb-3 border-b">
+                      <span>Total Amount</span>
+                      <span>₹{(subtotal + partsAmount).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-green-600 pb-3 border-b">
+                      <span>Advance Already Paid</span>
+                      <span>- ₹{advancePaid.toFixed(2)}</span>
+                    </div>
+                    {currentOffer?.offerApplied && (
+                      <div className="flex justify-between text-sm text-green-600 pb-3 border-b">
+                        <span className="flex items-center">
+                          <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                          {currentOffer.offerName}
+                        </span>
+                        <span>
+                          - ₹{currentOffer.discountAmount?.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+                    {appliedCoupon && (
+                      <div className="flex justify-between text-sm text-green-600 pb-3 border-b">
+                        <span className="flex items-center">
+                          <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                          {appliedCoupon.code}
+                        </span>
+                        <span>
+                          - ₹{appliedCoupon.discountAmount?.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* ✅ For fixed services, just show parts total */}
+                {!isHourlyService && partsAmount > 0 && (
+                  <div className="flex justify-between font-semibold text-lg pb-3 border-b">
+                    <span>Total Parts Amount</span>
+                    <span>₹{partsAmount.toFixed(2)}</span>
                   </div>
                 )}
               </div>
@@ -617,18 +744,23 @@ export const UserFinalPayment: React.FC = () => {
               subtotal={subtotal}
               billedHours={billedHours}
               hourlyRate={hourlyRate}
+              partsAmount={partsAmount}
+              isHourlyService={isHourlyService}
             />
           </div>
         </div>
       </div>
 
-      <CouponModal
-        isOpen={isCouponModalOpen}
-        onClose={handleCloseCouponModal}
-        coupons={eligibleCoupons}
-        onApplyCoupon={handleApplyCoupon}
-        appliedCoupon={appliedCoupon}
-      />
+      {/* ✅ Only show coupon modal for hourly services */}
+      {isHourlyService && (
+        <CouponModal
+          isOpen={isCouponModalOpen}
+          onClose={handleCloseCouponModal}
+          coupons={eligibleCoupons}
+          onApplyCoupon={handleApplyCoupon}
+          appliedCoupon={appliedCoupon}
+        />
+      )}
     </UserLayout>
   );
 };

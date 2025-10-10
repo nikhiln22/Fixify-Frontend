@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import TechnicianLayout from "../../../layouts/TechnicianLayout";
 import { TechnicianProfileSidebar } from "../../../components/technician/TechnicianProfileSidebar";
 import { getBookingsColumns } from "../../../constants/tablecolumns/BookingsColumn";
@@ -7,12 +7,15 @@ import Pagination from "../../../components/common/Pagination";
 import Modal from "../../../components/common/Modal";
 import OTPInput from "../../../components/common/OtpInput";
 import { TechnicianCancellationPolicy } from "../../../components/technician/TechnicianCancellationPolicy";
+import { AddReplacementParts } from "../../../components/technician/AddReplacementParts";
 import { IBooking } from "../../../models/booking";
+import { IPart } from "../../../models/parts";
 import {
   cancelBooking,
   generateCompletionOtp,
   startService,
   verifyCompletionOtp,
+  addReplacementParts,
 } from "../../../services/bookingService";
 import { showToast } from "../../../utils/toast";
 import { ChatModal } from "../../../components/common/ChatModal";
@@ -33,6 +36,15 @@ import {
   sendChatMessage,
 } from "../../../services/chatService";
 import { useNavigate } from "react-router-dom";
+import { getAllParts } from "../../../services/partsService";
+
+interface SelectedPart {
+  partId: string;
+  partName: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+}
 
 export const TechnicianJobListing: React.FC = () => {
   const navigate = useNavigate();
@@ -56,6 +68,17 @@ export const TechnicianJobListing: React.FC = () => {
   const [messages, setMessages] = useState<IChat[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
   const [sending, setSending] = useState(false);
+
+  const [isAddPartsModalOpen, setIsAddPartsModalOpen] = useState(false);
+  const [selectedPartsBooking, setSelectedPartsBooking] =
+    useState<IBooking | null>(null);
+  const [availableParts, setAvailableParts] = useState<IPart[]>([]);
+  const [loadingParts, setLoadingParts] = useState(false);
+  const [selectedPartsData, setSelectedPartsData] = useState<{
+    parts: SelectedPart[];
+    total: number;
+  }>({ parts: [], total: 0 });
+  const [isSubmittingParts, setIsSubmittingParts] = useState(false);
 
   const filterOptions = [
     { value: "", label: "All Jobs" },
@@ -106,6 +129,169 @@ export const TechnicianJobListing: React.FC = () => {
     console.log("Filter changed to:", e.target.value);
     setFilterStatus(e.target.value);
     setCurrentPage(1);
+  };
+
+  const handleAddParts = async (bookingId: string) => {
+    const booking = bookings.find((b) => b._id === bookingId);
+
+    console.log("=== DEBUG: handleAddParts ===");
+    console.log("bookingId:", bookingId);
+    console.log("booking found:", !!booking);
+    console.log("full booking object:", JSON.stringify(booking, null, 2));
+
+    if (booking) {
+      setSelectedPartsBooking(booking);
+      setIsAddPartsModalOpen(true);
+
+      console.log("typeof booking.serviceId:", typeof booking.serviceId);
+      console.log("booking.serviceId:", booking.serviceId);
+
+      let serviceId: string | undefined;
+
+      if (booking.serviceId) {
+        if (
+          typeof booking.serviceId === "object" &&
+          booking.serviceId !== null
+        ) {
+          console.log(
+            "serviceId is object, keys:",
+            Object.keys(booking.serviceId)
+          );
+          console.log("serviceId._id:", booking.serviceId._id);
+          serviceId = booking.serviceId._id;
+        } else if (typeof booking.serviceId === "string") {
+          console.log("serviceId is string:", booking.serviceId);
+          serviceId = booking.serviceId;
+        }
+      }
+
+      console.log("extracted serviceId:", serviceId);
+
+      if (!serviceId) {
+        console.error("ERROR: serviceId is undefined or null");
+        showToast({
+          message: "Service ID not found for this booking",
+          type: "error",
+        });
+        setLoadingParts(false);
+        return;
+      }
+
+      setLoadingParts(true);
+      try {
+        console.log("Calling getAllParts with serviceId:", serviceId);
+        const response = await getAllParts(null, "", "", null, serviceId);
+
+        console.log(
+          "response of the parts that is fetched in the technician job listing page:",
+          response
+        );
+
+        if (response.data && response.data.length > 0) {
+          setAvailableParts(response.data);
+        } else {
+          showToast({
+            message: "No parts available for this service",
+            type: "info",
+          });
+          setAvailableParts([]);
+        }
+      } catch (error) {
+        console.error("Error fetching parts:", error);
+        showToast({
+          message: "Failed to load parts",
+          type: "error",
+        });
+        setAvailableParts([]);
+      } finally {
+        setLoadingParts(false);
+      }
+    } else {
+      console.error("ERROR: Booking not found for bookingId:", bookingId);
+    }
+  };
+
+  const handleAddPartsModalClose = () => {
+    setIsAddPartsModalOpen(false);
+    setSelectedPartsBooking(null);
+    setAvailableParts([]);
+    setSelectedPartsData({ parts: [], total: 0 });
+  };
+
+  // ✅ Wrap handlePartsChange with useCallback to prevent re-creation
+  const handlePartsChange = useCallback(
+    (selectedParts: SelectedPart[], totalAmount: number) => {
+      setSelectedPartsData({ parts: selectedParts, total: totalAmount });
+    },
+    []
+  );
+
+  const handleSubmitParts = async () => {
+    if (selectedPartsData.parts.length === 0) {
+      showToast({
+        message: "Please select at least one part",
+        type: "error",
+      });
+      return;
+    }
+
+    if (!selectedPartsBooking) {
+      showToast({
+        message: "Booking not found",
+        type: "error",
+      });
+      return;
+    }
+
+    setIsSubmittingParts(true);
+
+    try {
+      const partsToSubmit = selectedPartsData.parts.map((part) => ({
+        partId: part.partId,
+        quantity: part.quantity,
+      }));
+
+      const response = await addReplacementParts(
+        selectedPartsBooking._id,
+        partsToSubmit,
+        selectedPartsData.total
+      );
+
+      if (response.success) {
+        setBookings(
+          bookings.map((booking) =>
+            booking._id === selectedPartsBooking._id
+              ? {
+                  ...booking,
+                  hasReplacementParts: true,
+                  replacementPartsApproved: null,
+                  totalPartsAmount: selectedPartsData.total,
+                }
+              : booking
+          )
+        );
+
+        showToast({
+          message: response.message || "Parts submitted for customer approval!",
+          type: "success",
+        });
+
+        handleAddPartsModalClose();
+      } else {
+        showToast({
+          message: response.message || "Failed to submit parts",
+          type: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting parts:", error);
+      showToast({
+        message: "Failed to submit parts. Please try again.",
+        type: "error",
+      });
+    } finally {
+      setIsSubmittingParts(false);
+    }
   };
 
   const handleStartService = async (bookingId: string) => {
@@ -178,7 +364,6 @@ export const TechnicianJobListing: React.FC = () => {
     }
   };
 
-  // ✅ Check if hourly service before sending end time
   const handleVerifyOtp = async () => {
     if (!selectedCompletionBooking || otp.length !== 4) {
       showToast({
@@ -453,7 +638,10 @@ export const TechnicianJobListing: React.FC = () => {
     handleCancelBooking,
     handleChatWithUser,
     undefined,
-    handleStartService
+    handleStartService,
+    undefined,
+    undefined,
+    handleAddParts
   );
 
   if (error) {
@@ -570,6 +758,26 @@ export const TechnicianJobListing: React.FC = () => {
                 </div>
               </div>
             </div>
+          </Modal>
+
+          <Modal
+            isOpen={isAddPartsModalOpen}
+            onClose={handleAddPartsModalClose}
+            title="Add Replacement Parts"
+            cancelText="Cancel"
+            confirmText={
+              isSubmittingParts ? "Submitting..." : "Submit for Approval"
+            }
+            confirmButtonColor="blue"
+            onConfirm={handleSubmitParts}
+            className="max-w-4xl"
+            disabled={isSubmittingParts}
+          >
+            <AddReplacementParts
+              parts={availableParts}
+              loading={loadingParts}
+              onPartsChange={handlePartsChange}
+            />
           </Modal>
 
           <ChatModal

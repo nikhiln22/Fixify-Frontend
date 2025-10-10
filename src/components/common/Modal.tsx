@@ -13,6 +13,8 @@ const Modal: React.FC<ModalProps> = ({
   onConfirm,
   confirmButtonColor = "blue",
   className,
+  disabled = false,
+  hideButtons = false,
 }) => {
   const backdropVariants = {
     hidden: { opacity: 0 },
@@ -75,7 +77,7 @@ const Modal: React.FC<ModalProps> = ({
             initial="hidden"
             animate="visible"
             exit="exit"
-            onClick={onClose}
+            onClick={disabled ? undefined : onClose}
           />
 
           <div className="fixed inset-0 z-[9999] overflow-y-auto">
@@ -98,13 +100,14 @@ const Modal: React.FC<ModalProps> = ({
                   <div className="text-lg text-gray-700">{children}</div>
                 </div>
 
-                {(cancelText || confirmText) && (
+                {!hideButtons && (cancelText || confirmText) && (
                   <div className="mt-8 flex justify-center space-x-6">
                     {cancelText && (
                       <button
                         type="button"
-                        className="inline-flex justify-center rounded-md border border-gray-200 bg-white px-6 py-3 text-lg font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 transition-colors duration-200"
+                        className="inline-flex justify-center rounded-md border border-gray-200 bg-white px-6 py-3 text-lg font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={onClose}
+                        disabled={disabled}
                       >
                         {cancelText}
                       </button>
@@ -113,11 +116,12 @@ const Modal: React.FC<ModalProps> = ({
                     {confirmText && onConfirm && (
                       <button
                         type="button"
-                        className={`inline-flex justify-center rounded-md border border-transparent px-6 py-3 text-lg font-medium text-white shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-colors duration-200 ${getButtonColorClass()}`}
+                        className={`inline-flex justify-center rounded-md border border-transparent px-6 py-3 text-lg font-medium text-white shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${getButtonColorClass()}`}
                         onClick={() => {
                           onConfirm();
                           onClose();
                         }}
+                        disabled={disabled}
                       >
                         {confirmText}
                       </button>
