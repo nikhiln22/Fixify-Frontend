@@ -27,6 +27,10 @@ export const getAllParts = async (
 }> => {
   try {
     console.log(`fetching the parts`);
+    console.log(
+      "serviceID in the getAllParts function in parts service:",
+      serviceId
+    );
 
     let queryParams = "";
     if (
@@ -36,21 +40,27 @@ export const getAllParts = async (
       limit !== undefined
     ) {
       queryParams += `page=${page}&limit=${limit}`;
+    }
 
-      if (search && search.trim() !== "") {
-        queryParams += `&search=${encodeURIComponent(search)}`;
-      }
+    if (search && search.trim() !== "") {
+      queryParams += `&search=${encodeURIComponent(search)}`;
+    }
 
-      if (serviceId && serviceId.trim() !== "") {
-        queryParams += `&serviceId=${serviceId}`;
-      }
+    if (serviceId && serviceId.trim() !== "") {
+      console.log(
+        "entered inside the if condition of the serviceId:",
+        serviceId
+      );
+      queryParams += `&serviceId=${serviceId}`;
+    }
 
-      if (filterStatus && filterStatus.trim() !== "") {
-        queryParams += `&status=${encodeURIComponent(filterStatus)}`;
-      }
+    if (filterStatus && filterStatus.trim() !== "") {
+      queryParams += `&status=${encodeURIComponent(filterStatus)}`;
     }
 
     const url = queryParams ? `${PARTS_API}?${queryParams}` : `${PARTS_API}`;
+
+    console.log("url in the parts full fetching fuction:", url);
 
     const response = await axiosInstance.get(url);
 

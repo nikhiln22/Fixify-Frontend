@@ -9,9 +9,11 @@ import { UserCancellationPolicy } from "../../../components/user/UserCancellatio
 import { IBooking } from "../../../models/booking";
 import { ChatModal } from "../../../components/common/ChatModal";
 import {
+  approveReplacementParts,
   cancelBooking,
   createBookingRating,
   getBookings,
+  getReplacementPartsApproval,
 } from "../../../services/bookingService";
 import { showToast } from "../../../utils/toast";
 import { Rating } from "../../../components/user/Rating";
@@ -30,6 +32,25 @@ import {
 } from "../../../services/chatService";
 import { usePaginatedList } from "../../../hooks/usePaginatedList";
 import { useNavigate } from "react-router-dom";
+import { PartsApproval } from "../../../components/user/PartsApproval";
+
+interface ReplacementPart {
+  partId: {
+    _id: string;
+    name: string;
+    description: string;
+    price: number;
+  };
+  quantity: number;
+  price: number;
+  totalPrice: number;
+}
+
+interface PartsApprovalData {
+  bookingId: string;
+  replacementParts: ReplacementPart[];
+  totalPartsAmount: number;
+}
 
 export const UserBookingsList: React.FC = () => {
   const itemsPerPage = 6;
@@ -53,6 +74,13 @@ export const UserBookingsList: React.FC = () => {
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
 
+  const [isPartsModalOpen, setIsPartsModalOpen] = useState(false);
+  const [selectedPartsBooking, setSelectedPartsBooking] =
+    useState<IBooking | null>(null);
+  const [isApprovingParts, setIsApprovingParts] = useState(false);
+  const [partsData, setPartsData] = useState<PartsApprovalData | null>(null);
+  const [loadingPartsData, setLoadingPartsData] = useState(false);
+
   const {
     data: bookings,
     setData: setBookings,
@@ -69,6 +97,146 @@ export const UserBookingsList: React.FC = () => {
 
   const handlePayNow = (bookingId: string) => {
     navigate(`/user/bookings/${bookingId}/finalpayment`);
+  };
+
+  const handleReviewParts = async (bookingId: string) => {
+    const booking = bookings.find((b) => b._id === bookingId);
+    if (booking) {
+      setSelectedPartsBooking(booking);
+      setIsPartsModalOpen(true);
+      setLoadingPartsData(true);
+
+      try {
+        const response = await getReplacementPartsApproval(bookingId);
+        console.log(
+          "response in the getReplacementpartsApproval function in the userbooking listing page:",
+          response
+        );
+        if (response.success) {
+          const mappedData: PartsApprovalData = {
+            bookingId: response.data.bookingId,
+            replacementParts: response.data.parts,
+            totalPartsAmount: response.data.totalPartsAmount,
+          };
+          setPartsData(mappedData);
+        } else {
+          showToast({
+            message: response.message || "Failed to load parts data",
+            type: "error",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching parts data:", error);
+        showToast({
+          message: "Failed to load replacement parts",
+          type: "error",
+        });
+      } finally {
+        setLoadingPartsData(false);
+      }
+    }
+  };
+
+  const handleApproveParts = async () => {
+    if (!selectedPartsBooking) return;
+
+    setIsApprovingParts(true);
+    try {
+      const response = await approveReplacementParts(
+        selectedPartsBooking._id,
+        true
+      );
+
+      if (response.success) {
+        setBookings(
+          bookings.map((booking) =>
+            booking._id === selectedPartsBooking._id
+              ? {
+                  ...booking,
+                  replacementPartsApproved: true,
+                  bookingAmount:
+                    booking.bookingAmount + (booking.totalPartsAmount || 0),
+                }
+              : booking
+          )
+        );
+
+        showToast({
+          message:
+            response.message || "Parts approved! Please proceed with payment.",
+          type: "success",
+        });
+
+        handlePartsModalClose();
+      } else {
+        showToast({
+          message: response.message || "Failed to approve parts",
+          type: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error approving parts:", error);
+      showToast({
+        message: "Failed to approve parts. Please try again.",
+        type: "error",
+      });
+    } finally {
+      setIsApprovingParts(false);
+    }
+  };
+
+  const handleRejectParts = async (rejectionReason: string) => {
+    if (!selectedPartsBooking) return;
+
+    setIsApprovingParts(true);
+    try {
+      const response = await approveReplacementParts(
+        selectedPartsBooking._id,
+        false,
+        rejectionReason
+      );
+
+      if (response.success) {
+        setBookings(
+          bookings.map((booking) =>
+            booking._id === selectedPartsBooking._id
+              ? {
+                  ...booking,
+                  replacementPartsApproved: false,
+                  partsRejectionReason: rejectionReason,
+                }
+              : booking
+          )
+        );
+
+        showToast({
+          message:
+            response.message || "Parts rejected. Technician has been notified.",
+          type: "success",
+        });
+
+        handlePartsModalClose();
+      } else {
+        showToast({
+          message: response.message || "Failed to reject parts",
+          type: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error rejecting parts:", error);
+      showToast({
+        message: "Failed to reject parts. Please try again.",
+        type: "error",
+      });
+    } finally {
+      setIsApprovingParts(false);
+    }
+  };
+
+  const handlePartsModalClose = () => {
+    setIsPartsModalOpen(false);
+    setSelectedPartsBooking(null);
+    setPartsData(null);
   };
 
   useEffect(() => {
@@ -389,7 +557,9 @@ export const UserBookingsList: React.FC = () => {
     handleCancelBooking,
     handleChatWithTechnician,
     handleRateService,
-    handlePayNow
+    undefined,
+    handlePayNow,
+    handleReviewParts 
   );
 
   return (
@@ -487,6 +657,23 @@ export const UserBookingsList: React.FC = () => {
             sending={sending}
             currentUserType="user"
           />
+
+          <Modal
+            isOpen={isPartsModalOpen}
+            onClose={handlePartsModalClose}
+            title="Review Replacement Parts"
+            cancelText=""
+            confirmText=""
+            className="max-w-4xl"
+            hideButtons={true}
+          >
+            <PartsApproval
+              partsData={partsData}
+              loading={loadingPartsData || isApprovingParts}
+              onApprove={handleApproveParts}
+              onReject={handleRejectParts}
+            />
+          </Modal>
         </div>
       </div>
     </UserLayout>

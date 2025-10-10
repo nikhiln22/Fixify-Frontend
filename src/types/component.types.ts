@@ -41,6 +41,7 @@ export interface ModalProps {
   fullContent?: boolean;
   className?: string;
   disabled?: boolean;
+  hideButtons?: boolean;
 }
 
 export interface OTPInputProps {
@@ -50,7 +51,7 @@ export interface OTPInputProps {
 }
 
 export interface Column<T> {
-  key: keyof T | "action";
+  key: keyof T | "action" | string;
   label: string;
   render?: (item: T, index: number) => React.ReactNode;
 }
@@ -284,6 +285,8 @@ export interface BookingSummaryProps {
   subtotal?: number;
   billedHours?: number;
   hourlyRate?: number;
+  partsAmount?: number;
+  isHourlyService?: boolean;
 }
 
 export interface WalletBalanceProps {

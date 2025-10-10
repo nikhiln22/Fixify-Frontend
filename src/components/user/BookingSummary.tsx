@@ -2,7 +2,7 @@ import React from "react";
 import Button from "../common/Button";
 import { BookingSummaryProps } from "../../types/component.types";
 import { buildCloudinaryUrl } from "../../utils/cloudinary/cloudinary";
-import { Ticket, ChevronRight, X, Info } from "lucide-react";
+import { Ticket, ChevronRight, X, Info, Package } from "lucide-react";
 
 export const BookingSummary: React.FC<BookingSummaryProps> = ({
   service,
@@ -20,8 +20,12 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
   subtotal = 0,
   billedHours = 0,
   hourlyRate = 0,
+  partsAmount = 0,
+  isHourlyService: isHourlyServiceProp,
 }) => {
-  const isHourlyService = service.serviceType === "hourly";
+  // ✅ Determine if hourly service from props or service object
+  const isHourlyService =
+    isHourlyServiceProp ?? service.serviceType === "hourly";
 
   const getServiceCharge = (): number => {
     if (isFinalPayment && isHourlyService) {
@@ -39,24 +43,31 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
   const totalDiscountAmount = offerDiscount + couponDiscount;
 
   const calculateFinalAmount = (): number => {
-    let amount = serviceCharge;
+    let amount = 0;
 
-    if (isFinalPayment && isHourlyService && advancePaid > 0) {
-      amount = amount - advancePaid;
-    }
-
-    if (offerData?.offerApplied && offerData.finalAmount !== undefined) {
-      amount = offerData.finalAmount;
-
-      if (isFinalPayment && isHourlyService && advancePaid > 0) {
+    if (isFinalPayment) {
+      if (isHourlyService) {
+        // ✅ Hourly service: service charges + parts - advance - discounts
+        amount = serviceCharge + partsAmount;
         amount = amount - advancePaid;
+        amount = amount - offerDiscount - couponDiscount;
+      } else {
+        // ✅ Fixed service: ONLY parts (no discounts, service already paid)
+        amount = partsAmount;
       }
-    } else if (offerDiscount > 0) {
-      amount = amount - offerDiscount;
-    }
+    } else {
+      // ✅ Initial booking
+      amount = serviceCharge;
 
-    if (couponDiscount > 0) {
-      amount = amount - couponDiscount;
+      if (offerData?.offerApplied && offerData.finalAmount !== undefined) {
+        amount = offerData.finalAmount;
+      } else if (offerDiscount > 0) {
+        amount = amount - offerDiscount;
+      }
+
+      if (couponDiscount > 0) {
+        amount = amount - couponDiscount;
+      }
     }
 
     return Math.max(0, amount);
@@ -66,9 +77,8 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
 
   const hasDiscount = offerData?.offerApplied || appliedCoupon;
 
-  const shouldShowDiscounts =
-    (isHourlyService && isFinalPayment) ||
-    (!isHourlyService && !isFinalPayment);
+  // ✅ Show discounts only for hourly services during final payment, or for any service during initial booking
+  const shouldShowDiscounts = isFinalPayment ? isHourlyService : true;
 
   const getOfferDisplayMessage = () => {
     if (!offerData) return "";
@@ -134,6 +144,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
 
       <hr className="my-4" />
 
+      {/* ✅ Info banner for hourly services during initial booking */}
       {isHourlyService && !isFinalPayment && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
           <div className="flex items-start gap-2">
@@ -151,6 +162,25 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
         </div>
       )}
 
+      {/* ✅ Info banner for fixed services with parts during final payment */}
+      {!isHourlyService && isFinalPayment && partsAmount > 0 && (
+        <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 mb-4">
+          <div className="flex items-start gap-2">
+            <Package className="w-4 h-4 text-purple-600 mt-0.5" />
+            <div>
+              <span className="text-sm text-purple-700 font-medium">
+                Parts Payment Only
+              </span>
+              <p className="text-xs text-purple-600 mt-1">
+                Service charges already paid. This payment is for replacement
+                parts only.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ Applied Coupon Display */}
       {shouldShowDiscounts && appliedCoupon && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
           <div className="flex items-center justify-between">
@@ -176,6 +206,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
         </div>
       )}
 
+      {/* ✅ Applied Offer Display */}
       {shouldShowDiscounts && offerData?.offerApplied && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
           <div className="flex items-center gap-2">
@@ -189,6 +220,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
         </div>
       )}
 
+      {/* ✅ Apply Coupon Button (only show when discounts are applicable) */}
       {shouldShowDiscounts && (
         <div
           onClick={onFetchCoupons}
@@ -210,72 +242,129 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
         </div>
       )}
 
+      {/* ✅ Payment Breakdown */}
       <div className="space-y-3 mb-6">
-        {isFinalPayment && isHourlyService ? (
+        {isFinalPayment ? (
           <>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Hourly Rate:</span>
-              <span className="font-medium">₹{hourlyRate}/hr</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Billed Hours:</span>
-              <span className="font-medium">× {billedHours}</span>
-            </div>
-            <div className="flex justify-between text-sm font-medium">
-              <span className="text-gray-900">Subtotal:</span>
-              <span className="text-gray-900">₹{subtotal}</span>
-            </div>
-            <hr className="my-2" />
+            {/* ✅ For hourly services: show service breakdown */}
+            {isHourlyService && (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Hourly Rate:</span>
+                  <span className="font-medium">₹{hourlyRate}/hr</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Billed Hours:</span>
+                  <span className="font-medium">× {billedHours}</span>
+                </div>
+                <div className="flex justify-between text-sm font-medium">
+                  <span className="text-gray-900">Service Subtotal:</span>
+                  <span className="text-gray-900">₹{subtotal}</span>
+                </div>
+              </>
+            )}
+
+            {/* ✅ Parts amount (for both hourly and fixed) */}
+            {partsAmount > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Replacement Parts:</span>
+                <span className="font-medium">₹{partsAmount}</span>
+              </div>
+            )}
+
+            {/* ✅ Total before deductions (only for hourly) */}
+            {isHourlyService && (
+              <>
+                <div className="flex justify-between text-sm font-semibold">
+                  <span className="text-gray-900">Total Amount:</span>
+                  <span className="text-gray-900">
+                    ₹{subtotal + partsAmount}
+                  </span>
+                </div>
+                <hr className="my-2" />
+              </>
+            )}
+
+            {/* ✅ Advance paid (only for hourly) */}
+            {isHourlyService && advancePaid > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-green-600">Advance Paid:</span>
+                <span className="font-medium text-green-600">
+                  -₹{advancePaid}
+                </span>
+              </div>
+            )}
+
+            {/* ✅ Discounts (only for hourly) */}
+            {shouldShowDiscounts &&
+              offerData?.offerApplied &&
+              offerDiscount > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-green-600">Offer Discount:</span>
+                  <span className="font-medium text-green-600">
+                    -₹{offerDiscount}
+                  </span>
+                </div>
+              )}
+
+            {shouldShowDiscounts && appliedCoupon && couponDiscount > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-green-600">Coupon Discount:</span>
+                <span className="font-medium text-green-600">
+                  -₹{couponDiscount}
+                </span>
+              </div>
+            )}
+
+            {shouldShowDiscounts && hasDiscount && (
+              <div className="flex justify-between text-sm font-medium">
+                <span className="text-green-600">Total Savings:</span>
+                <span className="text-green-600">-₹{totalDiscountAmount}</span>
+              </div>
+            )}
           </>
         ) : (
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Service Charge:</span>
-            <span className="font-medium">
-              {isHourlyService && !isFinalPayment
-                ? `₹${serviceCharge}/hr`
-                : `₹${serviceCharge}`}
-            </span>
-          </div>
-        )}
-
-        {isFinalPayment && advancePaid > 0 && (
-          <div className="flex justify-between text-sm">
-            <span className="text-green-600">Advance Paid:</span>
-            <span className="font-medium text-green-600">-₹{advancePaid}</span>
-          </div>
-        )}
-
-        {shouldShowDiscounts &&
-          offerData?.offerApplied &&
-          offerDiscount > 0 && (
+          <>
+            {/* ✅ Initial booking breakdown */}
             <div className="flex justify-between text-sm">
-              <span className="text-green-600">Offer Discount:</span>
-              <span className="font-medium text-green-600">
-                -₹{offerDiscount}
+              <span className="text-gray-600">Service Charge:</span>
+              <span className="font-medium">
+                {isHourlyService && !isFinalPayment
+                  ? `₹${serviceCharge}/hr`
+                  : `₹${serviceCharge}`}
               </span>
             </div>
-          )}
 
-        {shouldShowDiscounts && appliedCoupon && couponDiscount > 0 && (
-          <div className="flex justify-between text-sm">
-            <span className="text-green-600">Coupon Discount:</span>
-            <span className="font-medium text-green-600">
-              -₹{couponDiscount}
-            </span>
-          </div>
-        )}
+            {offerData?.offerApplied && offerDiscount > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-green-600">Offer Discount:</span>
+                <span className="font-medium text-green-600">
+                  -₹{offerDiscount}
+                </span>
+              </div>
+            )}
 
-        {shouldShowDiscounts && hasDiscount && (
-          <div className="flex justify-between text-sm font-medium">
-            <span className="text-green-600">Total Savings:</span>
-            <span className="text-green-600">
-              -₹{isFinalPayment ? totalDiscountAmount : totalDiscountAmount}
-            </span>
-          </div>
+            {appliedCoupon && couponDiscount > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-green-600">Coupon Discount:</span>
+                <span className="font-medium text-green-600">
+                  -₹{couponDiscount}
+                </span>
+              </div>
+            )}
+
+            {hasDiscount && (
+              <div className="flex justify-between text-sm font-medium">
+                <span className="text-green-600">Total Savings:</span>
+                <span className="text-green-600">-₹{totalDiscountAmount}</span>
+              </div>
+            )}
+          </>
         )}
 
         <hr className="my-2" />
 
+        {/* ✅ Final Amount to Pay */}
         <div className="flex justify-between text-lg font-semibold">
           <span>
             {isFinalPayment
@@ -287,10 +376,17 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
           <span className="text-black">₹{getAdvanceAmount()}</span>
         </div>
 
+        {/* ✅ Additional info text */}
         {isHourlyService && !isFinalPayment && (
           <div className="text-xs text-gray-500 mt-2">
             Remaining amount will be calculated based on actual hours worked and
             charged after service completion
+          </div>
+        )}
+
+        {!isHourlyService && isFinalPayment && partsAmount === 0 && (
+          <div className="text-xs text-gray-500 mt-2">
+            No additional charges. Service payment is complete.
           </div>
         )}
       </div>

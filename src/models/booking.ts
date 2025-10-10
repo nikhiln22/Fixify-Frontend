@@ -57,6 +57,8 @@ export interface IBooking {
   serviceEndTime: Date;
   actualDuration: Date;
   bookingAmount: number;
+  hasReplacementParts: boolean;
+  replacementPartsApproved: boolean | null;
   bookingStatus:
     | "Pending"
     | "Booked"
@@ -83,6 +85,8 @@ export interface IBooking {
   cancellationDate?: Date;
   cancellationReason?: string;
   isRated: boolean;
+  totalPartsAmount?: number;
+  partsRejectionReason?:string;
   createdAt: Date;
   updatedAt: Date;
 }
