@@ -23,7 +23,6 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
   partsAmount = 0,
   isHourlyService: isHourlyServiceProp,
 }) => {
-  // ✅ Determine if hourly service from props or service object
   const isHourlyService =
     isHourlyServiceProp ?? service.serviceType === "hourly";
 
@@ -47,16 +46,13 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
 
     if (isFinalPayment) {
       if (isHourlyService) {
-        // ✅ Hourly service: service charges + parts - advance - discounts
         amount = serviceCharge + partsAmount;
         amount = amount - advancePaid;
         amount = amount - offerDiscount - couponDiscount;
       } else {
-        // ✅ Fixed service: ONLY parts (no discounts, service already paid)
         amount = partsAmount;
       }
     } else {
-      // ✅ Initial booking
       amount = serviceCharge;
 
       if (offerData?.offerApplied && offerData.finalAmount !== undefined) {
@@ -77,8 +73,8 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
 
   const hasDiscount = offerData?.offerApplied || appliedCoupon;
 
-  // ✅ Show discounts only for hourly services during final payment, or for any service during initial booking
-  const shouldShowDiscounts = isFinalPayment ? isHourlyService : true;
+  const shouldShowCoupons = !isHourlyService || isFinalPayment;
+  const shouldShowDiscounts = !isHourlyService || isFinalPayment;
 
   const getOfferDisplayMessage = () => {
     if (!offerData) return "";
@@ -144,7 +140,6 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
 
       <hr className="my-4" />
 
-      {/* ✅ Info banner for hourly services during initial booking */}
       {isHourlyService && !isFinalPayment && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
           <div className="flex items-start gap-2">
@@ -162,7 +157,6 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
         </div>
       )}
 
-      {/* ✅ Info banner for fixed services with parts during final payment */}
       {!isHourlyService && isFinalPayment && partsAmount > 0 && (
         <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 mb-4">
           <div className="flex items-start gap-2">
@@ -180,7 +174,6 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
         </div>
       )}
 
-      {/* ✅ Applied Coupon Display */}
       {shouldShowDiscounts && appliedCoupon && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
           <div className="flex items-center justify-between">
@@ -206,7 +199,6 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
         </div>
       )}
 
-      {/* ✅ Applied Offer Display */}
       {shouldShowDiscounts && offerData?.offerApplied && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
           <div className="flex items-center gap-2">
@@ -220,8 +212,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
         </div>
       )}
 
-      {/* ✅ Apply Coupon Button (only show when discounts are applicable) */}
-      {shouldShowDiscounts && (
+      {shouldShowCoupons && (
         <div
           onClick={onFetchCoupons}
           className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 cursor-pointer hover:bg-blue-100 transition-colors"
@@ -242,11 +233,9 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
         </div>
       )}
 
-      {/* ✅ Payment Breakdown */}
       <div className="space-y-3 mb-6">
         {isFinalPayment ? (
           <>
-            {/* ✅ For hourly services: show service breakdown */}
             {isHourlyService && (
               <>
                 <div className="flex justify-between text-sm">
@@ -264,7 +253,6 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
               </>
             )}
 
-            {/* ✅ Parts amount (for both hourly and fixed) */}
             {partsAmount > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Replacement Parts:</span>
@@ -272,7 +260,6 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
               </div>
             )}
 
-            {/* ✅ Total before deductions (only for hourly) */}
             {isHourlyService && (
               <>
                 <div className="flex justify-between text-sm font-semibold">
@@ -285,7 +272,6 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
               </>
             )}
 
-            {/* ✅ Advance paid (only for hourly) */}
             {isHourlyService && advancePaid > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-green-600">Advance Paid:</span>
@@ -295,7 +281,6 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
               </div>
             )}
 
-            {/* ✅ Discounts (only for hourly) */}
             {shouldShowDiscounts &&
               offerData?.offerApplied &&
               offerDiscount > 0 && (
@@ -325,7 +310,6 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
           </>
         ) : (
           <>
-            {/* ✅ Initial booking breakdown */}
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Service Charge:</span>
               <span className="font-medium">
@@ -364,7 +348,6 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
 
         <hr className="my-2" />
 
-        {/* ✅ Final Amount to Pay */}
         <div className="flex justify-between text-lg font-semibold">
           <span>
             {isFinalPayment
@@ -376,7 +359,6 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
           <span className="text-black">₹{getAdvanceAmount()}</span>
         </div>
 
-        {/* ✅ Additional info text */}
         {isHourlyService && !isFinalPayment && (
           <div className="text-xs text-gray-500 mt-2">
             Remaining amount will be calculated based on actual hours worked and

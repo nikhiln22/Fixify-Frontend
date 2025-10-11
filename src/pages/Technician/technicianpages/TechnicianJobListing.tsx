@@ -98,6 +98,8 @@ export const TechnicianJobListing: React.FC = () => {
     error,
   } = usePaginatedList(getBookings, "", filterStatus, itemsPerPage);
 
+  console.log("bookings in techncian job listing:", bookings);
+
   const handleViewDetails = (bookingId: string) => {
     navigate(`/technician/jobdetails/${bookingId}`);
   };
@@ -133,11 +135,6 @@ export const TechnicianJobListing: React.FC = () => {
 
   const handleAddParts = async (bookingId: string) => {
     const booking = bookings.find((b) => b._id === bookingId);
-
-    console.log("=== DEBUG: handleAddParts ===");
-    console.log("bookingId:", bookingId);
-    console.log("booking found:", !!booking);
-    console.log("full booking object:", JSON.stringify(booking, null, 2));
 
     if (booking) {
       setSelectedPartsBooking(booking);
@@ -218,7 +215,6 @@ export const TechnicianJobListing: React.FC = () => {
     setSelectedPartsData({ parts: [], total: 0 });
   };
 
-  // ✅ Wrap handlePartsChange with useCallback to prevent re-creation
   const handlePartsChange = useCallback(
     (selectedParts: SelectedPart[], totalAmount: number) => {
       setSelectedPartsData({ parts: selectedParts, total: totalAmount });
@@ -298,14 +294,25 @@ export const TechnicianJobListing: React.FC = () => {
     try {
       const booking = bookings.find((b) => b._id === bookingId);
 
+      console.log("booking in handlestart:", booking);
+
       const isHourlyService =
         booking &&
         typeof booking.serviceId === "object" &&
         booking.serviceId.serviceType === "hourly";
 
+      console.log("isHourly value in technician job listing:", isHourlyService);
+
       const serviceStartTime = isHourlyService ? new Date() : undefined;
 
+      console.log(
+        "serviceStartTime in the technician job listing page:",
+        serviceStartTime
+      );
+
       const response = await startService(bookingId, serviceStartTime);
+
+      console.log("response in the handlesatrtservice function:", response);
 
       if (response.success) {
         setBookings(

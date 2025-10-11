@@ -3,12 +3,12 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import UserLayout from "../../../layouts/UserLayout";
 import Button from "../../../components/common/Button";
 import Banner from "../../../components/common/Banner";
-import { verifyPaymentSession } from "../../../services/bookingService";
+import { verifyFinalPaymentStripeSession } from "../../../services/bookingService";
 import { showToast } from "../../../utils/toast";
 import dayjs from "dayjs";
 import { IBooking } from "../../../models/booking";
 import technicianBanner from "../../../assets/technician Banner.png";
-import { CheckCircle, Clock, Calendar } from "lucide-react";
+import { CheckCircle, Clock, Calendar, Package } from "lucide-react";
 
 export const UserFinalPaymentSuccess: React.FC = () => {
   const navigate = useNavigate();
@@ -24,12 +24,12 @@ export const UserFinalPaymentSuccess: React.FC = () => {
       if (sessionId && !hasVerified.current) {
         hasVerified.current = true;
         try {
-          const res = await verifyPaymentSession(sessionId);
-          if (res.success && res.data) {
-            setBooking(res.data);
+          const res = await verifyFinalPaymentStripeSession(sessionId);
+          if (res.success && res.data?.booking) {
+            setBooking(res.data.booking);
             showToast({
               type: "success",
-              message: "Final payment completed successfully!",
+              message: res.message || "Final payment completed successfully!",
             });
           } else {
             showToast({
@@ -58,7 +58,6 @@ export const UserFinalPaymentSuccess: React.FC = () => {
     verify();
   }, [sessionId]);
 
-  // ✅ Calculate duration in hours from start and end times
   const calculateDurationInHours = (): number => {
     if (!booking?.serviceStartTime || !booking?.serviceEndTime) return 0;
 
@@ -70,7 +69,6 @@ export const UserFinalPaymentSuccess: React.FC = () => {
     return durationInHours;
   };
 
-  // ✅ Format duration for display
   const formatDuration = (): string => {
     const hours = calculateDurationInHours();
 
@@ -87,7 +85,6 @@ export const UserFinalPaymentSuccess: React.FC = () => {
     }`;
   };
 
-  // ✅ Calculate billed hours
   const calculateBilledHours = (): number => {
     const duration = calculateDurationInHours();
     if (duration === 0) return 0;
@@ -167,8 +164,18 @@ export const UserFinalPaymentSuccess: React.FC = () => {
   const payment =
     typeof booking.paymentId === "object" ? booking.paymentId : null;
 
+  const isHourlyService = service?.serviceType === "hourly";
   const billedHours = calculateBilledHours();
   const hasServiceDuration = booking.serviceStartTime && booking.serviceEndTime;
+  const hasReplacementParts =
+    booking.hasReplacementParts && booking.replacementPartsApproved === true;
+  const partsAmount = booking.totalPartsAmount || 0;
+
+  const finalPaymentAmount = payment?.amountPaid || 0;
+
+  const serviceSubtotal = isHourlyService
+    ? billedHours * (service?.hourlyRate || 0)
+    : 0;
 
   return (
     <UserLayout>
@@ -176,7 +183,6 @@ export const UserFinalPaymentSuccess: React.FC = () => {
 
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-2xl mx-auto px-4">
-          {/* Success Header */}
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
             <div className="text-center">
               <div className="flex justify-center mb-6">
@@ -189,23 +195,25 @@ export const UserFinalPaymentSuccess: React.FC = () => {
                 Payment Successful!
               </h1>
               <p className="text-lg text-gray-600 mb-6">
-                Your service has been completed and payment processed
+                {isHourlyService
+                  ? "Your service has been completed and final payment processed"
+                  : "Payment for replacement parts completed successfully"}
               </p>
 
-              {/* Payment Summary */}
               <div className="bg-green-50 border-2 border-green-200 rounded-xl p-6 mb-6">
-                <p className="text-sm text-green-700 mb-2">Amount Paid</p>
-                <p className="text-4xl font-bold text-green-900">
-                  ₹{booking.bookingAmount.toFixed(2)}
+                <p className="text-sm text-green-700 mb-2">
+                  Final Payment Amount
                 </p>
-                {payment?.advanceAmount && (
+                <p className="text-4xl font-bold text-green-900">
+                  ₹{payment?.amountPaid ? payment?.amountPaid.toFixed(2) : 0}
+                </p>
+                {payment?.advanceAmount && isHourlyService && (
                   <p className="text-sm text-green-700 mt-2">
-                    (Includes ₹{payment.advanceAmount} advance paid earlier)
+                    (₹{payment.advanceAmount} advance paid earlier)
                   </p>
                 )}
               </div>
 
-              {/* Transaction Details */}
               <div className="text-left space-y-3 mb-6">
                 <div className="flex justify-between items-center py-2 border-b">
                   <span className="text-gray-600 flex items-center">
@@ -254,14 +262,18 @@ export const UserFinalPaymentSuccess: React.FC = () => {
                     {service?.name || "N/A"}
                   </p>
                 </div>
-                {service?.serviceType === "hourly" && (
-                  <div className="text-right">
-                    <p className="text-sm text-gray-600">Service Type</p>
-                    <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                      Hourly Service
-                    </span>
-                  </div>
-                )}
+                <div className="text-right">
+                  <p className="text-sm text-gray-600">Service Type</p>
+                  <span
+                    className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${
+                      isHourlyService
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-purple-100 text-purple-800"
+                    }`}
+                  >
+                    {isHourlyService ? "Hourly Service" : "Fixed Service"}
+                  </span>
+                </div>
               </div>
 
               <div className="flex justify-between">
@@ -286,7 +298,7 @@ export const UserFinalPaymentSuccess: React.FC = () => {
                 </div>
               </div>
 
-              {hasServiceDuration && (
+              {hasServiceDuration && isHourlyService && (
                 <>
                   <div className="flex justify-between">
                     <div>
@@ -331,58 +343,132 @@ export const UserFinalPaymentSuccess: React.FC = () => {
           </div>
 
           {/* Payment Breakdown */}
-          {service?.serviceType === "hourly" && hasServiceDuration && (
-            <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Payment Breakdown
-              </h2>
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Hourly Rate</span>
-                  <span className="font-medium">
-                    ₹{service.hourlyRate}/hour
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Billed Hours</span>
-                  <span className="font-medium">× {billedHours}</span>
-                </div>
-                <div className="flex justify-between text-sm font-medium border-t pt-3">
-                  <span className="text-gray-900">Subtotal</span>
-                  <span className="text-gray-900">
-                    ₹{(billedHours * (service.hourlyRate || 0)).toFixed(2)}
-                  </span>
-                </div>
-                {payment?.advanceAmount && (
-                  <div className="flex justify-between text-sm text-green-600">
-                    <span>Advance Paid</span>
-                    <span>- ₹{payment.advanceAmount.toFixed(2)}</span>
+          <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Payment Breakdown
+            </h2>
+            <div className="space-y-3">
+              {isHourlyService ? (
+                <>
+                  {/* Hourly Service Breakdown */}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Hourly Rate</span>
+                    <span className="font-medium">
+                      ₹{service?.hourlyRate || 0}/hour
+                    </span>
                   </div>
-                )}
-                {payment?.originalAmount &&
-                  payment.amountPaid &&
-                  payment.originalAmount > payment.amountPaid && (
-                    <div className="flex justify-between text-sm text-green-600">
-                      <span>Discounts Applied</span>
-                      <span>
-                        - ₹
-                        {(payment.originalAmount - payment.amountPaid).toFixed(
-                          2
-                        )}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Billed Hours</span>
+                    <span className="font-medium">× {billedHours}</span>
+                  </div>
+                  <div className="flex justify-between text-sm font-medium border-t pt-3">
+                    <span className="text-gray-900">Service Charges</span>
+                    <span className="text-gray-900">
+                      ₹{serviceSubtotal.toFixed(2)}
+                    </span>
+                  </div>
+
+                  {hasReplacementParts && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600 flex items-center">
+                        <Package className="w-4 h-4 mr-1" />
+                        Replacement Parts
+                      </span>
+                      <span className="font-medium">
+                        ₹{partsAmount.toFixed(2)}
                       </span>
                     </div>
                   )}
-                <div className="flex justify-between text-lg font-bold border-t-2 pt-3">
-                  <span className="text-gray-900">Final Amount Paid</span>
-                  <span className="text-green-600">
-                    ₹{booking.bookingAmount.toFixed(2)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
 
-          {/* Action Buttons */}
+                  <div className="flex justify-between text-sm font-medium border-t pt-3">
+                    <span className="text-gray-900">Total Amount</span>
+                    <span className="text-gray-900">
+                      ₹{(serviceSubtotal + partsAmount).toFixed(2)}
+                    </span>
+                  </div>
+
+                  {payment?.advanceAmount && (
+                    <div className="flex justify-between text-sm text-green-600">
+                      <span>Advance Already Paid</span>
+                      <span>- ₹{payment.advanceAmount.toFixed(2)}</span>
+                    </div>
+                  )}
+
+                  {/* {payment?.offerDiscount && payment.offerDiscount > 0 && (
+                    <div className="flex justify-between text-sm text-green-600">
+                      <span>Offer Discount</span>
+                      <span>- ₹{payment.offerDiscount.toFixed(2)}</span>
+                    </div>
+                  )} */}
+
+                  {/* {payment?.couponDiscount && payment.couponDiscount > 0 && (
+                    <div className="flex justify-between text-sm text-green-600">
+                      <span>Coupon Discount</span>
+                      <span>- ₹{payment.couponDiscount.toFixed(2)}</span>
+                    </div>
+                  )} */}
+
+                  <div className="flex justify-between text-lg font-bold border-t-2 pt-3">
+                    <span className="text-gray-900">Final Payment</span>
+                    <span className="text-green-600">
+                      ₹{finalPaymentAmount.toFixed(2)}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
+                    <p className="text-sm text-purple-800 mb-2">
+                      Service payment was completed during booking
+                    </p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-purple-600">
+                        Service Amount (Already Paid)
+                      </span>
+                      <span className="font-semibold text-purple-900">
+                        ₹{booking.bookingAmount.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {hasReplacementParts && (
+                    <>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600 flex items-center">
+                          <Package className="w-4 h-4 mr-1" />
+                          Replacement Parts
+                        </span>
+                        <span className="font-medium">
+                          ₹{partsAmount.toFixed(2)}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between text-lg font-bold border-t-2 pt-3">
+                        <span className="text-gray-900">
+                          Parts Payment (This Payment)
+                        </span>
+                        <span className="text-green-600">
+                          ₹{finalPaymentAmount.toFixed(2)}
+                        </span>
+                      </div>
+
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+                        <p className="text-xs text-blue-800">
+                          <strong>Total Paid:</strong> ₹
+                          {(booking.bookingAmount + finalPaymentAmount).toFixed(
+                            2
+                          )}{" "}
+                          (Service + Parts)
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Next Steps */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">

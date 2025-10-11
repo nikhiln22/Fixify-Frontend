@@ -751,7 +751,6 @@ export const UserFinalPayment: React.FC = () => {
         </div>
       </div>
 
-      {/* ✅ Only show coupon modal for hourly services */}
       {isHourlyService && (
         <CouponModal
           isOpen={isCouponModalOpen}
