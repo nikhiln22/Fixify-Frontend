@@ -47,6 +47,8 @@ export const startService = async (
       payload.serviceStartTime = serviceStartTime.toISOString();
     }
 
+    console.log("payload in start service function:", payload);
+
     const response = await axiosInstance.patch(
       `${BOOKINGS_API}/${bookingId}/start`,
       payload
@@ -190,6 +192,8 @@ export const getBookings = async (
 
     const response = await axiosInstance.get(url);
 
+    console.log("resposne in the front end booking service:", response);
+
     return {
       data: response.data.data?.bookings || [],
       totalPages: response.data.data?.pagination?.pages || 1,
@@ -280,6 +284,18 @@ export const completeFinalPayment = async (paymentData: {
     return response.data;
   } catch (error) {
     console.log("error occured while making the payment:", error);
+    throw error;
+  }
+};
+
+export const verifyFinalPaymentStripeSession = async (sessionId: string) => {
+  try {
+    const response = await axiosInstance.get(
+      `${BOOKINGS_API}/${sessionId}/verify-final-payment`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error occured while verifypayment session:", error);
     throw error;
   }
 };
