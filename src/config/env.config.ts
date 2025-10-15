@@ -8,3 +8,5 @@ export const envConfig = {
       "https://api.olamaps.io/places/v1/reverse-geocode",
   },
 };
+
+console.log("apiUrl:", envConfig.apiUrl);
