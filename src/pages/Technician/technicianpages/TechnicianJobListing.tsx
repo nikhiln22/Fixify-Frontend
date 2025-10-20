@@ -496,7 +496,6 @@ export const TechnicianJobListing: React.FC = () => {
         selectedChatBooking._id,
         messageText,
         userId,
-        "technician"
       );
 
       if (response.success && response.data) {

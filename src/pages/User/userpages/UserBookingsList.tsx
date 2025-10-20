@@ -332,7 +332,6 @@ export const UserBookingsList: React.FC = () => {
         selectedChatBooking._id,
         messageText,
         technicianId,
-        "user"
       );
 
       if (response.success && response.data) {

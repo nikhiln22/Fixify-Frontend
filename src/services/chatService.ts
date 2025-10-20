@@ -35,24 +35,18 @@ export const getChatMessages = async (
 export const sendChatMessage = async (
   bookingId: string,
   messageText: string,
-  recipientId: string,
-  role: string
+  recipientId: string
 ): Promise<{
   data?: IChat;
   success: boolean;
   message?: string;
 }> => {
   try {
-    console.log(`sending chat message for ${role}`);
-
     const baseUrl = `${CHAT_API}/${bookingId}/send`;
 
     const requestBody = {
       messageText,
-      senderType: role,
-      ...(role === "user"
-        ? { technicianId: recipientId }
-        : { userId: recipientId }),
+      recipientId,
     };
 
     console.log("Request body:", requestBody);
@@ -67,7 +61,7 @@ export const sendChatMessage = async (
       message: response.data.message,
     };
   } catch (error) {
-    console.error(`error sending chat message for ${role}:`, error);
+    console.error(`error sending chat message:`, error);
     throw error;
   }
 };
