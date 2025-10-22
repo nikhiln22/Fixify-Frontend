@@ -331,7 +331,7 @@ export const UserBookingsList: React.FC = () => {
       const response = await sendChatMessage(
         selectedChatBooking._id,
         messageText,
-        technicianId,
+        technicianId
       );
 
       if (response.success && response.data) {
@@ -558,7 +558,7 @@ export const UserBookingsList: React.FC = () => {
     handleRateService,
     undefined,
     handlePayNow,
-    handleReviewParts 
+    handleReviewParts
   );
 
   return (
