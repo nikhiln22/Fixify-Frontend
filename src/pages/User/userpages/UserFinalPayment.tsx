@@ -44,7 +44,7 @@ export const UserFinalPayment: React.FC = () => {
   const [subtotal, setSubtotal] = useState(0);
   const [advancePaid, setAdvancePaid] = useState(300);
   const [partsAmount, setPartsAmount] = useState(0);
-  const [isHourlyService, setIsHourlyService] = useState(false); // ✅ Track if hourly service
+  const [isHourlyService, setIsHourlyService] = useState(false);
 
   const [currentOffer, setCurrentOffer] = useState<OfferData | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<CouponData | null>(null);
@@ -63,7 +63,6 @@ export const UserFinalPayment: React.FC = () => {
   const calculatePaymentBreakdown = useCallback(() => {
     if (!booking) return;
 
-    // ✅ Only calculate hourly charges if it's an hourly service
     if (isHourlyService && booking.serviceStartTime && booking.serviceEndTime) {
       const startTime = new Date(booking.serviceStartTime).getTime();
       const endTime = new Date(booking.serviceEndTime).getTime();
@@ -78,13 +77,11 @@ export const UserFinalPayment: React.FC = () => {
       const total = billed * hourlyRate;
       setSubtotal(total);
     } else {
-      // ✅ For fixed services, no service charges (already paid)
       setSubtotal(0);
       setBilledHours(0);
       setActualDuration(0);
     }
 
-    // ✅ Set parts amount if parts were approved
     if (
       booking.hasReplacementParts &&
       booking.replacementPartsApproved === true
@@ -96,7 +93,6 @@ export const UserFinalPayment: React.FC = () => {
   }, [booking, hourlyRate, isHourlyService]);
 
   const applyBestOfferForFinalPayment = useCallback(async () => {
-    // ✅ Only apply offers for hourly services with service charges
     if (!booking || !booking.serviceId || !isHourlyService || subtotal <= 0)
       return;
 
@@ -108,7 +104,6 @@ export const UserFinalPayment: React.FC = () => {
           ? booking.serviceId
           : booking.serviceId._id;
 
-      // ✅ Apply offer ONLY to service subtotal, NOT parts
       const offerResponse = await applyBestOffer(serviceId, subtotal);
       console.log("Offer response for final payment:", offerResponse);
 
@@ -147,7 +142,7 @@ export const UserFinalPayment: React.FC = () => {
       if (response.success && response.data) {
         const bookingData = response.data;
 
-        if (bookingData.bookingStatus !== "Payment Pending") {
+        if (bookingData?.paymentId?.paymentStatus !== "Partial Paid") {
           showToast({
             message: "This booking does not require payment",
             type: "warning",
@@ -158,7 +153,6 @@ export const UserFinalPayment: React.FC = () => {
 
         setBooking(bookingData);
 
-        // ✅ Check if hourly service
         const isHourly =
           typeof bookingData.serviceId === "object" &&
           bookingData.serviceId.serviceType === "hourly";

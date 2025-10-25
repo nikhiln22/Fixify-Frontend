@@ -206,9 +206,7 @@ export const getBookingsColumns = (
 
           {role === "user" &&
             handlePayNow &&
-            (item.bookingStatus === "Payment Pending" ||
-              (item.bookingStatus === "Completed" &&
-                item.paymentId?.paymentStatus === "Partial Paid")) && (
+            item.paymentId?.paymentStatus === "Partial Paid" && (
               <button
                 onClick={() => handlePayNow(item._id)}
                 className="px-5 py-2.5 rounded bg-yellow-500 text-white hover:bg-yellow-600 transition-colors text-sm font-semibold animate-pulse"
