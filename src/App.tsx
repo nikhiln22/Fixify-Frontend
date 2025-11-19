@@ -11,8 +11,25 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import { PageNotFound } from "./components/common/PageNotFound";
+import { useEffect } from "react";
 
 function App() {
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((registration) => {
+          console.log(
+            "Service Worker registered successfully:",
+            registration.scope
+          );
+        })
+        .catch((error) => {
+          console.error("Service Worker registration failed:", error);
+        });
+    }
+  }, []);
+
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
