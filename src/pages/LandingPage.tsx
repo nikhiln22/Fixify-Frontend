@@ -7,7 +7,6 @@ import technicianImage from "../assets/images/technician.jpg";
 import capenterHero from "../assets/images/carpenter.jpg";
 import plumberHero from "../assets/images/plumber.jpg";
 
-
 export const LandingPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
