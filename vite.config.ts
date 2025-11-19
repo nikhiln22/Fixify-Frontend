@@ -15,10 +15,8 @@ export default defineConfig({
         type: "module",
       },
 
-      // 🔥 Your icons live directly in /public
       includeAssets: ["favicon.ico", "icon-192x192.png", "icon-512x512.png"],
 
-      // 🔥 FIXIFY Manifest
       manifest: {
         name: "Fixify",
         short_name: "Fixify",
@@ -30,7 +28,6 @@ export default defineConfig({
         start_url: "/",
         orientation: "portrait-primary",
 
-        // 🔥 icons directly in /public (NO /icons/)
         icons: [
           {
             src: "icon-192x192.png",
@@ -47,7 +44,6 @@ export default defineConfig({
         ],
       },
 
-      // 🔥 Fix build error + enable smart caching
       workbox: {
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
 
